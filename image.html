@@ -4,26 +4,24 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Image Tools — ToolSwift</title>
-  <meta name="description" content="Batch resize, convert, compress, crop, rotate, add text/watermark, filters — 100% client-side, no upload."/>
+  <meta name="description" content="Best free online image editor: crop, rotate, filters, watermark, compress, WebP — 100% private, no upload"/>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <style>
-    .tool-card { transition: all 0.4s; }
-    .tool-card:hover { transform: translateY(-8px) scale(1.05); }
     .drop-zone { border: 4px dashed #94a3b8; transition: all 0.3s; }
     .drop-zone.dragover { border-color: #6366f1; background-color: #eef2ff; }
-    canvas { max-width: 100%; height: auto; }
+    canvas { max-width: 100%; height: auto; border-radius: 1rem; }
   </style>
 </head>
 <body class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 dark:from-slate-950 dark:to-slate-900 min-h-screen">
 
-  <!-- Header with navigation to other tools -->
+  <!-- Header -->
   <header class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-lg sticky top-0 z-50">
     <div class="container mx-auto px-6 py-5 flex flex-wrap items-center justify-between">
       <a href="index.html" class="flex items-center gap-3">
         <h1 class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">ToolSwift</h1>
       </a>
-      <nav class="flex flex-wrap gap-4 mt-4 sm:mt-0">
+      <nav class="flex flex-wrap gap-6 mt-4 sm:mt-0 text-lg">
         <a href="pdf.html" class="text-slate-700 dark:text-slate-300 hover:text-indigo-600"><i class="fa-solid fa-file-pdf mr-1"></i>PDF</a>
         <a href="image.html" class="text-indigo-600 font-bold"><i class="fa-solid fa-image mr-1"></i>Image</a>
         <a href="qr.html" class="text-slate-700 dark:text-slate-300 hover:text-indigo-600"><i class="fa-solid fa-qrcode mr-1"></i>QR</a>
@@ -37,41 +35,37 @@
   <div class="container mx-auto px-6 py-16 max-w-7xl">
     <div class="text-center mb-12">
       <h2 class="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-500 to-teal-600 mb-4">Image Tools</h2>
-      <p class="text-2xl text-slate-700 dark:text-slate-300">Resize • Convert • Compress • Crop • Rotate • Filters • Watermark — All in your browser</p>
-      <div class="flex justify-center gap-6 mt-8">
-        <span class="px-6 py-3 bg-green-100 text-green-800 rounded-full font-bold">100% Private</span>
-        <span class="px-6 py-3 bg-purple-100 text-purple-800 rounded-full font-bold">No Uploads</span>
-      </div>
+      <p class="text-2xl text-slate-700 dark:text-slate-300">Crop • Rotate • Filters • Watermark • Resize • Compress • WebP — All 100% in your browser</p>
     </div>
 
-    <!-- Upload Area -->
-    <div id="dropZone" class="drop-zone bg-white dark:bg-slate-800 rounded-3xl p-16 mb-12 text-center cursor-pointer">
+    <!-- Upload Zone -->
+    <div id="dropZone" class="drop-zone bg-white dark:bg-slate-800 rounded-3xl p-20 mb-12 text-center cursor-pointer">
       <i class="fa-solid fa-cloud-arrow-up text-8xl text-slate-400 mb-6"></i>
       <p class="text-2xl font-semibold text-slate-700 dark:text-slate-300">Drop images here or click to select</p>
       <input type="file" id="fileInput" multiple accept="image/*" class="hidden">
     </div>
 
-    <!-- Image List & Editor -->
-    <div id="imageContainer" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10"></div>
+    <!-- Images Grid -->
+    <div id="imageContainer" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10 mb-20"></div>
 
-    <!-- Global Controls (appear when images loaded) -->
-    <div id="globalControls" class="hidden fixed bottom-8 left-1/2 -translate-x-1/2 bg-white dark:bg-slate-800 rounded-3xl shadow-2xl p-8 max-w-4xl w-full z-40">
-      <h3 class="text-2xl font-bold mb-6 text-center">Batch Actions (applies to all loaded images)</h3>
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <!-- Batch Actions (now safely BELOW everything) -->
+    <div id="globalControls" class="hidden bg-white dark:bg-slate-800 rounded-3xl shadow-2xl p-8 max-w-5xl mx-auto -mt-10">
+      <h3 class="text-2xl font-bold mb-6 text-center">Batch Actions (applies to all images)</h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
         <div>
           <label class="block text-lg font-medium mb-2">Output Format</label>
           <select id="outputFormat" class="w-full px-4 py-3 rounded-xl border dark:bg-slate-700">
             <option value="image/jpeg">JPEG</option>
-            <option value="image/webp" selected>WebP (best compression)</option>
+            <option value="image/webp" selected>WebP (best quality/size)</option>
             <option value="image/png">PNG</option>
           </select>
         </div>
         <div>
-          <label class="block text-lg font-medium mb-2">Quality (WebP/JPEG) <span id="qualityValue">85</span>%</label>
-          <input type="range" id="quality" min="1" max="100" value="85" class="w-full">
+          <label class="block text-lg font-medium mb-2">Quality <span id="qualityValue">90</span>%</label>
+          <input type="range" id="quality" min="1" max="100" value="90" class="w-full">
         </div>
-        <div class="md:col-span-2">
-          <button id="downloadAll" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 rounded-xl font-bold text-xl hover:from-indigo-700 hover:to-purple-700 transition">
+        <div>
+          <button id="downloadAll" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 rounded-xl font-bold text-xl hover:from-indigo-700 hover:to-purple-700">
             Download All as ZIP
           </button>
         </div>
@@ -79,17 +73,16 @@
     </div>
   </div>
 
-  <!-- Individual Image Editor Template (hidden) -->
+  <!-- Template -->
   <template id="imageTemplate">
     <div class="image-item bg-white dark:bg-slate-800 rounded-3xl shadow-xl overflow-hidden">
       <div class="relative">
-        <canvas class="edited-canvas w-full"></canvas>
+        <canvas class="edited-canvas"></canvas>
         <button class="remove-btn absolute top-4 right-4 bg-red-600 text-white p-3 rounded-full hover:bg-red-700">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
       <div class="p-6 space-y-6">
-        <!-- Controls -->
         <div class="grid grid-cols-2 gap-4">
           <button class="crop-btn bg-blue-600 text-white py-3 rounded-xl font-medium hover:bg-blue-700">Crop</button>
           <button class="rotate-left bg-indigo-600 text-white py-3 rounded-xl font-medium hover:bg-indigo-700"><i class="fa-solid fa-rotate-left mr-2"></i>Rotate Left</button>
@@ -97,29 +90,26 @@
           <button class="flip-h bg-purple-600 text-white py-3 rounded-xl font-medium hover:bg-purple-700">Flip Horizontal</button>
         </div>
 
-        <!-- Filters -->
         <div>
           <label class="block text-lg font-medium mb-3">Filters</label>
           <div class="grid grid-cols-3 sm:grid-cols-6 gap-3">
             <button class="filter-btn p-3 rounded-xl border-2" data-filter="none">None</button>
             <button class="filter-btn p-3 rounded-xl border-2" data-filter="grayscale(100%)">Gray</button>
             <button class="filter-btn p-3 rounded-xl border-2" data-filter="sepia(100%)">Sepia</button>
-            <button class="filter-btn p-3 rounded-xl border-2" data-filter="blur(5px)">Blur</button>
-            <button class="filter-btn p-3 rounded-xl border-2" data-filter="brightness(1.5)">Bright</button>
+            <button class="filter-btn p-3 rounded-xl border-2" data-filter="blur(4px)">Blur</button>
+            <button class="filter-btn p-3 rounded-xl border-2" data-filter="brightness(1.4)">Bright</button>
             <button class="filter-btn p-3 rounded-xl border-2" data-filter="contrast(1.5)">Contrast</button>
           </div>
         </div>
 
-        <!-- Watermark -->
         <div>
-          <label class="block text-lg font-medium mb-2">Add Text Watermark</label>
+          <label class="block text-lg font-medium mb-2">Text Watermark</label>
           <div class="flex gap-3">
-            <input type="text" class="watermark-text flex-1 px-4 py-3 rounded-xl border dark:bg-slate-700" placeholder="Your text">
-            <button class="add-watermark bg-gradient-to-r from-pink-600 to-rose-600 text-white px-6 py-3 rounded-xl font-medium hover:from-pink-700 hover:to-rose-700">Add</button>
+            <input type="text" class="watermark-text flex-1 px-4 py-3 rounded-xl border dark:bg-slate-700" placeholder="Enter text">
+            <button class="add-watermark bg-gradient-to-r from-pink-600 to-rose-600 text-white px-6 py-3 rounded-xl">Add</button>
           </div>
         </div>
 
-        <!-- Resize -->
         <div class="grid grid-cols-2 gap-4">
           <div>
             <label class="block text-lg font-medium mb-2">Width (px)</label>
@@ -131,7 +121,7 @@
           </div>
         </div>
 
-        <button class="download-single w-full bg-gradient-to-r from-green-600 to-teal-600 text-white py-4 rounded-xl font-bold hover:from-green-700 hover:to-teal-700 transition">
+        <button class="download-single w-full bg-gradient-to-r from-green-600 to-teal-600 text-white py-4 rounded-xl font-bold hover:from-green-700 hover:to-teal-700">
           Download This Image
         </button>
       </div>
@@ -151,32 +141,22 @@
     const template = document.getElementById('imageTemplate');
     const globalControls = document.getElementById('globalControls');
     const outputFormat = document.getElementById('outputFormat');
-    const qualitySlider = document.getElementById('quality');
+    const quality = document.getElementById('quality');
     const qualityValue = document.getElementById('qualityValue');
-    const downloadAllBtn = document.getElementById('downloadAll');
+    const downloadAll = document.getElementById('downloadAll');
 
     let images = [];
 
-    // Drag & drop
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(event => {
-      dropZone.addEventListener(event, e => {
-        e.preventDefault();
-        e.stopPropagation();
-      });
-    });
-    ['dragenter', 'dragover'].forEach(event => {
-      dropZone.addEventListener(event, () => dropZone.classList.add('dragover'));
-    });
-    ['dragleave', 'drop'].forEach(event => {
-      dropZone.addEventListener(event, () => dropZone.classList.remove('dragover'));
-    });
-    dropZone.addEventListener('click', () => fileInput.click());
-    dropZone.addEventListener('drop', handleFiles);
-    fileInput.addEventListener('change', () => handleFiles(fileInput.files));
+    // Drag & Drop
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(e => dropZone.addEventListener(e, ev => { ev.preventDefault(); ev.stopPropagation(); }));
+    ['dragenter', 'dragover'].forEach(e => dropZone.addEventListener(e, () => dropZone.classList.add('dragover')));
+    ['dragleave', 'drop'].forEach(e => dropZone.addEventListener(e, () => dropZone.classList.remove('dragover')));
+    dropZone.onclick = () => fileInput.click();
+    dropZone.ondrop = e => handleFiles(e.dataTransfer.files);
+    fileInput.onchange = () => handleFiles(fileInput.files);
 
     function handleFiles(files) {
-      [...files].forEach(file => {
-        if (!file.type.startsWith('image/')) return;
+      [...files].filter(f => f.type.startsWith('image/')).forEach(file => {
         const reader = new FileReader();
         reader.onload = e => addImage(e.target.result, file.name);
         reader.readAsDataURL(file);
@@ -184,164 +164,140 @@
     }
 
     function addImage(src, filename) {
-      const clone = template.content.cloneNode(true);
-      const canvas = clone.querySelector('.edited-canvas');
-      const ctx = canvas.getContext('2d');
       const img = new Image();
       img.onload = () => {
+        const clone = template.content.cloneNode(true);
+        const canvas = clone.querySelector('.edited-canvas');
+        const ctx = canvas.getContext('2d');
         canvas.width = img.width;
         canvas.height = img.height;
         ctx.drawImage(img, 0, 0);
-        setupControls(clone, canvas, ctx, img, filename);
+
+        const state = {
+          canvas, ctx, img, filename,
+          rotation: 0,
+          flipH: 1,
+          filter: 'none'
+        };
+
+        setupControls(clone, state);
         imageContainer.appendChild(clone);
-        images.push({ canvas, ctx, img, filename, element: imageContainer.lastElementChild });
+        images.push(state);
         globalControls.classList.remove('hidden');
       };
       img.src = src;
     }
 
-    function setupControls(root, canvas, ctx, originalImg, filename) {
-      const cropBtn = root.querySelector('.crop-btn');
-      const rotateLeft = root.querySelector('.rotate-left');
-      const rotateRight = root.querySelector('.rotate-right');
-      const flipH = root.querySelector('.flip-h');
-      const filters = root.querySelectorAll('.filter-btn');
-      const watermarkInput = root.querySelector('.watermark-text');
-      const addWatermark = root.querySelector('.add-watermark');
-      const resizeW = root.querySelector('.resize-w');
-      const resizeH = root.querySelector('.resize-h');
-      const downloadSingle = root.querySelector('.download-single');
-      const removeBtn = root.querySelector('.remove-btn');
-
+    function setupControls(root, state) {
+      const { canvas, ctx, img, filename } = state;
       let cropper = null;
-      let currentFilter = 'none';
-      let scaleX = 1;
 
-      function redraw() {
-        ctx.filter = currentFilter;
+      function render() {
+        ctx.filter = state.filter;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.save();
-        ctx.scale(scaleX, 1);
-        ctx.drawImage(originalImg, 0, 0, scaleX === -1 ? -canvas.width : canvas.width, canvas.height);
+        ctx.translate(canvas.width / 2, canvas.height / 2);
+        ctx.rotate(state.rotation * Math.PI / 180);
+        ctx.scale(state.flipH, 1);
+        ctx.drawImage(img, -img.width / 2, -img.height / 2, img.width, img.height);
         ctx.restore();
       }
 
-      cropBtn.addEventListener('click', () => {
+      // Crop
+      root.querySelector('.crop-btn').onclick = () => {
         if (cropper) {
           const cropped = cropper.getCroppedCanvas();
           canvas.width = cropped.width;
           canvas.height = cropped.height;
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
           ctx.drawImage(cropped, 0, 0);
-          originalImg.src = canvas.toDataURL();
+          img.src = canvas.toDataURL();
+          state.rotation = 0; state.flipH = 1;
           cropper.destroy();
           cropper = null;
-          cropBtn.textContent = 'Crop';
+          render();
         } else {
-          const imageElement = document.createElement('img');
-          imageElement.src = canvas.toDataURL();
-          root.querySelector('.relative').appendChild(imageElement);
-          cropper = new Cropper(imageElement, { aspectRatio: NaN, viewMode: 1 });
-          cropBtn.textContent = 'Apply Crop';
+          const tempImg = document.createElement('img');
+          tempImg.src = canvas.toDataURL();
+          root.querySelector('.relative').appendChild(tempImg);
+          cropper = new Cropper(tempImg, { viewMode: 1 });
         }
-      });
+      };
 
-      rotateLeft.addEventListener('click', () => {
-        ctx.translate(canvas.width / 2, canvas.height / 2);
-        ctx.rotate(-90 * Math.PI / 180);
-        ctx.translate(-canvas.width / 2, -canvas.height / 2);
-        [canvas.width, canvas.height] = [canvas.height, canvas.width];
-        redraw();
-      });
+      // Rotate & Flip
+      root.querySelector('.rotate-left').onclick = () => { state.rotation -= 90; render(); };
+      root.querySelector('.rotate-right').onclick = () => { state.rotation += 90; render(); };
+      root.querySelector('.flip-h').onclick = () => { state.flipH *= -1; render(); };
 
-      rotateRight.addEventListener('click', () => {
-        ctx.translate(canvas.width / 2, canvas.height / 2);
-        ctx.rotate(90 * Math.PI / 180);
-        ctx.translate(-canvas.width / 2, -canvas.height / 2);
-        [canvas.width, canvas.height] = [canvas.height, canvas.width];
-        redraw();
-      });
-
-      flipH.addEventListener('click', () => {
-        scaleX *= -1;
-        redraw();
-      });
-
-      filters.forEach(btn => {
-        btn.addEventListener('click', () => {
-          filters.forEach(b => b.classList.remove('ring-4', 'ring-indigo-500'));
+      // Filters
+      root.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.onclick = () => {
+          document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('ring-4', 'ring-indigo-500'));
           btn.classList.add('ring-4', 'ring-indigo-500');
-          currentFilter = btn.dataset.filter === 'none' ? 'none' : btn.dataset.filter;
-          redraw();
-        });
+          state.filter = btn.dataset.filter === 'none' ? 'none' : btn.dataset.filter;
+          render();
+        };
       });
 
-      addWatermark.addEventListener('click', () => {
-        const text = watermarkInput.value || 'Watermark';
-        ctx.font = '60px Arial';
-        ctx.fillStyle = 'rgba(255,255,255,0.6)';
-        ctx.strokeStyle = 'rgba(0,0,0,0.6)';
-        ctx.lineWidth = 8;
+      // Watermark
+      root.querySelector('.add-watermark').onclick = () => {
+        const text = root.querySelector('.watermark-text').value || 'Watermark';
+        ctx.font = 'bold 80px Arial';
+        ctx.fillStyle = 'rgba(255,255,255,0.7)';
+        ctx.strokeStyle = 'rgba(0,0,0,0.7)';
+        ctx.lineWidth = 12;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.strokeText(text, canvas.width / 2, canvas.height / 2);
         ctx.fillText(text, canvas.width / 2, canvas.height / 2);
-        watermarkInput.value = '';
+      };
+
+      // Resize
+      const wInput = root.querySelector('.resize-w');
+      const hInput = root.querySelector('.resize-h');
+      [wInput, hInput].forEach(input => input.oninput = () => {
+        let w = parseInt(wInput.value) || img.width;
+        let h = parseInt(hInput.value) || img.height;
+        if (wInput.value) h = img.height * (w / img.width);
+        if (hInput.value) w = img.width * (h / img.height);
+        canvas.width = w; canvas.height = h;
+        render();
+        wInput.value = w; hInput.value = h;
       });
 
-      resizeW.addEventListener('input', applyResize);
-      resizeH.addEventListener('input', applyResize);
+      // Download single
+      root.querySelector('.download-single').onclick = () => {
+        canvas.toBlob(blob => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = filename.replace(/\.[^.]+$/, '') + '_edited' + (outputFormat.value === 'image/png' ? '.png' : '.webp');
+          a.click();
+        }, outputFormat.value, quality.value / 100);
+      };
 
-      function applyResize() {
-        const w = parseInt(resizeW.value) || null;
-        const h = parseInt(resizeH.value) || null;
-        if (!w && !h) return;
-        const newCanvas = document.createElement('canvas');
-        if (w && h) {
-          newCanvas.width = w;
-          newCanvas.height = h;
-        } else if (w) {
-          newCanvas.width = w;
-          newCanvas.height = originalImg.height * (w / originalImg.width);
-        } else {
-          newCanvas.height = h;
-          newCanvas.width = originalImg.width * (h / originalImg.height);
-        }
-        newCanvas.getContext('2d').drawImage(canvas, 0, 0, newCanvas.width, newCanvas.height);
-        canvas.width = newCanvas.width;
-        canvas.height = newCanvas.height;
-        ctx.drawImage(newCanvas, 0, 0);
-        originalImg.src = canvas.toDataURL();
-      }
-
-      downloadSingle.addEventListener('click', () => {
-        const link = document.createElement('a');
-        link.download = filename.replace(/\.[^.]+$/, '') + '_edited.webp';
-        link.href = canvas.toDataURL(outputFormat.value, qualitySlider.value / 100);
-        link.click();
-      });
-
-      removeBtn.addEventListener('click', () => {
+      // Remove
+      root.querySelector('.remove-btn').onclick = () => {
         root.remove();
-        images = images.filter(i => i.element !== root);
+        images = images.filter(i => i.canvas !== canvas);
         if (images.length === 0) globalControls.classList.add('hidden');
-      });
+      };
 
-      redraw();
+      render();
     }
 
-    qualitySlider.addEventListener('input', () => qualityValue.textContent = qualitySlider.value);
+    quality.oninput = () => qualityValue.textContent = quality.value;
 
-    downloadAllBtn.addEventListener('click', async () => {
+    downloadAll.onclick = async () => {
       const zip = new JSZip();
       images.forEach((img, i) => {
-        const data = img.canvas.toDataURL(outputFormat.value, qualitySlider.value / 100);
-        const base64 = data.split(',')[1];
-        zip.file(img.filename.replace(/\.[^.]+$/, '') + '_edited' + (outputFormat.value === 'image/png' ? '.png' : '.webp'), base64, {base64: true});
+        img.canvas.toBlob(blob => {
+          zip.file(img.filename.replace(/\.[^.]+$/, '') + '_edited' + (outputFormat.value === 'image/png' ? '.png' : '.webp'), blob);
+          if (i === images.length - 1) {
+            zip.generateAsync({type:'blob'}).then(content => saveAs(content, 'ToolSwift_images.zip'));
+          }
+        }, outputFormat.value, quality.value / 100);
       });
-      const content = await zip.generateAsync({type: 'blob'});
-      saveAs(content, 'ToolSwift_images.zip');
-    });
+    };
   </script>
 </body>
 </html>
