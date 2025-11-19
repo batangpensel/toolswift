@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>PDF Merger + Rotate - ToolSwift</title>
-  <meta name="description" content="Merge PDFs, convert & rotate images with smooth animations — 100% private."/>
+  <meta name="description" content="Merge PDFs & images with perfect rotation preview — 100% private, in-browser."/>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -14,80 +14,70 @@
   <script src="https://unpkg.com/downloadjs@1.4.8/download.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <style>
-    .rotate-animation {
-      transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
-      transform-style: preserve-3d;
-    }
+    .rotate-preview { transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
     .drag-over { border-color: #8b5cf6 !important; background: rgba(139,92,246,0.1); }
-    .thumbnail:hover { transform: translateY(-8px) scale(1.03); }
-    .rotate-btn:hover { transform: scale(1.2); background: rgba(255,255,255,0.3) !important; }
+    .thumbnail:hover { transform: translateY(-8px); }
   </style>
 </head>
 <body class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 dark:from-slate-950 dark:to-slate-900 min-h-screen">
-  <div id="root" class="max-w-5xl mx-auto p-6 pt-12"></div>
+  <div id="root" class="max-w-6xl mx-auto p-6 pt-12"></div>
 
 <script type="text/babel">
 const { useState, useRef, useEffect } = React;
 const { PDFDocument, PageSizes, degrees } = PDFLib;
 
-const formatBytes = (b) => b ? `${(b / 1024 / 1024).toFixed(2)} MB` : '0 MB';
+const formatBytes = (b) => b < 1024*1024 ? `${(b/1024).toFixed(1)} KB` : `${(b/1024/1024).toFixed(2)} MB`;
 
 const App = () => {
-  const [items, setItems] = useState([]); // {file, rotation: 0, previewUrl}
+  const [items, setItems] = useState([]); // {file, rotation: 0, previewUrl: dataURL}
   const [isDragging, setIsDragging] = useState(false);
   const [isMerging, setIsMerging] = useState(false);
   const [error, setError] = useState("");
   const listRef = useRef();
   const fileInputRef = useRef();
 
-  // Re-render rotated preview using canvas
-  const rotatePreview = (index, newRotation) => {
-    const item = items[index];
-    if (!item.previewUrl || !item.file.type.startsWith('image/')) return;
-
-    const img = new Image();
-    img.onload = () => {
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-
-      const rad = (newRotation * Math.PI) / 180;
-      const sin = Math.abs(Math.sin(rad));
-      const cos = Math.abs(Math.cos(rad));
-
-      canvas.width = img.width * cos + img.height * sin;
-      canvas.height = img.width * sin + img.height * cos;
-
-      ctx.translate(canvas.width / 2, canvas.height / 2);
-      ctx.rotate(rad);
-      ctx.drawImage(img, -img.width / 2, -img.height / 2);
-
-      const newUrl = canvas.toDataURL(item.file.type);
-      URL.revokeObjectURL(item.previewUrl);
-      setItems(prev => prev.map((it, i) => i === index ? {...it, previewUrl: newUrl} : it));
-    };
-    img.src = item.previewUrl;
-  };
-
-  const rotateItem = (index, direction) => {
-    setItems(prev => {
-      const newItems = [...prev];
-      const oldRot = newItems[index].rotation;
-      const newRot = (oldRot + direction + 360) % 360;
-      newItems[index].rotation = newRot;
-
-      // Trigger animated rotation via CSS class
-      const el = document.getElementById(`thumb-${index}`);
-      if (el) {
-        el.style.transform = `rotate(${newRot}deg)`;
-        // Trigger reflow to restart animation
-        void el.offsetWidth;
+  // Generate correct rotated preview (handles 90°/270° dimension swap)
+  const generateRotatedPreview = (file, rotation) => {
+    return new Promise((resolve) => {
+      if (!file.type.startsWith('image/')) {
+        resolve(null);
+        return;
       }
 
-      // Update actual image data after animation
-      setTimeout(() => rotatePreview(index, newRot), 500);
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
 
-      return newItems;
+        const rad = (rotation * Math.PI) / 180;
+        const sin = Math.abs(Math.sin(rad));
+        const cos = Math.abs(Math.cos(rad));
+
+        canvas.width = img.naturalWidth * cos + img.naturalHeight * sin;
+        canvas.height = img.naturalWidth * sin + img.naturalHeight * cos;
+
+        ctx.translate(canvas.width / 2, canvas.height / 2);
+        ctx.rotate(rad);
+        ctx.drawImage(img, -img.naturalWidth / 2, -img.naturalHeight / 2);
+
+        resolve(canvas.toDataURL(file.type));
+      };
+      img.src = URL.createObjectURL(file);
     });
+  };
+
+  const rotateItem = async (index, direction) => {
+    const newRotation = (items[index].rotation + direction + 360) % 360;
+
+    // Optimistic UI update
+    setItems(prev => prev.map((it, i) => i === index ? {...it, rotation: newRotation} : it));
+
+    // Generate accurate rotated preview
+    const newPreview = await generateRotatedPreview(items[index].file, newRotation);
+    if (newPreview) {
+      if (items[index].previewUrl) URL.revokeObjectURL(items[index].previewUrl);
+      setItems(prev => prev.map((it, i) => i === index ? {...it, previewUrl: newPreview} : it));
+    }
   };
 
   useEffect(() => {
@@ -106,24 +96,30 @@ const App = () => {
     }
   }, [items]);
 
-  const handleDrop = (e) => {
+  const handleDrop = async (e) => {
     e.preventDefault();
     setIsDragging(false);
-    const files = [...e.dataTransfer?.files || e.target.files || []].filter(f =>
-      f.type === "application/pdf" || f.type.startsWith("image/")
-    );
-    if (!files.length) return setError("Only PDFs and images allowed");
+    setError("");
 
-    const newItems = files.map(file => ({
-      file,
-      rotation: 0,
-      previewUrl: file.type.startsWith('image/') ? URL.createObjectURL(file) : null
-    }));
+    const files = [...(e.dataTransfer?.files || e.target.files || [])]
+      .filter(f => f.type === "application/pdf" || f.type.startsWith("image/"));
+
+    if (!files.length) return setError("Please add PDF or image files");
+
+    const newItems = [];
+    for (const file of files) {
+      const preview = file.type.startsWith('image/') 
+        ? await generateRotatedPreview(file, 0)
+        : null;
+
+      newItems.push({ file, rotation: 0, previewUrl: preview });
+    }
+
     setItems(prev => [...prev, ...newItems]);
   };
 
   const removeItem = (i) => {
-    if (items[i]?.previewUrl) URL.revokeObjectURL(items[i].previewUrl);
+    if (items[i].previewUrl?.startsWith('blob:')) URL.revokeObjectURL(items[i].previewUrl);
     setItems(prev => prev.filter((_, idx) => idx !== i));
   };
 
@@ -146,29 +142,29 @@ const App = () => {
             pdfDoc.addPage(p);
           });
         } else {
-          const img = file.type.includes('png')
+          const embed = file.type.includes('png') 
             ? await pdfDoc.embedPng(buf)
             : await pdfDoc.embedJpg(buf);
 
           const page = pdfDoc.addPage(PageSizes.A4);
           const { width, height } = page.getSize();
           const margin = 60;
-          const maxW = width - 2 * margin;
-          const maxH = height - 2 * margin;
 
-          let imgW = img.width;
-          let imgH = img.height;
+          let imgW = embed.width;
+          let imgH = embed.height;
           if (rotation % 180 !== 0) [imgW, imgH] = [imgH, imgW];
 
-          const scale = Math.min(maxW / imgW, maxH / imgH, 1);
-          const drawW = imgW * scale;
-          const drawH = imgH * scale;
+          const scale = Math.min(
+            (width - margin*2) / imgW,
+            (height - margin*2) / imgH,
+            1
+          );
 
-          page.drawImage(img, {
-            x: width / 2 - drawW / 2,
-            y: height / 2 - drawH / 2,
-            width: drawW,
-            height: drawH,
+          page.drawImage(embed, {
+            x: width/2 - (imgW * scale)/2,
+            y: height/2 - (imgH * scale)/2,
+            width: imgW * scale,
+            height: imgH * scale,
             rotate: degrees(rotation),
           });
         }
@@ -177,7 +173,7 @@ const App = () => {
       const bytes = await pdfDoc.save();
       download(bytes, `ToolSwift_merged_${new Date().toISOString().slice(0,10)}.pdf`, "application/pdf");
     } catch (err) {
-      setError("Merge failed: " + err.message);
+      setError("Failed to merge: " + err.message);
     } finally {
       setIsMerging(false);
     }
@@ -186,22 +182,22 @@ const App = () => {
   return (
     <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl p-8 md:p-12">
       <h1 className="text-5xl font-black text-center mb-4 text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
-        PDF Merger + Rotate
+        PDF Merger + Perfect Rotate
       </h1>
       <p className="text-center text-xl text-slate-600 dark:text-slate-400 mb-10">
-        Smooth animations • Perfect orientation • 100% private
+        See exactly how your files will look • 100% private • Instant
       </p>
 
       <div
         onDragOver={e => {e.preventDefault(); setIsDragging(true)}}
         onDragLeave={() => setIsDragging(false)}
         onDrop={handleDrop}
-        className={`border-4 border-dashed rounded-3xl p-20 text-center transition-all ${isDragging ? 'drag-over border-purple-500' : 'border-blue-400'}`}
+        className={`border-4 border-dashed rounded-3xl p-24 text-center transition-all ${isDragging ? 'drag-over border-purple-500' : 'border-blue-400'}`}
       >
         <i className="fa-solid fa-cloud-arrow-up text-9xl text-blue-600 mb-6"></i>
-        <p className="text-3xl font-bold mb-4">Drop files anywhere</p>
+        <p className="text-3xl font-bold mb-4">Drop files here</p>
         <label className="inline-block px-12 py-5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-2xl text-xl font-bold cursor-pointer hover:shadow-2xl">
-          Or click to choose
+          Choose Files
           <input ref={fileInputRef} type="file" multiple accept=".pdf,image/*" className="hidden" onChange={handleDrop}/>
         </label>
       </div>
@@ -212,11 +208,11 @@ const App = () => {
             <h3 className="text-2xl font-bold">
               {items.length} file{items.length > 1 ? 's' : ''} • {formatBytes(items.reduce((s,i)=>s+i.file.size,0))}
             </h3>
-            <div className="flex gap-4">
-              <button onClick={() => fileInputRef.current?.click()} className="text-blue-600 hover:underline">
+            <div className="flex gap-6">
+              <button onClick={() => fileInputRef.current?.click()} className="text-blue-600 hover:underline text-lg">
                 <i className="fas fa-plus mr-2"></i>Add more
               </button>
-              <button onClick={() => { items.forEach(i => i.previewUrl && URL.revokeObjectURL(i.previewUrl)); setItems([]); }} className="text-red-600 hover:underline">
+              <button onClick={() => { items.forEach(i => i.previewUrl && URL.revokeObjectURL(i.previewUrl)); setItems([]); }} className="text-red-600 hover:underline text-lg">
                 Clear all
               </button>
             </div>
@@ -229,12 +225,11 @@ const App = () => {
                   <i className="fas fa-grip-vertical text-3xl text-white drop-shadow-lg"></i>
                 </div>
 
-                {/* Rotation Controls */}
                 <div className="absolute top-12 left-3 z-20 flex flex-col gap-3 opacity-0 group-hover:opacity-100 transition">
-                  <button onClick={() => rotateItem(i, -90)} className="rotate-btn bg-black/70 text-white p-3 rounded-full shadow-lg">
+                  <button onClick={() => rotateItem(i, -90)} className="bg-black/70 text-white p-3 rounded-full shadow-lg hover:scale-110 transition">
                     <i className="fas fa-undo-alt"></i>
                   </button>
-                  <button onClick={() => rotateItem(i, 90)} className="rotate-btn bg-black/70 text-white p-3 rounded-full shadow-lg">
+                  <button onClick={() => rotateItem(i, 90)} className="bg-black/70 text-white p-3 rounded-full shadow-lg hover:scale-110 transition">
                     <i className="fas fa-redo-alt"></i>
                   </button>
                 </div>
@@ -243,20 +238,27 @@ const App = () => {
                   <i className="fas fa-times"></i>
                 </button>
 
-                <div id={`thumb-${i}`} className="rotate-animation w-full h-56 flex items-center justify-center bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-800 dark:to-slate-900 overflow-hidden">
+                <div className="h-64 flex items-center justify-center bg-gradient-to-br from-slate-200 to-slate-300 dark:from-slate-800 dark:to-slate-900 p-4">
                   {item.previewUrl ? (
-                    <img src={item.previewUrl} alt="" className="max-w-full max-h-full object-contain shadow-2xl" style={{transform: `rotate(${item.rotation}deg)`}} />
+                    <img src={item.previewUrl} alt="preview" className="max-w-full max-h-full object-contain rounded-lg shadow-2xl rotate-preview" />
                   ) : (
                     <div className="text-center">
-                      <i className={`fa-solid fa-file-pdf text-8xl ${item.rotation ? 'text-red-500' : 'text-red-400'} mb-3`}></i>
-                      {item.rotation !== 0 && <div className="bg-black/70 text-white px-3 py-1 rounded-full text-sm">Rotated {item.rotation}°</div>}
+                      <i className="fa-solid fa-file-pdf text-8xl text-red-500 mb-3"></i>
+                      {item.rotation !== 0 && (
+                        <div className="inline-block bg-purple-600 text-white px-4 py-2 rounded-full font-bold">
+                          Rotated {item.rotation}°
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
 
-                <div className="p-4 text-center bg-white dark:bg-slate-900">
+                <div className="p-4 bg-white dark:bg-slate-900">
                   <p className="text-sm font-semibold truncate">{item.file.name}</p>
-                  <p className="text-xs text-slate-500">{formatBytes(item.file.size)}{item.rotation ? ` • ${item.rotation}°` : ''}</p>
+                  <p className="text-xs text-slate-500">
+                    {formatBytes(item.file.size)}
+                    {item.rotation !== 0 && ` • ${item.rotation}° rotated`}
+                  </p>
                 </div>
               </div>
             ))}
@@ -267,12 +269,12 @@ const App = () => {
           <button
             onClick={mergePDF}
             disabled={isMerging}
-            className="w-full mt-12 bg-gradient-to-r from-blue-600 to-purple-600 disabled:opacity-60 text-white py-7 rounded-3xl text-3xl font-bold hover:shadow-2xl transition flex items-center justify-center gap-4"
+            className="w-full mt-12 bg-gradient-to-r from-blue-600 to-purple-600 disabled:opacity-60 text-white py-8 rounded-3xl text-3xl font-bold hover:shadow-2xl transition flex items-center justify-center gap-4"
           >
             {isMerging ? (
-              <>Merging... <i className="fas fa-spinner fa-spin"></i></>
+              <>Merging... <i className="fas fa-spinner fa-spin text-4xl"></i></>
             ) : (
-              <>Download Merged PDF <i className="fas fa-download"></i></>
+              <>Download Final PDF <i className="fas fa-download"></i></>
             )}
           </button>
         </div>
@@ -280,7 +282,7 @@ const App = () => {
 
       <p className="text-center mt-16">
         <a href="index.html" className="text-blue-600 hover:underline text-xl font-medium">
-          ← All Tools
+          ← Back to All Tools
         </a>
       </p>
     </div>
