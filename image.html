@@ -1,229 +1,347 @@
 <!DOCTYPE html>
 <html lang="en" class="dark scroll-smooth">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Batch Image Resizer & Converter - ToolSwift</title>
-  <meta name="description" content="Resize, convert, and compress multiple images instantly in your browser — no upload, fully private."/>
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Tools — ToolSwift</title>
+  <meta name="description" content="Batch resize, convert, compress, crop, rotate, add text/watermark, filters — 100% client-side, no upload."/>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"/>
-   
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <script src="https://unpkg.com/babel-standalone@7/babel.min.js"></script>
-
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <script>
-    tailwind.config = {
-      darkMode: 'class',
-      theme: { extend: { fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui'] } } }
-    }
-  </script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <style>
-    .preview-grid { scrollbar-width: thin; }
-    .remove-btn:hover { background: rgba(239,68,68,0.2); }
+    .tool-card { transition: all 0.4s; }
+    .tool-card:hover { transform: translateY(-8px) scale(1.05); }
+    .drop-zone { border: 4px dashed #94a3b8; transition: all 0.3s; }
+    .drop-zone.dragover { border-color: #6366f1; background-color: #eef2ff; }
+    canvas { max-width: 100%; height: auto; }
   </style>
 </head>
 <body class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 dark:from-slate-950 dark:to-slate-900 min-h-screen">
-  <div class="max-w-6xl mx-auto px-6 py-12">
+
+  <!-- Header with navigation to other tools -->
+  <header class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-lg sticky top-0 z-50">
+    <div class="container mx-auto px-6 py-5 flex flex-wrap items-center justify-between">
+      <a href="index.html" class="flex items-center gap-3">
+        <h1 class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">ToolSwift</h1>
+      </a>
+      <nav class="flex flex-wrap gap-4 mt-4 sm:mt-0">
+        <a href="pdf.html" class="text-slate-700 dark:text-slate-300 hover:text-indigo-600"><i class="fa-solid fa-file-pdf mr-1"></i>PDF</a>
+        <a href="image.html" class="text-indigo-600 font-bold"><i class="fa-solid fa-image mr-1"></i>Image</a>
+        <a href="qr.html" class="text-slate-700 dark:text-slate-300 hover:text-indigo-600"><i class="fa-solid fa-qrcode mr-1"></i>QR</a>
+        <a href="ocr.html" class="text-slate-700 dark:text-slate-300 hover:text-indigo-600"><i class="fa-solid fa-eye mr-1"></i>OCR</a>
+        <a href="speed.html" class="text-slate-700 dark:text-slate-300 hover:text-indigo-600"><i class="fa-solid fa-gauge-high mr-1"></i>Speed</a>
+        <a href="password.html" class="text-slate-700 dark:text-slate-300 hover:text-indigo-600"><i class="fa-solid fa-key mr-1"></i>Password</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container mx-auto px-6 py-16 max-w-7xl">
     <div class="text-center mb-12">
-      <h1 class="text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-500 to-teal-600 mb-4">
-        Batch Image Resizer & Converter
-      </h1>
-      <p class="text-xl text-slate-600 dark:text-slate-400">Resize • Convert • Compress — 100% in your browser, no servers</p>
+      <h2 class="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-500 to-teal-600 mb-4">Image Tools</h2>
+      <p class="text-2xl text-slate-700 dark:text-slate-300">Resize • Convert • Compress • Crop • Rotate • Filters • Watermark — All in your browser</p>
+      <div class="flex justify-center gap-6 mt-8">
+        <span class="px-6 py-3 bg-green-100 text-green-800 rounded-full font-bold">100% Private</span>
+        <span class="px-6 py-3 bg-purple-100 text-purple-800 rounded-full font-bold">No Uploads</span>
+      </div>
     </div>
 
-    <div id="root"></div>
+    <!-- Upload Area -->
+    <div id="dropZone" class="drop-zone bg-white dark:bg-slate-800 rounded-3xl p-16 mb-12 text-center cursor-pointer">
+      <i class="fa-solid fa-cloud-arrow-up text-8xl text-slate-400 mb-6"></i>
+      <p class="text-2xl font-semibold text-slate-700 dark:text-slate-300">Drop images here or click to select</p>
+      <input type="file" id="fileInput" multiple accept="image/*" class="hidden">
+    </div>
+
+    <!-- Image List & Editor -->
+    <div id="imageContainer" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10"></div>
+
+    <!-- Global Controls (appear when images loaded) -->
+    <div id="globalControls" class="hidden fixed bottom-8 left-1/2 -translate-x-1/2 bg-white dark:bg-slate-800 rounded-3xl shadow-2xl p-8 max-w-4xl w-full z-40">
+      <h3 class="text-2xl font-bold mb-6 text-center">Batch Actions (applies to all loaded images)</h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label class="block text-lg font-medium mb-2">Output Format</label>
+          <select id="outputFormat" class="w-full px-4 py-3 rounded-xl border dark:bg-slate-700">
+            <option value="image/jpeg">JPEG</option>
+            <option value="image/webp" selected>WebP (best compression)</option>
+            <option value="image/png">PNG</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-lg font-medium mb-2">Quality (WebP/JPEG) <span id="qualityValue">85</span>%</label>
+          <input type="range" id="quality" min="1" max="100" value="85" class="w-full">
+        </div>
+        <div class="md:col-span-2">
+          <button id="downloadAll" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 rounded-xl font-bold text-xl hover:from-indigo-700 hover:to-purple-700 transition">
+            Download All as ZIP
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <script type="text/babel">
-    const { useState, useRef } = React;
+  <!-- Individual Image Editor Template (hidden) -->
+  <template id="imageTemplate">
+    <div class="image-item bg-white dark:bg-slate-800 rounded-3xl shadow-xl overflow-hidden">
+      <div class="relative">
+        <canvas class="edited-canvas w-full"></canvas>
+        <button class="remove-btn absolute top-4 right-4 bg-red-600 text-white p-3 rounded-full hover:bg-red-700">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="p-6 space-y-6">
+        <!-- Controls -->
+        <div class="grid grid-cols-2 gap-4">
+          <button class="crop-btn bg-blue-600 text-white py-3 rounded-xl font-medium hover:bg-blue-700">Crop</button>
+          <button class="rotate-left bg-indigo-600 text-white py-3 rounded-xl font-medium hover:bg-indigo-700"><i class="fa-solid fa-rotate-left mr-2"></i>Rotate Left</button>
+          <button class="rotate-right bg-indigo-600 text-white py-3 rounded-xl font-medium hover:bg-indigo-700"><i class="fa-solid fa-rotate-right mr-2"></i>Rotate Right</button>
+          <button class="flip-h bg-purple-600 text-white py-3 rounded-xl font-medium hover:bg-purple-700">Flip Horizontal</button>
+        </div>
 
-    const App = () => {
-      const [files, setFiles] = useState([]);
-      const [width, setWidth] = useState("");
-      const [height, setHeight] = useState("");
-      const [format, setFormat] = useState("image/webp");
-      const [quality, setQuality] = useState(0.92);
-      const [keepRatio, setKeepRatio] = useState(true);
-      const [processing, setProcessing] = useState(false);
-      const fileInputRef = useRef(null);
-
-      const addFiles = (newFiles) => {
-        const newFileObjects = Array.from(newFiles).map(file => ({
-          file,
-          id: Math.random().toString(36).substr(2, 9),
-          preview: URL.createObjectURL(file)
-        }));
-        setFiles(prev => [...prev, ...newFileObjects]);
-      };
-
-      const removeFile = (id) => {
-        setFiles(prev => {
-          const fileObj = prev.find(f => f.id === id);
-          if (fileObj) URL.revokeObjectURL(fileObj.preview);
-          return prev.filter(f => f.id !== id);
-        });
-      };
-
-      const clearAll = () => {
-        files.forEach(f => URL.revokeObjectURL(f.preview));
-        setFiles([]);
-      };
-
-      const processAll = async () => {
-        if (processing || files.length === 0) return;
-        setProcessing(true);
-
-        for (const item of files) {
-          const img = new Image();
-          img.src = item.preview;
-           
-          await new Promise(resolve => { img.onload = resolve; });
-
-          // --- FIX START: Logic corrected here ---
-          let targetWidth = width ? parseInt(width) : img.naturalWidth;
-          targetWidth = isNaN(targetWidth) ? img.naturalWidth : targetWidth; // Removed 'let'
-
-          let targetHeight = height ? parseInt(height) : img.naturalHeight;
-          targetHeight = isNaN(targetHeight) ? img.naturalHeight : targetHeight; // Removed 'let' just in case
-          // --- FIX END ---
-
-          if (keepRatio && (width || height)) {
-            if (width && !height) {
-              targetHeight = Math.round(img.naturalHeight * (targetWidth / img.naturalWidth));
-            } else if (height && !width) {
-              targetWidth = Math.round(img.naturalWidth * (targetHeight / img.naturalHeight));
-            }
-          }
-
-          const canvas = document.createElement("canvas");
-          canvas.width = targetWidth;
-          canvas.height = targetHeight;
-
-          const ctx = canvas.getContext("2d");
-          ctx.imageSmoothingQuality = "high";
-          ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
-
-          canvas.toBlob(blob => {
-            const ext = format.split("/")[1] === "jpeg" ? "jpg" : format.split("/")[1];
-            const name = item.file.name.replace(/\.[^/.]+$/, "") + "." + ext;
-
-            const a = document.createElement("a");
-            a.href = URL.createObjectURL(blob);
-            a.download = name;
-            a.click();
-            URL.revokeObjectURL(a.href);
-          }, format, quality);
-        }
-
-        setProcessing(false);
-      };
-
-      const totalSize = files.reduce((sum, f) => sum + f.file.size, 0) / (1024 * 1024);
-      const formatNames = { "image/webp": "WebP", "image/jpeg": "JPEG", "image/png": "PNG" };
-
-      return (
-        <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl p-8 md:p-12">
-          {/* Upload Zone */}
-          <input
-            type="file"
-            multiple
-            accept="image/*"
-            ref={fileInputRef}
-            className="hidden"
-            onChange={(e) => e.target.files?.length && addFiles(e.target.files)}
-          />
-          <div
-            className="border-4 border-dashed border-green-500 rounded-3xl p-20 text-center cursor-pointer hover:bg-green-50 dark:hover:bg-green-900/20 transition"
-            onClick={() => fileInputRef.current?.click()}
-            onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); }}
-            onDrop={(e) => { e.preventDefault(); e.stopPropagation(); addFiles(e.dataTransfer.files); }}
-          >
-            <i className="fa-solid fa-cloud-arrow-up text-8xl text-green-600 mb-6"></i>
-            <p className="text-3xl font-bold">Drop images here or click to select</p>
-            <p className="text-lg text-slate-600 dark:text-slate-400 mt-2">JPG, PNG, WebP, GIF, BMP, TIFF… all supported</p>
-          </div>
-
-          {/* Preview + Controls */}
-          {files.length > 0 && (
-            <>
-              <div className="mt-10">
-                <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-2xl font-bold">
-                    {files.length} image{files.length > 1 ? "s" : ""} • {totalSize.toFixed(1)} MB
-                  </h2>
-                  <button onClick={clearAll} className="text-red-600 hover:underline">Clear all</button>
-                </div>
-
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 max-h-96 overflow-y-auto p-4 bg-slate-50 dark:bg-slate-900 rounded-2xl">
-                  {files.map(item => (
-                    <div key={item.id} className="relative group">
-                      <img src={item.preview} alt="" className="w-full h-32 object-cover rounded-lg shadow" />
-                      <button
-                        onClick={() => removeFile(item.id)}
-                        className="absolute top-1 right-1 bg-white/90 dark:bg-black/90 rounded-full p-2 opacity-0 group-hover:opacity-100 transition"
-                      >
-                        <i className="fa-solid fa-xmark text-red-600 text-lg"></i>
-                      </button>
-                      <p className="text-xs text-center mt-1 truncate px-1">{item.file.name}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="mt-10 bg-slate-50 dark:bg-slate-900/50 rounded-3xl p-8 space-y-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  <div>
-                    <label className="block text-sm font-semibold mb-2">Width (px)</label>
-                    <input type="number" placeholder="Auto" value={width} onChange={e => setWidth(e.target.value)} className="w-full p-4 border rounded-xl text-lg"/>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold mb-2">Height (px)</label>
-                    <input type="number" placeholder="Auto" value={height} onChange={e => setHeight(e.target.value)} className="w-full p-4 border rounded-xl text-lg"/>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold mb-2">Format</label>
-                    <select value={format} onChange={e => setFormat(e.target.value)} className="w-full p-4 border rounded-xl text-lg">
-                      <option value="image/webp">WebP (Best compression)</option>
-                      <option value="image/jpeg">JPEG</option>
-                      <option value="image/png">PNG (lossless)</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-semibold mb-2">Quality: {(quality * 100).toFixed(0)}%</label>
-                    <input type="range" min="0.1" max="1" step="0.05" value={quality} onChange={e => setQuality(parseFloat(e.target.value))} className="w-full"/>
-                  </div>
-                </div>
-
-                <label className="flex items-center gap-3 cursor-pointer select-none">
-                  <input type="checkbox" checked={keepRatio} onChange={e => setKeepRatio(e.target.checked)} className="w-6 h-6 rounded text-green-600"/>
-                  <span className="text-lg font-medium">Maintain aspect ratio (recommended)</span>
-                </label>
-
-                <button
-                  onClick={processAll}
-                  disabled={processing}
-                  className={`w-full py-6 rounded-2xl text-600 text-white text-2xl font-bold transition ${processing ? "bg-gray-500 cursor-not-allowed" : "bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700"}`}
-                >
-                  {processing ? "Processing your images…" : `Download All as ${formatNames[format]}`}
-                </button>
-              </div>
-            </>
-          )}
-
-          <div className="text-center mt-12">
-            <a href="index.html" className="text-blue-600 dark:text-blue-400 hover:underline text-xl">
-              ← Back to All Tools
-            </a>
+        <!-- Filters -->
+        <div>
+          <label class="block text-lg font-medium mb-3">Filters</label>
+          <div class="grid grid-cols-3 sm:grid-cols-6 gap-3">
+            <button class="filter-btn p-3 rounded-xl border-2" data-filter="none">None</button>
+            <button class="filter-btn p-3 rounded-xl border-2" data-filter="grayscale(100%)">Gray</button>
+            <button class="filter-btn p-3 rounded-xl border-2" data-filter="sepia(100%)">Sepia</button>
+            <button class="filter-btn p-3 rounded-xl border-2" data-filter="blur(5px)">Blur</button>
+            <button class="filter-btn p-3 rounded-xl border-2" data-filter="brightness(1.5)">Bright</button>
+            <button class="filter-btn p-3 rounded-xl border-2" data-filter="contrast(1.5)">Contrast</button>
           </div>
         </div>
-      );
-    };
 
-    const root = ReactDOM.createRoot(document.getElementById('root'));
-    root.render(<App />);
+        <!-- Watermark -->
+        <div>
+          <label class="block text-lg font-medium mb-2">Add Text Watermark</label>
+          <div class="flex gap-3">
+            <input type="text" class="watermark-text flex-1 px-4 py-3 rounded-xl border dark:bg-slate-700" placeholder="Your text">
+            <button class="add-watermark bg-gradient-to-r from-pink-600 to-rose-600 text-white px-6 py-3 rounded-xl font-medium hover:from-pink-700 hover:to-rose-700">Add</button>
+          </div>
+        </div>
+
+        <!-- Resize -->
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-lg font-medium mb-2">Width (px)</label>
+            <input type="number" class="resize-w w-full px-4 py-3 rounded-xl border dark:bg-slate-700" placeholder="Auto">
+          </div>
+          <div>
+            <label class="block text-lg font-medium mb-2">Height (px)</label>
+            <input type="number" class="resize-h w-full px-4 py-3 rounded-xl border dark:bg-slate-700" placeholder="Auto">
+          </div>
+        </div>
+
+        <button class="download-single w-full bg-gradient-to-r from-green-600 to-teal-600 text-white py-4 rounded-xl font-bold hover:from-green-700 hover:to-teal-700 transition">
+          Download This Image
+        </button>
+      </div>
+    </div>
+  </template>
+
+  <!-- Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.1/dist/cropper.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.1/dist/cropper.min.css">
+
+  <script>
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const imageContainer = document.getElementById('imageContainer');
+    const template = document.getElementById('imageTemplate');
+    const globalControls = document.getElementById('globalControls');
+    const outputFormat = document.getElementById('outputFormat');
+    const qualitySlider = document.getElementById('quality');
+    const qualityValue = document.getElementById('qualityValue');
+    const downloadAllBtn = document.getElementById('downloadAll');
+
+    let images = [];
+
+    // Drag & drop
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(event => {
+      dropZone.addEventListener(event, e => {
+        e.preventDefault();
+        e.stopPropagation();
+      });
+    });
+    ['dragenter', 'dragover'].forEach(event => {
+      dropZone.addEventListener(event, () => dropZone.classList.add('dragover'));
+    });
+    ['dragleave', 'drop'].forEach(event => {
+      dropZone.addEventListener(event, () => dropZone.classList.remove('dragover'));
+    });
+    dropZone.addEventListener('click', () => fileInput.click());
+    dropZone.addEventListener('drop', handleFiles);
+    fileInput.addEventListener('change', () => handleFiles(fileInput.files));
+
+    function handleFiles(files) {
+      [...files].forEach(file => {
+        if (!file.type.startsWith('image/')) return;
+        const reader = new FileReader();
+        reader.onload = e => addImage(e.target.result, file.name);
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function addImage(src, filename) {
+      const clone = template.content.cloneNode(true);
+      const canvas = clone.querySelector('.edited-canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      img.onload = () => {
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
+        setupControls(clone, canvas, ctx, img, filename);
+        imageContainer.appendChild(clone);
+        images.push({ canvas, ctx, img, filename, element: imageContainer.lastElementChild });
+        globalControls.classList.remove('hidden');
+      };
+      img.src = src;
+    }
+
+    function setupControls(root, canvas, ctx, originalImg, filename) {
+      const cropBtn = root.querySelector('.crop-btn');
+      const rotateLeft = root.querySelector('.rotate-left');
+      const rotateRight = root.querySelector('.rotate-right');
+      const flipH = root.querySelector('.flip-h');
+      const filters = root.querySelectorAll('.filter-btn');
+      const watermarkInput = root.querySelector('.watermark-text');
+      const addWatermark = root.querySelector('.add-watermark');
+      const resizeW = root.querySelector('.resize-w');
+      const resizeH = root.querySelector('.resize-h');
+      const downloadSingle = root.querySelector('.download-single');
+      const removeBtn = root.querySelector('.remove-btn');
+
+      let cropper = null;
+      let currentFilter = 'none';
+      let scaleX = 1;
+
+      function redraw() {
+        ctx.filter = currentFilter;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.save();
+        ctx.scale(scaleX, 1);
+        ctx.drawImage(originalImg, 0, 0, scaleX === -1 ? -canvas.width : canvas.width, canvas.height);
+        ctx.restore();
+      }
+
+      cropBtn.addEventListener('click', () => {
+        if (cropper) {
+          const cropped = cropper.getCroppedCanvas();
+          canvas.width = cropped.width;
+          canvas.height = cropped.height;
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(cropped, 0, 0);
+          originalImg.src = canvas.toDataURL();
+          cropper.destroy();
+          cropper = null;
+          cropBtn.textContent = 'Crop';
+        } else {
+          const imageElement = document.createElement('img');
+          imageElement.src = canvas.toDataURL();
+          root.querySelector('.relative').appendChild(imageElement);
+          cropper = new Cropper(imageElement, { aspectRatio: NaN, viewMode: 1 });
+          cropBtn.textContent = 'Apply Crop';
+        }
+      });
+
+      rotateLeft.addEventListener('click', () => {
+        ctx.translate(canvas.width / 2, canvas.height / 2);
+        ctx.rotate(-90 * Math.PI / 180);
+        ctx.translate(-canvas.width / 2, -canvas.height / 2);
+        [canvas.width, canvas.height] = [canvas.height, canvas.width];
+        redraw();
+      });
+
+      rotateRight.addEventListener('click', () => {
+        ctx.translate(canvas.width / 2, canvas.height / 2);
+        ctx.rotate(90 * Math.PI / 180);
+        ctx.translate(-canvas.width / 2, -canvas.height / 2);
+        [canvas.width, canvas.height] = [canvas.height, canvas.width];
+        redraw();
+      });
+
+      flipH.addEventListener('click', () => {
+        scaleX *= -1;
+        redraw();
+      });
+
+      filters.forEach(btn => {
+        btn.addEventListener('click', () => {
+          filters.forEach(b => b.classList.remove('ring-4', 'ring-indigo-500'));
+          btn.classList.add('ring-4', 'ring-indigo-500');
+          currentFilter = btn.dataset.filter === 'none' ? 'none' : btn.dataset.filter;
+          redraw();
+        });
+      });
+
+      addWatermark.addEventListener('click', () => {
+        const text = watermarkInput.value || 'Watermark';
+        ctx.font = '60px Arial';
+        ctx.fillStyle = 'rgba(255,255,255,0.6)';
+        ctx.strokeStyle = 'rgba(0,0,0,0.6)';
+        ctx.lineWidth = 8;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.strokeText(text, canvas.width / 2, canvas.height / 2);
+        ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+        watermarkInput.value = '';
+      });
+
+      resizeW.addEventListener('input', applyResize);
+      resizeH.addEventListener('input', applyResize);
+
+      function applyResize() {
+        const w = parseInt(resizeW.value) || null;
+        const h = parseInt(resizeH.value) || null;
+        if (!w && !h) return;
+        const newCanvas = document.createElement('canvas');
+        if (w && h) {
+          newCanvas.width = w;
+          newCanvas.height = h;
+        } else if (w) {
+          newCanvas.width = w;
+          newCanvas.height = originalImg.height * (w / originalImg.width);
+        } else {
+          newCanvas.height = h;
+          newCanvas.width = originalImg.width * (h / originalImg.height);
+        }
+        newCanvas.getContext('2d').drawImage(canvas, 0, 0, newCanvas.width, newCanvas.height);
+        canvas.width = newCanvas.width;
+        canvas.height = newCanvas.height;
+        ctx.drawImage(newCanvas, 0, 0);
+        originalImg.src = canvas.toDataURL();
+      }
+
+      downloadSingle.addEventListener('click', () => {
+        const link = document.createElement('a');
+        link.download = filename.replace(/\.[^.]+$/, '') + '_edited.webp';
+        link.href = canvas.toDataURL(outputFormat.value, qualitySlider.value / 100);
+        link.click();
+      });
+
+      removeBtn.addEventListener('click', () => {
+        root.remove();
+        images = images.filter(i => i.element !== root);
+        if (images.length === 0) globalControls.classList.add('hidden');
+      });
+
+      redraw();
+    }
+
+    qualitySlider.addEventListener('input', () => qualityValue.textContent = qualitySlider.value);
+
+    downloadAllBtn.addEventListener('click', async () => {
+      const zip = new JSZip();
+      images.forEach((img, i) => {
+        const data = img.canvas.toDataURL(outputFormat.value, qualitySlider.value / 100);
+        const base64 = data.split(',')[1];
+        zip.file(img.filename.replace(/\.[^.]+$/, '') + '_edited' + (outputFormat.value === 'image/png' ? '.png' : '.webp'), base64, {base64: true});
+      });
+      const content = await zip.generateAsync({type: 'blob'});
+      saveAs(content, 'ToolSwift_images.zip');
+    });
   </script>
 </body>
 </html>
