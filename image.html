@@ -4,13 +4,19 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Image Tools — ToolSwift</title>
-  <meta name="description" content="Best free online image editor: crop, rotate, filters, watermark, compress, WebP — 100% private, no upload"/>
+  <meta name="description" content="Best free online image editor: crop, rotate, filters, watermark, compress, WebP — 100% private"/>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <style>
     .drop-zone { border: 4px dashed #94a3b8; transition: all 0.3s; }
     .drop-zone.dragover { border-color: #6366f1; background-color: #eef2ff; }
-    canvas { max-width: 100%; height: auto; border-radius: 1rem; }
+    canvas { max-width: 100%; height: auto; border-radius: 1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+    .filter-btn {
+      @apply px-6 py-3 rounded-full font-medium transition-all duration-200 border-2;
+    }
+    .filter-btn.active {
+      @apply bg-indigo-600 text-white border-indigo-600 shadow-lg ring-4 ring-indigo-300;
+    }
   </style>
 </head>
 <body class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 dark:from-slate-950 dark:to-slate-900 min-h-screen">
@@ -21,7 +27,7 @@
       <a href="index.html" class="flex items-center gap-3">
         <h1 class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">ToolSwift</h1>
       </a>
-      <nav class="flex flex-wrap gap-6 mt-4 sm:mt-6 text-lg">
+      <nav class="flex flex-wrap gap-6 text-lg">
         <a href="pdf.html" class="text-slate-700 dark:text-slate-300 hover:text-indigo-600"><i class="fa-solid fa-file-pdf mr-1"></i>PDF</a>
         <a href="image.html" class="text-indigo-600 font-bold"><i class="fa-solid fa-image mr-1"></i>Image</a>
         <a href="qr.html" class="text-slate-700 dark:text-slate-300 hover:text-indigo-600"><i class="fa-solid fa-qrcode mr-1"></i>QR</a>
@@ -35,37 +41,34 @@
   <div class="container mx-auto px-6 py-16 max-w-7xl">
     <div class="text-center mb-12">
       <h2 class="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-500 to-teal-600 mb-4">Image Tools</h2>
-      <p class="text-2xl text-slate-700 dark:text-slate-300">Crop • Rotate • Filters • Watermark • Resize • Compress • WebP — All 100% in your browser</p>
+      <p class="text-2xl text-slate-700 dark:text-slate-300">Professional editing • Instant preview • Zero upload</p>
     </div>
 
-    <!-- Upload Zone -->
     <div id="dropZone" class="drop-zone bg-white dark:bg-slate-800 rounded-3xl p-20 mb-12 text-center cursor-pointer">
       <i class="fa-solid fa-cloud-arrow-up text-8xl text-slate-400 mb-6"></i>
-      <p class="text-2xl font-semibold text-slate-700 dark:text-slate-300">Drop images here or click to select</p>
+      <p class="text-2xl font-semibold text-slate-700 dark:text-slate-300">Drop images or click to upload</p>
       <input type="file" id="fileInput" multiple accept="image/*" class="hidden">
     </div>
 
-    <!-- Images Grid -->
     <div id="imageContainer" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10 mb-20"></div>
 
-    <!-- Batch Actions (below everything) -->
     <div id="globalControls" class="hidden bg-white dark:bg-slate-800 rounded-3xl shadow-2xl p-8 max-w-5xl mx-auto">
-      <h3 class="text-2xl font-bold mb-6 text-center text-slate-800 dark:text-slate-200">Batch Actions (applies to all images)</h3>
+      <h3 class="text-2xl font-bold mb-6 text-center">Batch Export</h3>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
         <div>
-          <label class="block text-lg font-medium mb-2">Output Format</label>
-          <select id="outputFormat" class="w-full px-4 py-3 rounded-xl border dark:bg-slate-700">
+          <label class="block text-lg font-medium mb-2">Format</label>
+          <select id="outputFormat" class="w-full px-5 py-3 rounded-xl border dark:bg-slate-700">
             <option value="image/jpeg">JPEG</option>
-            <option value="image/webp" selected>WebP (recommended)</option>
+            <option value="image/webp" selected>WebP (Best)</option>
             <option value="image/png">PNG</option>
           </select>
         </div>
         <div>
-          <label class="block text-lg font-medium mb-2">Quality <span id="qualityValue">90</span>%</label>
-          <input type="range" id="quality" min="1" max="100" value="90" class="w-full">
+          <label class="block text-lg font-medium mb-2">Quality <span class="font-bold text-indigo-600" id="qualityValue">90</span>%</label>
+          <input type="range" id="quality" min="1" max="100" value="90" class="w-full h-3 rounded-lg appearance-none cursor-pointer bg-gray-300">
         </div>
         <div>
-          <button id="downloadAll" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 rounded-xl font-bold text-xl hover:from-indigo-700 hover:to-purple-700 transition">
+          <button id="downloadAll" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 rounded-xl font-bold text-xl hover:from-indigo-700 hover:to-purple-700 transition shadow-lg">
             Download All as ZIP
           </button>
         </div>
@@ -73,68 +76,71 @@
     </div>
   </div>
 
-  <!-- Image Editor Template -->
   <template id="imageTemplate">
     <div class="image-item bg-white dark:bg-slate-800 rounded-3xl shadow-xl overflow-hidden">
       <div class="relative">
         <canvas class="edited-canvas block mx-auto"></canvas>
-        <button class="remove-btn absolute top-4 right-4 bg-red-600 text-white p-3 rounded-full hover:bg-red-700 z-10">
-          <i class="fa-solid fa-xmark"></i>
+        <button class="remove-btn absolute top-4 right-4 bg-red-600 text-white p-4 rounded-full hover:bg-red-700 shadow-lg z-10">
+          <i class="fa-solid fa-xmark text-xl"></i>
         </button>
       </div>
-      <div class="p-6 space-y-6">
+      <div class="p-8 space-y-8">
         <div class="grid grid-cols-2 gap-4">
-          <button class="crop-btn bg-blue-600 text-white py-3 rounded-xl font-medium hover:bg-blue-700">Crop</button>
-          <button class="rotate-left bg-indigo-600 text-white py-3 rounded-xl font-medium hover:bg-indigo-700"><i class="fa-solid fa-rotate-left mr-2"></i>Rotate Left</button>
-          <button class="rotate-right bg-indigo-600 text-white py-3 rounded-xl font-medium hover:bg-indigo-700"><i class="fa-solid fa-rotate-right mr-2"></i>Rotate Right</button>
-          <button class="flip-h bg-purple-600 text-white py-3 rounded-xl font-medium hover:bg-purple-700">Flip Horizontal</button>
+          <button class="crop-btn bg-blue-600 text-white py-4 rounded-2xl font-semibold hover:bg-blue-700 shadow-md transition">Crop</button>
+          <button class="rotate-left bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 rounded-2xl font-semibold hover:shadow-xl transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-rotate-left"></i> Rotate Left
+          </button>
+          <button class="rotate-right bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 rounded-2xl font-semibold hover:shadow-xl transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-rotate-right"></i> Rotate Right
+          </button>
+          <button class="flip-h bg-purple-600 text-white py-4 rounded-2xl font-semibold hover:bg-purple-700 shadow-md transition">Flip Horizontal</button>
         </div>
 
         <div>
-          <label class="block text-lg font-medium mb-3">Filters</label>
-          <div class="grid grid-cols-3 sm:grid-cols-6 gap-3">
-            <button class="filter-btn p-3 rounded-xl border-2" data-filter="none">None</button>
-            <button class="filter-btn p-3 rounded-xl border-2" data-filter="grayscale(100%)">Gray</button>
-            <button class="filter-btn p-3 rounded-xl border-2" data-filter="sepia(100%)">Sepia</button>
-            <button class="filter-btn p-3 rounded-xl border-2" data-filter="blur(4px)">Blur</button>
-            <button class="filter-btn p-3 rounded-xl border-2" data-filter="brightness(1.4)">Bright</button>
-            <button class="filter-btn p-3 rounded-xl border-2" data-filter="contrast(1.5)">Contrast</button>
+          <label class="block text-xl font-bold mb-4 text-slate-800 dark:text-slate-200">Filters</label>
+          <div class="grid grid-cols-3 sm:grid-cols-6 gap-4">
+            <button class="filter-btn border-slate-300 dark:border-slate-600 active" data-filter="none">None</button>
+            <button class="filter-btn border-slate-300 dark:border-slate-600" data-filter="grayscale(100%)">Gray</button>
+            <button class="filter-btn border-slate-300 dark:border-slate-600" data-filter="sepia(100%)">Sepia</button>
+            <button class="filter-btn border-slate-300 dark:border-slate-600" data-filter="blur(4px)">Blur</button>
+            <button class="filter-btn border-slate-300 dark:border-slate-600" data-filter="brightness(1.4)">Bright</button>
+            <button class="filter-btn border-slate-300 dark:border-slate-600" data-filter="contrast(1.5)">Contrast</button>
           </div>
         </div>
 
         <div>
-          <label class="block text-lg font-medium mb-2">Text Watermark</label>
+          <label class="block text-xl font-bold mb-3 text-slate-800 dark:text-slate-200">Watermark</label>
           <div class="flex gap-3">
-            <input type="text" class="watermark-text flex-1 px-4 py-3 rounded-xl border dark:bg-slate-700" placeholder="Enter text">
-            <button class="add-watermark bg-gradient-to-r from-pink-600 to-rose-600 text-white px-6 py-3 rounded-xl hover:from-pink-700 hover:to-rose-700">Add</button>
+            <input type="text" class="watermark-text flex-1 px-5 py-4 rounded-xl border dark:bg-slate-700 text-lg" placeholder="Your text here">
+            <button class="add-watermark bg-gradient-to-r from-pink-600 to-rose-600 text-white px-8 py-4 rounded-xl font-bold hover:shadow-xl transition">Add</button>
           </div>
         </div>
 
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-2 gap-6">
           <div>
             <label class="block text-lg font-medium mb-2">Width (px)</label>
-            <input type="number" class="resize-w w-full px-4 py-3 rounded-xl border dark:bg-slate-700" placeholder="Auto">
+            <input type="number" class="resize-w w-full px-5 py-4 rounded-xl border dark:bg-slate-700" placeholder="Auto">
           </div>
           <div>
             <label class="block text-lg font-medium mb-2">Height (px)</label>
-            <input type="number" class="resize-h w-full px-4 py-3 rounded-xl border dark:bg-slate-700" placeholder="Auto">
+            <input type="number" class="resize-h w-full px-5 py-4 rounded-xl border dark:bg-slate-700" placeholder="Auto">
           </div>
         </div>
 
-        <button class="download-single w-full bg-gradient-to-r from-green-600 to-teal-600 text-white py-4 rounded-xl font-bold hover:from-green-700 hover:to-teal-700 transition">
-          Download This Image
+        <button class="download-single w-full bg-gradient-to-r from-green-600 to-teal-600 text-white py-5 rounded-2xl font-bold text-xl hover:shadow-2xl transition">
+          Download Image
         </button>
       </div>
     </div>
   </template>
 
-  <!-- Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.1/dist/cropper.min.js"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.1/dist/cropper.min.css">
 
   <script>
+    // Same variables as before...
     const dropZone = document.getElementById('dropZone');
     const fileInput = document.getElementById('fileInput');
     const imageContainer = document.getElementById('imageContainer');
@@ -144,24 +150,9 @@
     const quality = document.getElementById('quality');
     const qualityValue = document.getElementById('qualityValue');
     const downloadAll = document.getElementById('downloadAll');
-
     let images = [];
 
-    // Drag & Drop
-    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(e => dropZone.addEventListener(e, ev => { ev.preventDefault(); ev.stopPropagation(); }));
-    ['dragenter', 'dragover'].forEach(e => dropZone.addEventListener(e, () => dropZone.classList.add('dragover')));
-    ['dragleave', 'drop'].forEach(e => dropZone.addEventListener(e, () => dropZone.classList.remove('dragover')));
-    dropZone.onclick = () => fileInput.click();
-    dropZone.ondrop = e => handleFiles(e.dataTransfer.files);
-    fileInput.onchange = () => handleFiles(fileInput.files);
-
-    function handleFiles(files) {
-      [...files].filter(f => f.type.startsWith('image/')).forEach(file => {
-        const reader = new FileReader();
-        reader.onload = e => addImage(e.target.result, file.name);
-        reader.readAsDataURL(file);
-      });
-    }
+    // Drag & drop code (unchanged)...
 
     function addImage(src, filename) {
       const img = new Image();
@@ -174,10 +165,7 @@
 
         const state = {
           canvas, ctx, originalImg: img, filename,
-          rotation: 0,
-          flipH: 1,
-          filter: 'none',
-          crop: null  // {x, y, width, height}
+          rotation: 0, flipH: 1, filter: 'none', crop: null
         };
 
         redraw(state);
@@ -194,64 +182,75 @@
       const { canvas, ctx, originalImg, rotation, flipH, filter, crop } = state;
       ctx.filter = filter;
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-
       ctx.save();
       ctx.translate(canvas.width / 2, canvas.height / 2);
       ctx.rotate(rotation * Math.PI / 180);
       ctx.scale(flipH, 1);
 
       let srcX = 0, srcY = 0, srcW = originalImg.width, srcH = originalImg.height;
-      if (crop) {
-        srcX = crop.x; srcY = crop.y; srcW = crop.width; srcH = crop.height;
-      }
+      if (crop) { srcX = crop.x; srcY = crop.y; srcW = crop.width; srcH = crop.height; }
 
-      ctx.drawImage(originalImg, srcX, srcY, srcW, srcH, -srcW / 2, -srcH / 2, srcW, srcH);
+      ctx.drawImage(originalImg, srcX, srcY, srcW, srcH, -srcW/2, -srcH/2, srcW, srcH);
       ctx.restore();
     }
 
     function setupControls(root, state) {
       let cropper = null;
+      const filterBtns = root.querySelectorAll('.filter-btn');
+
+      // Professional active state
+      filterBtns.forEach(btn => btn.onclick = () => {
+        filterBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.filter = btn.dataset.filter === 'none' ? 'none' : btn.dataset.filter;
+        redraw(state);
+      });
+
+      root.querySelector('.rotate-left').onclick = () => {
+        state.rotation -= 90;
+        if (Math.abs(state.rotation % 180) === 90) {
+          [state.canvas.width, state.canvas.height] = [state.canvas.height, state.canvas.width];
+        }
+        redraw(state);
+      };
+
+      root.querySelector('.rotate-right').onclick = () => {
+        state.rotation += 90;
+        if (Math.abs(state.rotation % 180) === 90) {
+          [state.canvas.width, state.canvas.height] = [state.canvas.height, state.canvas.width];
+        }
+        redraw(state);
+      };
+
+      // Rest of controls (crop, flip, watermark, resize, download) remain perfect from previous version
+      // ... (same as last working version)
+
+      root.querySelector('.flip-h').onclick = () => { state.flipH *= -1; redraw(state); };
 
       root.querySelector('.crop-btn').onclick = () => {
         if (cropper) {
-          // Apply crop
           const data = cropper.getData(true);
           state.crop = { x: data.x, y: data.y, width: data.width, height: data.height };
           state.canvas.width = data.width;
           state.canvas.height = data.height;
           redraw(state);
-          cropper.destroy();
-          cropper = null;
+          cropper.destroy(); cropper = null;
           root.querySelector('.crop-btn').textContent = 'Crop';
         } else {
-          // Start cropping
           const tempImg = document.createElement('img');
           tempImg.src = state.canvas.toDataURL();
           root.querySelector('.relative').appendChild(tempImg);
-          cropper = new Cropper(tempImg, { viewMode: 1, autoCropArea: 0.95 });
+          cropper = new Cropper(tempImg, { viewMode: 1, autoCropArea: 0.9 });
           root.querySelector('.crop-btn').textContent = 'Apply Crop';
         }
       };
 
-      root.querySelector('.rotate-left').onclick = () => { state.rotation -= 90; redraw(state); };
-      root.querySelector('.rotate-right').onclick = () => { state.rotation += 90; redraw(state); };
-      root.querySelector('.flip-h').onclick = () => { state.flipH *= -1; redraw(state); };
-
-      root.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.onclick = () => {
-          root.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('ring-4', 'ring-indigo-500'));
-          btn.classList.add('ring-4', 'ring-indigo-500');
-          state.filter = btn.dataset.filter === 'none' ? 'none' : btn.dataset.filter;
-          redraw(state);
-        };
-      });
-
       root.querySelector('.add-watermark').onclick = () => {
-        const text = root.querySelector('.watermark-text').value.trim() || 'Watermark';
-        state.ctx.font = 'bold 80px Arial';
-        state.ctx.fillStyle = 'rgba(255,255,255,0.7)';
-        state.ctx.strokeStyle = 'rgba(0,0,0,0.7)';
-        state.ctx.lineWidth = 12;
+        const text = root.querySelector('.watermark-text').value || 'Watermark';
+        state.ctx.font = 'bold 100px Arial';
+        state.ctx.fillStyle = 'rgba(255,255,255,0.8)';
+        state.ctx.strokeStyle = 'rgba(0,0,0,0.8)';
+        state.ctx.lineWidth = 16;
         state.ctx.textAlign = 'center';
         state.ctx.textBaseline = 'middle';
         state.ctx.strokeText(text, state.canvas.width / 2, state.canvas.height / 2);
@@ -260,13 +259,12 @@
 
       const wInput = root.querySelector('.resize-w');
       const hInput = root.querySelector('.resize-h');
-      [wInput, hInput].oninput = () => {
+      wInput.oninput = hInput.oninput = () => {
         let w = parseInt(wInput.value) || state.originalImg.width;
         let h = parseInt(hInput.value) || state.originalImg.height;
-        if (wInput.value && !hInput.value) h = state.originalImg.height * (w / state.originalImg.width);
-        if (hInput.value && !wInput.value) w = state.originalImg.width * (h / state.originalImg.height);
-        state.canvas.width = w;
-        state.canvas.height = h;
+        if (wInput.value) h = state.originalImg.height * (w / state.originalImg.width);
+        if (hInput.value) w = state.originalImg.width * (h / state.originalImg.height);
+        state.canvas.width = w; state.canvas.height = h;
         redraw(state);
       };
 
@@ -274,8 +272,7 @@
         state.canvas.toBlob(blob => {
           const a = document.createElement('a');
           a.href = URL.createObjectURL(blob);
-          a.download = state.filename.replace(/\.[^.]+$/, '') + '_edited' + 
-                       (outputFormat.value === 'image/png' ? '.png' : '.webp');
+          a.download = state.filename.replace(/\.[^.]+$/, '') + '_edited' + (outputFormat.value.includes('png') ? '.png' : '.webp');
           a.click();
         }, outputFormat.value, quality.value / 100);
       };
@@ -287,24 +284,34 @@
       };
     }
 
-    quality.onPaginate = () => qualityValue.textContent = quality.value;
     quality.oninput = () => qualityValue.textContent = quality.value;
 
     downloadAll.onclick = async () => {
       const zip = new JSZip();
-      for (let i = 0; i < images.length; i++) {
-        const state = images[i];
-        await new Promise(resolve => {
+      for (const state of images) {
+        await new Promise(r => {
           state.canvas.toBlob(blob => {
-            zip.file(state.filename.replace(/\.[^.]+$/, '') + '_edited' + 
-                     (outputFormat.value === 'image/png' ? '.png' : '.webp'), blob);
-            resolve();
+            zip.file(state.filename.replace(/\.[^.]+$/, '') + '_edited' + (outputFormat.value === 'image/png' ? '.png' : '.webp'), blob);
+            r();
           }, outputFormat.value, quality.value / 100);
         });
       }
-      const content = await zip.generateAsync({type: 'blob'});
+      const content = await zip.generateAsync({type:'blob'});
       saveAs(content, 'ToolSwift_Images.zip');
     };
+
+    // Drag & drop setup (same as before)
+    ['dragenter','dragover','dragleave','drop'].forEach(e => dropZone.addEventListener(e, ev => {ev.preventDefault();ev.stopPropagation();}));
+    ['dragenter','dragover'].forEach(e => dropZone.addEventListener(e, () => dropZone.classList.add('dragover')));
+    ['dragleave','drop'].forEach(e => dropZone.addEventListener(e, () => dropZone.classList.remove('dragover')));
+    dropZone.onclick = () => fileInput.click();
+    dropZone.ondrop = e => handleFiles(e.dataTransfer.files);
+    fileInput.onchange = () => handleFiles(fileInput.files);
+    function handleFiles(files) { [...files].filter(f=>f.type.startsWith('image/')).forEach(f => {
+      const r = new FileReader();
+      r.onload = e => addImage(e.target.result, f.name);
+      r.readAsDataURL(f);
+    });}
   </script>
 </body>
 </html>
