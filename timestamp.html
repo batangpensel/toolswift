@@ -1,0 +1,9 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Timestamp Converter - ToolSwift</title><script src="https://cdn.tailwindcss.com"></script></head><body class="bg-slate-50 dark:bg-slate-900 min-h-screen flex items-center justify-center"><div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl p-16 max-w-2xl w-full text-center"><h1 class="text-5xl font-bold mb-10">Unix Timestamp Converter</h1><input type="number" id="unix" placeholder="Unix timestamp" class="w-full p-8 text-4xl text-center font-mono rounded-2xl mb-8"/><p id="human" class="text-3xl mb-8"></p><button onclick="convert()" class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-16 py-8 rounded-full text-3xl font-bold">Convert</button></div><script>
+function convert() {
+  const val = document.getElementById('unix').value;
+  if (!val) return;
+  const date = new Date(val.length > 10 ? val : val * 1000);
+  document.getElementById('human').textContent = date.toLocaleString();
+}
+document.getElementById('unix').addEventListener('input', convert);
+</script><p class="text-center mt-10"><a href="index.html" class="text-blue-600 text-xl">← All Tools</a></p></body></html>
