@@ -1,0 +1,8 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Base64 Encoder/Decoder - ToolSwift</title><script src="https://cdn.tailwindcss.com"></script></head><body class="bg-slate-50 dark:bg-slate-900 min-h-screen p-8"><div class="max-w-4xl mx-auto"><h1 class="text-5xl font-bold text-center mb-10">Base64 Encode / Decode</h1><textarea id="input" placeholder="Text or Base64..." class="w-full h-96 p-8 text-xl font-mono rounded-3xl shadow-2xl mb-8"></textarea><div class="flex gap-6 justify-center mb-8"><button onclick="document.getElementById('input').value = btoa(document.getElementById('input').value)" class="bg-green-600 text-white px-12 py-6 rounded-2xl text-2xl font-bold">Encode</button><button onclick="try{document.getElementById('input').value = atob(document.getElementById('input').value)}catch(e){alert('Invalid Base64')}" class="bg-red-600 text-white px-12 py-6 rounded-2xl text-2xl font-bold">Decode</button></div><input type="file" id="file" class="hidden"/><label htmlFor="file" class="block text-center text-blue-600 text-xl cursor-pointer underline">Or upload image → Base64</label></div><script>
+document.getElementById('file').onchange = e => {
+  const file = e.target.files[0];
+  const reader = new FileReader();
+  reader.onload = ev => document.getElementById('input').value = ev.target.result;
+  reader.readAsDataURL(file);
+};
+</script><p class="text-center mt-10"><a href="index.html" class="text-blue-600 text-xl">← All Tools</a></p></body></html>
