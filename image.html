@@ -1,0 +1,50 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Image Resizer - ToolSwift</title><script src="https://cdn.tailwindcss.com"></script><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"></head><body class="bg-slate-50 dark:bg-slate-900 min-h-screen"><div id="root" class="max-w-4xl mx-auto p-8"></div><script type="text/babel">
+const App = () => {
+  const [files, setFiles] = React.useState([]);
+  const [w, setW] = React.useState(""); const [h, setH] = React.useState(""); const [fmt, setFmt] = React.useState("image/webp"); const [q, setQ] = React.useState(0.92);
+
+  const process = () => files.forEach(file => {
+    const img = new Image(); img.onload = () => {
+      const canvas = document.createElement("canvas");
+      const width = w || img.width;
+      const height = h || img.height;
+      canvas.width = width; canvas.height = height;
+      canvas.getContext("2d").drawImage(img, 0, 0, width, height);
+      canvas.toBlob(blob => {
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = file.name.split('.').slice(0,-1).join('.') + '.' + fmt.split('/')[1];
+        a.click();
+      }, fmt, q);
+    };
+    img.src = URL.createObjectURL(file);
+  });
+
+  return (
+    <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl p-10">
+      <h1 class="text-5xl font-bold text-center mb-8">Batch Image Resizer & Converter</h1>
+      <input type="file" multiple accept="image/*" onChange={e => setFiles([...e.target.files])} class="hidden" id="img"/>
+      <label htmlFor="img" class="block border-4 border-dashed border-green-500 rounded-3xl p-24 text-center cursor-pointer hover:bg-green-50">
+        <i class="fa-solid fa-image text-8xl text-green-600 mb-6"></i><p class="text-3xl font-bold">Drop images here</p>
+      </label>
+      {files.length > 0 && (
+        <div class="mt-10 space-y-6">
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <input type="number" placeholder="Width" value={w} onChange={e=>setW(e.target.value)} class="p-4 border rounded-xl text-center text-xl"/>
+            <input type="number" placeholder="Height" value={h} onChange={e=>setH(e.target.value)} class="p-4 border rounded-xl text-center text-xl"/>
+            <select value={fmt} onChange={e=>setFmt(e.target.value)} class="p-4 border rounded-xl text-xl">
+              <option value="image/jpeg">JPEG</option>
+              <option value="image/png">PNG</option>
+              <option value="image/webp">WEBP (Best)</option>
+            </select>
+            <input type="range" min="0.1" max="1" step="0.05" value={q} onChange={e=>setQ(e.target.value)} class="p-4"/>
+          </div>
+          <button onClick={process} class="w-full bg-gradient-to-r from-green-500 to-teal-600 text-white py-6 rounded-2xl text-2xl font-bold">Download All</button>
+        </div>
+      )}
+      <p class="text-center mt-10"><a href="index.html" class="text-blue-600 text-xl">← All Tools</a></p>
+    </div>
+  );
+};
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script></body></html>
