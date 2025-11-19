@@ -8,8 +8,7 @@
 
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css"/>
-  
-  <!-- React + Babel (ABSOLUTELY REQUIRED) -->
+   
   <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <script src="https://unpkg.com/babel-standalone@7/babel.min.js"></script>
@@ -29,7 +28,7 @@
 <body class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 dark:from-slate-950 dark:to-slate-900 min-h-screen">
   <div class="max-w-6xl mx-auto px-6 py-12">
     <div class="text-center mb-12">
-      <h1 class="text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-500 to-teal-600 mb-800 mb-4">
+      <h1 class="text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-500 to-teal-600 mb-4">
         Batch Image Resizer & Converter
       </h1>
       <p class="text-xl text-slate-600 dark:text-slate-400">Resize • Convert • Compress — 100% in your browser, no servers</p>
@@ -80,14 +79,16 @@
         for (const item of files) {
           const img = new Image();
           img.src = item.preview;
-          
+           
           await new Promise(resolve => { img.onload = resolve; });
 
+          // --- FIX START: Logic corrected here ---
           let targetWidth = width ? parseInt(width) : img.naturalWidth;
-          let targetWidth = isNaN(targetWidth) ? img.naturalWidth : targetWidth;
+          targetWidth = isNaN(targetWidth) ? img.naturalWidth : targetWidth; // Removed 'let'
 
           let targetHeight = height ? parseInt(height) : img.naturalHeight;
-          targetHeight = isNaN(targetHeight) ? img.naturalHeight : targetHeight;
+          targetHeight = isNaN(targetHeight) ? img.naturalHeight : targetHeight; // Removed 'let' just in case
+          // --- FIX END ---
 
           if (keepRatio && (width || height)) {
             if (width && !height) {
