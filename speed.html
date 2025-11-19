@@ -1,0 +1,10 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Speed Test - ToolSwift</title><script src="https://cdn.tailwindcss.com"></script></head><body class="bg-slate-50 dark:bg-slate-900 min-h-screen flex items-center justify-center"><div class="text-center"><h1 class="text-6xl font-black mb-10">Speed Test</h1><div class="text-9xl font-black text-blue-600 mb-6" id="speed">0</div><p class="text-3xl mb-10">Mbps</p><button onclick="runTest()" class="bg-gradient-to-r from-green-500 to-blue-600 text-white px-16 py-8 rounded-full text-3xl font-bold shadow-2xl hover:shadow-green-500/50">Start Test</button></div><script>
+async function runTest() {
+  const url = "https://speed.cloudflare.com/__down?bytes=100000000";
+  const start = performance.now();
+  await fetch(url, { cache: "no-store" });
+  const duration = (performance.now() - start) / 1000;
+  const mbps = (800 / duration).toFixed(1);
+  document.getElementById("speed").textContent = mbps;
+}
+</script><p class="absolute bottom-10"><a href="index.html" class="text-blue-600 text-xl">← All Tools</a></p></body></html>
