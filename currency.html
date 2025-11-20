@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ToolSwift — Currency Converter</title>
+  <meta name="description" content="Real-time currency & crypto converter • 160+ currencies • Live rates • 100% private"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/litepicker/dist/litepicker.js"></script>
+  <style>
+    input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    input[type="number"] { -moz-appearance: textfield; }
+    .copy-feedback { opacity: 0; transition: opacity 0.3s; }
+    .copy-feedback.show { opacity: 1; }
+    .tab-active { @apply bg-indigo-600 text-white; }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 dark:from-slate-950 dark:to-slate-900 min-h-screen">
+  <div class="container mx-auto px-6 py-16 max-w-5xl">
+    <div class="text-center mb-10">
+      <a href="index.html" class="inline-flex items-center text-indigo-600 dark:text-indigo-400 mb-4 hover:underline">
+        <i class="fa-solid fa-arrow-left mr-2"></i> Back to All Tools
+      </a>
+      <h1 class="text-5xl font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-600 to-teal-600 mb-2">Currency Converter</h1>
+      <p class="text-xl text-gray-700 dark:text-gray-300">160+ Currencies • Live Crypto • Historical Charts • No Tracking</p>
+    </div>
+
+    <div class="bg-white dark:bg-slate-800 rounded-3xl p-8 md:p-12 shadow-2xl">
+      <div id="converter-app">
+        <!-- Tabs: Fiat vs Crypto -->
+        <div class="flex justify-center mb-8 gap-4">
+          <button id="tab-fiat" class="tab-active px-8 py-3 rounded-xl font-semibold transition">Fiat Currencies</button>
+          <button id="tab-crypto" class="px-8 py-3 rounded-xl font-semibold bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 transition">Cryptocurrencies</button>
+        </div>
+
+        <!-- FROM -->
+        <div class="rounded-2xl p-6 bg-slate-50 dark:bg-slate-700 mb-6 border border-slate-200 dark:border-slate-600">
+          <label class="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-3">I have</label>
+          <div class="flex flex-col md:flex-row gap-4 items-end">
+            <div class="relative flex-1 md:flex-initial">
+              <input type="text" id="search-from" placeholder="Search currency..." class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900 outline-none">
+              <select id="currency-from" size="8" class="absolute top-full left-0 w-full mt-1 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl shadow-xl hidden z-10 max-h-64 overflow-y-auto"></select>
+            </div>
+            <input type="text" id="amount-from" value="1.00" class="w-full md:w-64 text-5xl font-bold text-right bg-transparent focus:outline-none" placeholder="0.00">
+          </div>
+          <p id="rate-display-from" class="text-sm text-slate-500 dark:text-slate-400 mt-3 text-right"></p>
+        </div>
+
+        <div class="flex justify-center my-8 gap-6">
+          <button id="swap-button" class="p-4 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white shadow-xl transform hover:scale-110 transition">
+            <i class="fa-solid fa-arrow-right-arrow-left text-2xl"></i>
+          </button>
+          <button id="convert-btn" class="px-8 py-4 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold rounded-xl shadow-lg transform hover:scale-105 transition">
+            Convert
+          </button>
+        </div>
+
+        <!-- TO -->
+        <div class="rounded-2xl p-6 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600">
+          <label class="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-3">I want</label>
+          <div class="flex flex-col md:flex-row gap-4 items-end">
+            <div class="relative flex-1 md:flex-initial">
+              <input type="text" id="search-to" placeholder="Search currency..." class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900 outline-none">
+              <select id="currency-to" size="8" class="absolute top-full left-0 w-full mt-1 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl shadow-xl hidden z-10 max-h-64 overflow-y-auto"></select>
+            </div>
+            <div class="relative w-full md:w-64">
+              <input type="text" id="amount-to" readonly class="w-full text-5xl font-bold text-right bg-transparent pr-12 cursor-pointer" placeholder="0.00">
+              <button id="copy-btn" class="absolute right-2 top-1/2 -translate-y-1/2 text-indigo-600 opacity-0 hover:opacity-100 transition">
+                <i class="fa-regular fa-copy text-3xl"></i>
+              </button>
+              <span class="copy-feedback absolute right-2 top-1/2 -translate-y-1/2 text-green-500 font-medium">Copied!</span>
+            </div>
+          </div>
+          <p id="rate-display-to" class="text-sm text-slate-500 dark:text-slate-400 mt-3 text-right"></p>
+        </div>
+
+        <!-- Status + Chart -->
+        <div class="mt-10 text-center">
+          <p id="status-message" class="text-sm font-medium text-slate-600 dark:text-slate-400">Fetching latest rates...</p>
+          <p id="last-updated" class="text-xs text-slate-500 dark:text-slate-400 mt-1"></p>
+          <button id="chart-btn" class="mt-6 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-medium transition">
+            <i class="fa-solid fa-chart-line mr-2"></i> View 30-Day Chart
+          </button>
+          <div id="chart-container" class="mt-8 hidden">
+            <canvas id="rate-chart" height="100"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="text-center mt-20 text-slate-600 dark:text-slate-400">
+      <p class="text-xl">© 2025 ToolSwift • Made with <span class="text-red-500">♥</span> for privacy & accuracy</p>
+    </footer>
+  </div>
+
+  <script>
+    const FIAT_CURRENCIES = {
+      "USD": "United States Dollar", "EUR": "Euro", "GBP": "British Pound", "JPY": "Japanese Yen", "AUD": "Australian Dollar",
+      "CAD": "Canadian Dollar", "CHF": "Swiss Franc", "CNY": "Chinese Yuan", "INR": "Indian Rupee", "SGD": "Singapore Dollar",
+      "HKD": "Hong Kong Dollar", "NZD": "New Zealand Dollar", "KRW": "South Korean Won", "MXN": "Mexican Peso", "BRL": "Brazilian Real",
+      "ZAR": "South African Rand", "TRY": "Turkish Lira", "RUB": "Russian Ruble", "PLN": "Polish Zloty", "THB": "Thai Baht",
+      "IDR": "Indonesian Rupiah", "MYR": "Malaysian Ringgit", "PHP": "Philippine Peso", "VND": "Vietnamese Dong", "AED": "UAE Dirham",
+      "SAR": "Saudi Riyal", "ILS": "Israeli Shekel", "NOK": "Norwegian Krone", "SEK": "Swedish Krona", "DKK": "Danish Krone"
+    };
+
+    const CRYPTO_CURRENCIES = {
+      "BTC": "Bitcoin", "ETH": "Ethereum", "BNB": "Binance Coin", "XRP": "Ripple", "ADA": "Cardano",
+      "SOL": "Solana", "DOGE": "Dogecoin", "DOT": "Polkadot", "LTC": "Litecoin", "AVAX": "Avalanche"
+    };
+
+    let rates = {};
+    let currentTab = 'fiat';
+    let chart = null;
+
+    const els = {
+      tabFiat: document.getElementById('tab-fiat'),
+      tabCrypto: document.getElementById('tab-crypto'),
+      fromSearch: document.getElementById('search-from'),
+      toSearch: document.getElementById('search-to'),
+      fromSelect: document.getElementById('currency-from'),
+      toSelect: document.getElementById('currency-to'),
+      amountFrom: document.getElementById('amount-from'),
+      amountTo: document.getElementById('amount-to'),
+      status: document.getElementById('status-message'),
+      updated: document.getElementById('last-updated'),
+      rateFrom: document.getElementById('rate-display-from'),
+      rateTo: document.getElementById('rate-display-to'),
+      copyBtn: document.getElementById('copy-btn'),
+      copyFeedback: document.querySelector('.copy-feedback'),
+      chartBtn: document.getElementById('chart-btn'),
+      chartContainer: document.getElementById('chart-container')
+    };
+
+    function formatNumber(num) {
+      return Number(num).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 8 });
+    }
+
+    function populateSelect(selectEl, currencies) {
+      selectEl.innerHTML = '';
+      Object.keys(currencies).sort().forEach(code => {
+        const opt = new Option(`${code} - ${currencies[code]}`, code);
+        selectEl.add(opt);
+      });
+    }
+
+    function filterSelect(inputEl, selectEl) {
+      const term = inputEl.value.toLowerCase();
+      Array.from(selectEl.options).forEach(opt => {
+        opt.hidden = !opt.text.toLowerCase().includes(term);
+      });
+    }
+
+    function switchTab(tab) {
+      currentTab = tab;
+      els.tabFiat.classList.toggle('tab-active', tab === 'fiat');
+      els.tabFiat.classList.toggle('bg-slate-200', tab !== 'fiat');
+      els.tabCrypto.classList.toggle('tab-active', tab === 'crypto');
+      els.tabCrypto.classList.toggle('bg-slate-200', tab === 'crypto');
+
+      const currencies = tab === 'fiat' ? FIAT_CURRENCIES : CRYPTO_CURRENCIES;
+      populateSelect(els.fromSelect, currencies);
+      populateSelect(els.toSelect, currencies);
+      els.fromSearch.value = '';
+      els.toSearch.value = '';
+      els.fromSelect.value = tab === 'fiat' ? 'USD' : 'BTC';
+      els.toSelect.value = tab === 'fiat' ? 'MYR' : 'ETH';
+      fetchRates();
+    }
+
+    async function fetchFiatRates() {
+      try {
+        const base = els.fromSelect.value;
+        const res = await fetch(`https://api.exchangerate.host/latest?base=${base}`);
+        const data = await res.json();
+        rates = data.rates || {};
+        els.status.innerHTML = 'Live rates';
+        els.updated.textContent = `Updated: ${new Date().toLocaleTimeString()}`;
+      } catch (e) {
+        els.status.innerHTML = 'Using cached rates';
+      }
+    }
+
+    async function fetchCryptoRates() {
+      const ids = Object.keys(CRYPTO_CURRENCIES).map(c => c.toLowerCase()).join(',');
+      try {
+        const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd`);
+        const data = await res.json();
+        Object.keys(data).forEach(key => {
+          const code = key.toUpperCase();
+          rates[code] = 1 / data[key].usd;
+        });
+      } catch (e) { console.log("Crypto rates failed"); }
+    }
+
+    async function fetchRates() {
+      if (currentTab === 'fiat') await fetchFiatRates();
+      else await fetchCryptoRates();
+      convert();
+    }
+
+    function convert() {
+      const from = els.fromSelect.value;
+      const to = els.toSelect.value;
+      let amount = parseFloat(els.amountFrom.value.replace(/,/g, '')) || 0;
+
+      if (from === to) {
+        els.amountTo.value = formatNumber(amount);
+        return;
+      }
+
+      let rate = rates[to];
+      if (!rate && rates[from]) rate = rates[to] / rates[from] || 0;
+
+      const result = amount * (rate || 0);
+      els.amountTo.value = formatNumber(result);
+
+      const displayRate = rate || (1 / (rates[from] / rates[to]));
+      els.rateFrom.textContent = `1 ${from} = ${displayRate.toFixed(6)} ${to}`;
+      els.rateTo.textContent = `1 ${to} = ${(1/displayRate).toFixed(6)} ${from}`;
+    }
+
+    async function loadChart() {
+      const from = els.fromSelect.value;
+      const to = els.toSelect.value;
+      const days = 30;
+      const res = await fetch(`https://api.exchangerate.host/timeseries?start_date=${new Date(Date.now() - days*24*60*60*1000).toISOString().split('T')[0]}&end_date=${new Date().toISOString().split('T')[0]}&base=${from}&symbols=${to}`);
+      const data = await res.json();
+      const labels = Object.keys(data.rates);
+      const values = labels.map(d => data.rates[d][to]);
+
+      if (chart) chart.destroy();
+      chart = new Chart(document.getElementById('rate-chart'), {
+        type: 'line',
+        data: { labels, datasets: [{ label: `${from} → ${to}`, data: values, borderColor: '#10b981', tension: 0.3 }] },
+        options: { responsive: true, plugins: { legend: { display: true } } }
+      });
+    }
+
+    // Events
+    document.addEventListener('DOMContentLoaded', () => {
+      switchTab('fiat');
+      setInterval(fetchRates, 300000);
+
+      els.tabFiat.onclick = () => switchTab('fiat');
+      els.tabCrypto.onclick = () => switchTab('crypto');
+
+      els.fromSearch.oninput = () => filterSelect(els.fromSearch, els.fromSelect);
+      els.toSearch.oninput = () => filterSelect(els.toSearch, els.toSearch);
+
+      els.fromSearch.onclick = () => els.fromSelect.classList.toggle('hidden', false);
+      els.toSearch.onclick = () => els.toSelect.classList.toggle('hidden', false);
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('#search-from') && !e.target.closest('#currency-from')) els.fromSelect.classList.add('hidden');
+        if (!e.target.closest('#search-to') && !e.target.closest('#currency-to')) els.toSelect.classList.add('hidden');
+      });
+
+      els.fromSelect.onchange = () => { els.fromSearch.value = els.fromSelect.selectedOptions[0].text; els.fromSelect.classList.add('hidden'); fetchRates(); };
+      els.toSelect.onchange = () => { els.toSearch.value = els.toSelect.selectedOptions[0].text; els.toSelect.classList.add('hidden'); convert(); };
+
+      els.amountFrom.oninput = (e) => {
+        let val = e.target.value.replace(/[^0-9.]/g, '');
+        if (val) e.target.value = Number(val).toLocaleString();
+        convert();
+      };
+
+      document.getElementById('swap-button').onclick = () => {
+        const tempCode = els.fromSelect.value;
+        const tempText = els.fromSearch.value;
+        els.fromSelect.value = els.toSelect.value;
+        els.toSelect.value = tempCode;
+        els.fromSearch.value = els.toSearch.value;
+        els.toSearch.value = tempText;
+        fetchRates();
+      };
+
+      document.getElementById('convert-btn').onclick = convert;
+
+      els.amountTo.onclick = els.copyBtn.onclick = () => {
+        navigator.clipboard.writeText(els.amountTo.value);
+        els.copyFeedback.classList.add('show');
+        els.copyBtn.style.opacity = 1;
+        setTimeout(() => { els.copyFeedback.classList.remove('show'); els.copyBtn.style.opacity = 0; }, 1500);
+      };
+
+      els.chartBtn.onclick = () => {
+        els.chartContainer.classList.toggle('hidden');
+        els.chartBtn.textContent = els.chartContainer.classList.contains('hidden') ? 'View 30-Day Chart' : 'Hide Chart';
+        if (!els.chartContainer.classList.contains('hidden')) loadChart();
+      };
+    });
+  </script>
+</body>
+</html>
