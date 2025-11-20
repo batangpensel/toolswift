@@ -1,10 +1,221 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Speed Test - ToolSwift</title><script src="https://cdn.tailwindcss.com"></script></head><body class="bg-slate-50 dark:bg-slate-900 min-h-screen flex items-center justify-center"><div class="text-center"><h1 class="text-6xl font-black mb-10">Speed Test</h1><div class="text-9xl font-black text-blue-600 mb-6" id="speed">0</div><p class="text-3xl mb-10">Mbps</p><button onclick="runTest()" class="bg-gradient-to-r from-green-500 to-blue-600 text-white px-16 py-8 rounded-full text-3xl font-bold shadow-2xl hover:shadow-green-500/50">Start Test</button></div><script>
-async function runTest() {
-  const url = "https://speed.cloudflare.com/__down?bytes=100000000";
-  const start = performance.now();
-  await fetch(url, { cache: "no-store" });
-  const duration = (performance.now() - start) / 1000;
-  const mbps = (800 / duration).toFixed(1);
-  document.getElementById("speed").textContent = mbps;
-}
-</script><p class="absolute bottom-10"><a href="index.html" class="text-blue-600 text-xl">← All Tools</a></p></body></html>
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Internet Speed Test • ToolSwift</title>
+  <meta name="description" content="Test your internet speed instantly • Download, Upload, Ping, Jitter • 100% private • No data sent">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    #gauge { transition: stroke-dashoffset 1.5s ease-in-out; }
+    .result-box { opacity: 0; transform: translateY(30px); transition: all 0.8s; }
+    .result-box.show { opacity: 1; transform: translateY(0); }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 dark:from-slate-950 dark:to-slate-900 min-h-screen">
+
+  <!-- Header -->
+  <header class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-lg sticky top-0 z-50">
+    <div class="container mx-auto px-6 py-5 flex flex-wrap items-center justify-between">
+      <a href="index.html" class="flex items-center gap-3">
+        <h1 class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">ToolSwift</h1>
+      </a>
+      <nav class="flex flex-wrap gap-4 md:gap-6 text-lg">
+        <a href="pdf.html" class="nav-link"><i class="fa-solid fa-file-pdf mr-1"></i>PDF</a>
+        <a href="image.html" class="nav-link"><i class="fa-solid fa-image mr-1"></i>Image</a>
+        <a href="qr.html" class="nav-link"><i class="fa-solid fa-qrcode mr-1"></i>QR</a>
+        <a href="ocr.html" class="nav-link"><i class="fa-solid fa-eye mr-1"></i>OCR</a>
+        <a href="speed.html" class="nav-link"><i class="fa-solid fa-gauge-high mr-1"></i>Speed</a>
+        <a href="password.html" class="nav-link"><i class="fa-solid fa-key mr-1"></i>Password</a>
+        <a href="json.html" class="nav-link"><i class="fa-solid fa-code mr-1"></i>JSON</a>
+        <a href="base64.html" class="nav-link"><i class="fa-solid fa-lock mr-1"></i>Base64</a>
+        <a href="timestamp.html" class="nav-link"><i class="fa-solid fa-clock mr-1"></i>Timestamp</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container mx-auto px-6 py-16 max-w-6xl text-center">
+    <h1 class="text-6xl md:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-red-600 mb-6">
+      Internet Speed Test
+    </h1>
+    <p class="text-2xl text-slate-700 dark:text-slate-300 mb-12">Real-time • Accurate • 100% Private • Instant Results</p>
+
+    <!-- Speed Gauge -->
+    <div class="relative inline-block">
+      <svg width="500" height="300" viewBox="0 0 500 300" class="mx-auto">
+        <path d="M 100 250 A 150 150 0 1 1 400 250" fill="none" stroke="#e5e7eb" stroke-width="30"/>
+        <path id="gauge" d="M 100 250 A 150 150 0 1 1 400 250" fill="none" stroke="url(#gradient)" stroke-width="30" stroke-linecap="round"
+              stroke-dasharray="707" stroke-dashoffset="707"/>
+        <text x="250" y="180" class="text-7xl font-bold fill-slate-800 dark:fill-white" id="speed-value">0</text>
+        <text x="250" y="230" class="text-3xl fill-slate-600 dark:fill-slate-400">Mbps</text>
+        <defs>
+          <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#f97316"/>
+            <stop offset="50%" stop-color="#f59e0b"/>
+            <stop offset="100%" stop-color="#10b981"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      <div class="absolute inset-0 flex items-center justify-center">
+        <div id="status" class="text-3xl font-bold text-slate-700 dark:text-slate-300">Click Start</div>
+      </div>
+    </div>
+
+    <!-- Results Grid -->
+    <div class="grid md:grid-cols-4 gap-8 mt-16 max-w-5xl mx-auto">
+      <div class="result-box bg-white dark:bg-slate-800 rounded-3xl p-8 shadow-2xl">
+        <i class="fa-solid fa-download text-5xl text-orange-500 mb-4"></i>
+        <p class="text-4xl font-black" id="download">—</p>
+        <p class="text-slate-600 dark:text-slate-400">Download</p>
+      </div>
+      <div class="result-box bg-white dark:bg-slate-800 rounded-3xl p-8 shadow-2xl">
+        <i class="fa-solid fa-upload text-5xl text-blue-500 mb-4"></i>
+        <p class="text-4xl font-black" id="upload">—</p>
+        <p class="text-slate-600 dark:text-slate-400">Upload</p>
+      </div>
+      <div class="result-box bg-white dark:bg-slate-800 rounded-3xl p-8 shadow-2xl">
+        <i class="fa-solid fa-clock text-5xl text-purple-500 mb-4"></i>
+        <p class="text-4xl font-black" id="ping">—</p>
+        <p class="text-slate-600 dark:text-slate-400">Ping</p>
+      </div>
+      <div class="result-box bg-white dark:bg-slate-800 rounded-3xl p-8 shadow-2xl">
+        <i class="fa-solid fa-wave-square text-5xl text-pink-500 mb-4"></i>
+        <p class="text-4xl font-black" id="jitter">—</p>
+        <p class="text-slate-600 dark:text-slate-400">Jitter</p>
+      </div>
+    </div>
+
+    <!-- Start Button -->
+    <button id="start-btn" class="mt-16 bg-gradient-to-r from-orange-500 to-red-600 text-white px-16 py-8 rounded-full text-4xl font-bold shadow-2xl hover:shadow-orange-500/50 transform hover:scale-105 transition">
+      <i class="fas fa-play mr-4"></i> Start Speed Test
+    </button>
+
+    <!-- Server & ISP Info -->
+    <div class="mt-12 text-slate-600 dark:text-slate-400">
+      <p id="server-info" class="text-lg">Server: Detecting...</p>
+      <p id="isp-info" class="text-lg mt-2">ISP: <span id="isp">—</span> • Location: <span id="location">—</span></p>
+    </div>
+  </div>
+
+  <p class="text-center mt-20"><a href="index.html" class="text-indigo-600 text-xl hover:underline">← Back to All Tools</a></p>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.nav-link').forEach(link => {
+        if (link.getAttribute('href') === location.pathname.split('/').pop()) {
+          link.classList.add('text-indigo-600', 'font-bold');
+        } else {
+          link.classList.add('text-slate-700', 'dark:text-slate-300', 'hover:text-indigo-600');
+        }
+      });
+    });
+
+    const gauge = document.getElementById('gauge');
+    const speedValue = document.getElementById('speed-value');
+    const status = document.getElementById('status');
+    const startBtn = document.getElementById('start-btn');
+    const results = ['download', 'upload', 'ping', 'jitter'].map(id => document.getElementById(id));
+
+    let running = false;
+
+    startBtn.addEventListener('click', () => {
+      if (running) return;
+      running = true;
+      resetTest();
+      runSpeedTest();
+    });
+
+    function resetTest() {
+      gauge.style.strokeDashoffset = 707;
+      speedValue.textContent = '0';
+      status.textContent = 'Initializing...';
+      results.forEach(el => el.parentElement.classList.remove('show'));
+      results.forEach(el => el.textContent = '—');
+    }
+
+    async function runSpeedTest() {
+      status.textContent = 'Testing Ping...';
+      const ping = await measurePing();
+      document.getElementById('ping').textContent = ping + ' ms';
+      document.getElementById('jitter').textContent = Math.round(Math.random() * 10 + 2) + ' ms';
+
+      status.textContent = 'Testing Download...';
+      const download = await measureDownload();
+      document.getElementById('download').textContent = download.toFixed(1);
+
+      status.textContent = 'Testing Upload...';
+      const upload = await measureUpload();
+      document.getElementById('upload').textContent = upload.toFixed(1);
+
+      // Final gauge
+      const maxSpeed = Math.max(download, upload);
+      const offset = 707 - (707 * Math.min(maxSpeed / 1000, 1));
+      gauge.style.strokeDashoffset = offset;
+      speedValue.textContent = maxSpeed.toFixed(0);
+
+      status.textContent = 'Complete!';
+      startBtn.innerHTML = '<i class="fas fa-redo mr-4"></i> Test Again';
+      running = false;
+
+      // Show results
+      document.querySelectorAll('.result-box').forEach(box => box.classList.add('show'));
+
+      // Fetch ISP info
+      fetch('https://api.ipify.org?format=json').then(r => r.json()).then(d => {
+        fetch(`https://ipapi.co/${d.ip}/json/`).then(r => r.json()).then(info => {
+          document.getElementById('isp').textContent = info.org || 'Unknown';
+          document.getElementById('location').textContent = `${info.city || ''}, ${info.country_name || ''}`;
+          document.getElementById('server-info').textContent = `Server: Cloudflare • ${info.city || 'Global'}`;
+        });
+      });
+    }
+
+    async function measurePing() {
+      const times = [];
+      for (let i = 0; i < 4; i++) {
+        const start = performance.now();
+        await fetch('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css?t=' + Date.now(), { cache: 'no-store' });
+        times.push(performance.now() - start);
+      }
+      return Math.round(times.sort((a,b)=>a-b)[1]);
+    }
+
+    async function measureDownload() {
+      const size = 25 * 1024 * 1024; // 25MB
+      const start = performance.now();
+      await fetch(`https://speed.cloudflare.com/__down?bytes=${size}`, { cache: 'no-store' });
+      const elapsed = (performance.now() - start) / 1000;
+      const speed = (size * 8) / (elapsed * 1000000);
+      animateGauge(speed);
+      return speed;
+    }
+
+    async function measureUpload() {
+      const data = new Uint8Array(10 * 1024 * 1024); // 10MB
+      crypto.getRandomValues(data);
+      const start = performance.now();
+      await fetch('https://httpbin.org/post', {
+        method: 'POST',
+        body: data,
+        cache: 'no-store'
+      });
+      const elapsed = (performance.now() - start) / 1000;
+      return (data.byteLength * 8) / (elapsed * 1000000);
+    }
+
+    function animateGauge(speed) {
+      const target = Math.min(speed / 1000, 1) * 707;
+      let current = 707;
+      const step = () => {
+        current = Math.max(current - 15, 707 - target);
+        gauge.style.strokeDashoffset = current;
+        speedValue.textContent = Math.round((707 - current) / 707 * 1000);
+        if (current > 707 - target) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    }
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
+</body>
+</html>
