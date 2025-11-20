@@ -8,10 +8,10 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <style>
-    .drop-zone { transition: all 0.3s; border: 4px dashed #f472b6; }
-    .drop-zone.dragover { border-color: #ec4899; background-color: #fdf2f8; transform: scale(1.02); }
     .copy-feedback { opacity: 0; transition: opacity 0.4s; }
     .copy-feedback.show { opacity: 1; }
+    #live-clock { animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
   </style>
 </head>
 <body class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 dark:from-slate-950 dark:to-slate-900 min-h-screen">
