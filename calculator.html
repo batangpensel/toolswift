@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculators — ToolSwift</title>
+  <meta name="description" content="All-in-one calculators: Scientific, Percentage, BMI, Loan, Date, Unit Converter — all 100% in your browser."/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    .tab-btn { transition: all 0.3s; }
+    .tab-btn:hover { background-color: rgba(255,255,255,0.1); }
+    .tab-btn.active { border-bottom: 4px solid #6366f1; }
+    .input-field { transition: all 0.3s; }
+    .input-field:focus { ring-2 ring-indigo-500; }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 dark:from-slate-950 dark:to-slate-900 min-h-screen">
+  <div class="container mx-auto px-6 py-16 max-w-7xl">
+    <div class="text-center mb-16">
+      <a href="index.html" class="inline-flex items-center text-indigo-600 dark:text-indigo-400 mb-4 hover:underline">
+        <i class="fa-solid fa-arrow-left mr-2"></i> Back to ToolSwift
+      </a>
+      <h1 class="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600 mb-4">Calculators</h1>
+      <p class="text-2xl text-slate-700 dark:text-slate-300">Scientific • Percentage • BMI • Loan • Date • Unit Converter</p>
+      <p class="text-slate-600 dark:text-slate-400 mt-2">All tools run 100% in your browser • Private & Instant</p>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div class="flex justify-center mb-10 overflow-x-auto">
+      <button class="tab-btn px-6 py-3 text-lg font-semibold text-slate-700 dark:text-slate-300 hover:bg-indigo-100 dark:hover:bg-slate-800 rounded-t-lg" data-tab="scientific">Scientific</button>
+      <button class="tab-btn px-6 py-3 text-lg font-semibold text-slate-700 dark:text-slate-300 hover:bg-indigo-100 dark:hover:bg-slate-800 rounded-t-lg" data-tab="percentage">Percentage</button>
+      <button class="tab-btn px-6 py-3 text-lg font-semibold text-slate-700 dark:text-slate-300 hover:bg-indigo-100 dark:hover:bg-slate-800 rounded-t-lg" data-tab="bmi">BMI</button>
+      <button class="tab-btn px-6 py-3 text-lg font-semibold text-slate-700 dark:text-slate-300 hover:bg-indigo-100 dark:hover:bg-slate-800 rounded-t-lg" data-tab="loan">Loan</button>
+      <button class="tab-btn px-6 py-3 text-lg font-semibold text-slate-700 dark:text-slate-300 hover:bg-indigo-100 dark:hover:bg-slate-800 rounded-t-lg" data-tab="date">Date</button>
+      <button class="tab-btn px-6 py-3 text-lg font-semibold text-slate-700 dark:text-slate-300 hover:bg-indigo-100 dark:hover:bg-slate-800 rounded-t-lg" data-tab="unit">Unit Converter</button>
+    </div>
+
+    <!-- Tab Contents -->
+    <div class="bg-white dark:bg-slate-800 rounded-3xl p-10 shadow-xl">
+
+      <!-- Scientific Calculator -->
+      <div id="scientific" class="tab-content hidden">
+        <h2 class="text-3xl font-bold mb-6 text-center text-slate-800 dark:text-slate-200">Scientific Calculator</h2>
+        <div class="max-w-md mx-auto">
+          <input type="text" id="sci-display" class="w-full p-4 text-right text-3xl bg-gray-100 dark:bg-slate-700 rounded-lg mb-4 input-field" readonly>
+          <div class="grid grid-cols-4 gap-2">
+            <button class="btn col-span-2 bg-indigo-100 dark:bg-slate-700 text-indigo-800 dark:text-indigo-300 p-4 rounded-lg text-2xl" onclick="sciClear()">C</button>
+            <button class="btn bg-indigo-100 dark:bg-slate-700 text-indigo-800 dark:text-indigo-300 p-4 rounded-lg text-2xl" onclick="sciBackspace()">&larr;</button>
+            <button class="btn bg-indigo-100 dark:bg-slate-700 text-indigo-800 dark:text-indigo-300 p-4 rounded-lg text-2xl" onclick="sciInput('/')">/</button>
+            <button class="btn bg-gray-100 dark:bg-slate-900 p-4 rounded-lg text-2xl" onclick="sciInput('7')">7</button>
+            <button class="btn bg-gray-100 dark:bg-slate-900 p-4 rounded-lg text-2xl" onclick="sciInput('8')">8</button>
+            <button class="btn bg-gray-100 dark:bg-slate-900 p-4 rounded-lg text-2xl" onclick="sciInput('9')">9</button>
+            <button class="btn bg-indigo-100 dark:bg-slate-700 text-indigo-800 dark:text-indigo-300 p-4 rounded-lg text-2xl" onclick="sciInput('*')">*</button>
+            <button class="btn bg-gray-100 dark:bg-slate-900 p-4 rounded-lg text-2xl" onclick="sciInput('4')">4</button>
+            <button class="btn bg-gray-100 dark:bg-slate-900 p-4 rounded-lg text-2xl" onclick="sciInput('5')">5</button>
+            <button class="btn bg-gray-100 dark:bg-slate-900 p-4 rounded-lg text-2xl" onclick="sciInput('6')">6</button>
+            <button class="btn bg-indigo-100 dark:bg-slate-700 text-indigo-800 dark:text-indigo-300 p-4 rounded-lg text-2xl" onclick="sciInput('-')">-</button>
+            <button class="btn bg-gray-100 dark:bg-slate-900 p-4 rounded-lg text-2xl" onclick="sciInput('1')">1</button>
+            <button class="btn bg-gray-100 dark:bg-slate-900 p-4 rounded-lg text-2xl" onclick="sciInput('2')">2</button>
+            <button class="btn bg-gray-100 dark:bg-slate-900 p-4 rounded-lg text-2xl" onclick="sciInput('3')">3</button>
+            <button class="btn bg-indigo-100 dark:bg-slate-700 text-indigo-800 dark:text-indigo-300 p-4 rounded-lg text-2xl" onclick="sciInput('+')">+</button>
+            <button class="btn bg-gray-100 dark:bg-slate-900 p-4 rounded-lg text-2xl" onclick="sciInput('0')">0</button>
+            <button class="btn bg-gray-100 dark:bg-slate-900 p-4 rounded-lg text-2xl" onclick="sciInput('.')">.</button>
+            <button class="btn bg-indigo-500 text-white p-4 rounded-lg text-2xl col-span-2" onclick="sciCalculate()">=</button>
+            <button class="btn bg-purple-100 dark:bg-slate-700 text-purple-800 dark:text-purple-300 p-4 rounded-lg text-xl" onclick="sciFunc('sin')">sin</button>
+            <button class="btn bg-purple-100 dark:bg-slate-700 text-purple-800 dark:text-purple-300 p-4 rounded-lg text-xl" onclick="sciFunc('cos')">cos</button>
+            <button class="btn bg-purple-100 dark:bg-slate-700 text-purple-800 dark:text-purple-300 p-4 rounded-lg text-xl" onclick="sciFunc('tan')">tan</button>
+            <button class="btn bg-purple-100 dark:bg-slate-700 text-purple-800 dark:text-purple-300 p-4 rounded-lg text-xl" onclick="sciInput('Math.PI')">π</button>
+            <button class="btn bg-purple-100 dark:bg-slate-700 text-purple-800 dark:text-purple-300 p-4 rounded-lg text-xl" onclick="sciFunc('log')">log</button>
+            <button class="btn bg-purple-100 dark:bg-slate-700 text-purple-800 dark:text-purple-300 p-4 rounded-lg text-xl" onclick="sciFunc('sqrt')">√</button>
+            <button class="btn bg-purple-100 dark:bg-slate-700 text-purple-800 dark:text-purple-300 p-4 rounded-lg text-xl" onclick="sciInput('**')">^</button>
+            <button class="btn bg-purple-100 dark:bg-slate-700 text-purple-800 dark:text-purple-300 p-4 rounded-lg text-xl" onclick="sciInput('('">(</button>
+            <button class="btn bg-purple-100 dark:bg-slate-700 text-purple-800 dark:text-purple-300 p-4 rounded-lg text-xl" onclick="sciInput(')')">)</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Percentage Calculator -->
+      <div id="percentage" class="tab-content hidden">
+        <h2 class="text-3xl font-bold mb-6 text-center text-slate-800 dark:text-slate-200">Percentage Calculator</h2>
+        <div class="max-w-md mx-auto space-y-6">
+          <div>
+            <label class="block text-slate-600 dark:text-slate-400 mb-2">What is X% of Y?</label>
+            <div class="flex gap-2">
+              <input type="number" id="perc-x1" class="w-1/3 p-3 rounded-lg input-field bg-gray-100 dark:bg-slate-700">
+              <span class="self-center">%</span>
+              <span class="self-center">of</span>
+              <input type="number" id="perc-y1" class="w-1/3 p-3 rounded-lg input-field bg-gray-100 dark:bg-slate-700">
+              <button class="bg-indigo-500 text-white p-3 rounded-lg" onclick="calcPerc1()">=</button>
+            </div>
+            <p id="perc-res1" class="mt-2 text-xl text-indigo-600 dark:text-indigo-400"></p>
+          </div>
+          <div>
+            <label class="block text-slate-600 dark:text-slate-400 mb-2">X is what % of Y?</label>
+            <div class="flex gap-2">
+              <input type="number" id="perc-x2" class="w-1/3 p-3 rounded-lg input-field bg-gray-100 dark:bg-slate-700">
+              <span class="self-center">is what % of</span>
+              <input type="number" id="perc-y2" class="w-1/3 p-3 rounded-lg input-field bg-gray-100 dark:bg-slate-700">
+              <button class="bg-indigo-500 text-white p-3 rounded-lg" onclick="calcPerc2()">=</button>
+            </div>
+            <p id="perc-res2" class="mt-2 text-xl text-indigo-600 dark:text-indigo-400"></p>
+          </div>
+          <div>
+            <label class="block text-slate-600 dark:text-slate-400 mb-2">Percentage Increase/Decrease</label>
+            <div class="flex gap-2">
+              <input type="number" id="perc-from" class="w-1/3 p-3 rounded-lg input-field bg-gray-100 dark:bg-slate-700">
+              <span class="self-center">to</span>
+              <input type="number" id="perc-to" class="w-1/3 p-3 rounded-lg input-field bg-gray-100 dark:bg-slate-700">
+              <button class="bg-indigo-500 text-white p-3 rounded-lg" onclick="calcPercChange()">=</button>
+            </div>
+            <p id="perc-res-change" class="mt-2 text-xl text-indigo-600 dark:text-indigo-400"></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- BMI Calculator -->
+      <div id="bmi" class="tab-content hidden">
+        <h2 class="text-3xl font-bold mb-6 text-center text-slate-800 dark:text-slate-200">BMI Calculator</h2>
+        <div class="max-w-md mx-auto space-y-4">
+          <div>
+            <label class="block text-slate-600 dark:text-slate-400 mb-2">Height (cm)</label>
+            <input type="number" id="bmi-height" class="w-full p-3 rounded-lg input-field bg-gray-100 dark:bg-slate-700">
+          </div>
+          <div>
+            <label class="block text-slate-600 dark:text-slate-400 mb-2">Weight (kg)</label>
+            <input type="number" id="bmi-weight" class="w-full p-3 rounded-lg input-field bg-gray-100 dark:bg-slate-700">
+          </div>
+          <button class="w-full bg-indigo-500 text-white p-3 rounded-lg" onclick="calcBMI()">Calculate BMI</button>
+          <p id="bmi-res" class="mt-4 text-xl text-center text-indigo-600 dark:text-indigo-400"></p>
+          <p id="bmi-category" class="text-center text-slate-600 dark:text-slate-400"></p>
+        </div>
+      </div>
+
+      <!-- Loan Calculator -->
+      <div id="loan" class="tab-content hidden">
+        <h2 class="text-3xl font-bold mb-6 text-center text-slate-800 dark:text-slate-200">Loan Calculator</h2>
+        <div class="max-w-md mx-auto space-y-4">
+          <div>
+            <label class="block text-slate-600 dark:text-slate-400 mb-2">Loan Amount ($)</label>
+            <input type="number" id="loan-amount" class="w-full p-3 rounded-lg input-field bg-gray-100 dark:bg-slate-700">
+          </div>
+          <div>
+            <label class="block text-slate-600 dark:text-slate-400 mb-2">Annual Interest Rate (%)</label>
+            <input type="number" id="loan-rate" class="w-full p-3 rounded-lg input-field bg-gray-100 dark:bg-slate-700">
+          </div>
+          <div>
+            <label class="block text-slate-600 dark:text-slate-400 mb-2">Loan Term (years)</label>
+            <input type="number" id="loan-term" class="w-full p-3 rounded-lg input-field bg-gray-100 dark:bg-slate-700">
+          </div>
+          <button class="w-full bg-indigo-500 text-white p-3 rounded-lg" onclick="calcLoan()">Calculate</button>
+          <p id="loan-res" class="mt-4 text-xl text-center text-indigo-600 dark:text-indigo-400"></p>
+        </div>
+      </div>
+
+      <!-- Date Calculator -->
+      <div id="date" class="tab-content hidden">
+        <h2 class="text-3xl font-bold mb-6 text-center text-slate-800 dark:text-slate-200">Date Calculator</h2>
+        <div class="max-w-md mx-auto space-y-4">
+          <div>
+            <label class="block text-slate-600 dark:text-slate-400 mb-2">Start Date</label>
+            <input type="date" id="date-start" class="w-full p-3 rounded-lg input-field bg-gray-100 dark:bg-slate-700">
+          </div>
+          <div>
+            <label class="block text-slate-600 dark:text-slate-400 mb-2">End Date</label>
+            <input type="date" id="date-end" class="w-full p-3 rounded-lg input-field bg-gray-100 dark:bg-slate-700">
+          </div>
+          <button class="w-full bg-indigo-500 text-white p-3 rounded-lg" onclick="calcDateDiff()">Calculate Difference</button>
+          <p id="date-res" class="mt-4 text-xl text-center text-indigo-600 dark:text-indigo-400"></p>
+        </div>
+      </div>
+
+      <!-- Unit Converter -->
+      <div id="unit" class="tab-content hidden">
+        <h2 class="text-3xl font-bold mb-6 text-center text-slate-800 dark:text-slate-200">Unit Converter</h2>
+        <div class="max-w-md mx-auto space-y-4">
+          <div>
+            <label class="block text-slate-600 dark:text-slate-400 mb-2">Category</label>
+            <select id="unit-category" class="w-full p-3 rounded-lg input-field bg-gray-100 dark:bg-slate-700" onchange="updateUnits()">
+              <option value="length">Length</option>
+              <option value="weight">Weight</option>
+              <option value="temperature">Temperature</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-slate-600 dark:text-slate-400 mb-2">From</label>
+            <input type="number" id="unit-from" class="w-full p-3 rounded-lg input-field bg-gray-100 dark:bg-slate-700" oninput="convertUnit()">
+          </div>
+          <div>
+            <label class="block text-slate-600 dark:text-slate-400 mb-2">From Unit</label>
+            <select id="unit-from-type" class="w-full p-3 rounded-lg input-field bg-gray-100 dark:bg-slate-700" oninput="convertUnit()"></select>
+          </div>
+          <div>
+            <label class="block text-slate-600 dark:text-slate-400 mb-2">To Unit</label>
+            <select id="unit-to-type" class="w-full p-3 rounded-lg input-field bg-gray-100 dark:bg-slate-700" oninput="convertUnit()"></select>
+          </div>
+          <p id="unit-res" class="mt-4 text-xl text-center text-indigo-600 dark:text-indigo-400"></p>
+        </div>
+      </div>
+
+    </div>
+
+    <footer class="text-center mt-20 text-slate-600 dark:text-slate-400">
+      <p class="text-xl">© 2025 ToolSwift • Made with <span class="text-red-500">♥</span> for privacy</p>
+    </footer>
+  </div>
+
+  <script>
+    // Tab Switching
+    const tabs = document.querySelectorAll('.tab-btn');
+    const contents = document.querySelectorAll('.tab-content');
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => { t.classList.remove('active'); t.classList.remove('border-b-4'); });
+        tab.classList.add('active');
+        contents.forEach(c => c.classList.add('hidden'));
+        document.getElementById(tab.dataset.tab).classList.remove('hidden');
+      });
+    });
+    // Default to first tab
+    tabs[0].click();
+
+    // Scientific Calculator Functions
+    let sciDisplay = document.getElementById('sci-display');
+    function sciInput(value) { sciDisplay.value += value; }
+    function sciClear() { sciDisplay.value = ''; }
+    function sciBackspace() { sciDisplay.value = sciDisplay.value.slice(0, -1); }
+    function sciFunc(func) { sciDisplay.value += `Math.${func}(`; }
+    function sciCalculate() {
+      try { sciDisplay.value = eval(sciDisplay.value); } catch { sciDisplay.value = 'Error'; }
+    }
+
+    // Percentage Calculator Functions
+    function calcPerc1() {
+      let x = parseFloat(document.getElementById('perc-x1').value);
+      let y = parseFloat(document.getElementById('perc-y1').value);
+      document.getElementById('perc-res1').textContent = isNaN(x) || isNaN(y) ? '' : (x / 100 * y).toFixed(2);
+    }
+    function calcPerc2() {
+      let x = parseFloat(document.getElementById('perc-x2').value);
+      let y = parseFloat(document.getElementById('perc-y2').value);
+      document.getElementById('perc-res2').textContent = isNaN(x) || isNaN(y) ? '' : ((x / y) * 100).toFixed(2) + '%';
+    }
+    function calcPercChange() {
+      let from = parseFloat(document.getElementById('perc-from').value);
+      let to = parseFloat(document.getElementById('perc-to').value);
+      document.getElementById('perc-res-change').textContent = isNaN(from) || isNaN(to) ? '' : (((to - from) / from) * 100).toFixed(2) + '%';
+    }
+
+    // BMI Calculator Function
+    function calcBMI() {
+      let height = parseFloat(document.getElementById('bmi-height').value) / 100;
+      let weight = parseFloat(document.getElementById('bmi-weight').value);
+      let bmi = (weight / (height * height)).toFixed(2);
+      document.getElementById('bmi-res').textContent = isNaN(bmi) ? '' : `Your BMI: ${bmi}`;
+      let category = bmi < 18.5 ? 'Underweight' : bmi < 25 ? 'Normal' : bmi < 30 ? 'Overweight' : 'Obese';
+      document.getElementById('bmi-category').textContent = isNaN(bmi) ? '' : category;
+    }
+
+    // Loan Calculator Function
+    function calcLoan() {
+      let amount = parseFloat(document.getElementById('loan-amount').value);
+      let rate = parseFloat(document.getElementById('loan-rate').value) / 100 / 12;
+      let term = parseFloat(document.getElementById('loan-term').value) * 12;
+      let payment = (amount * rate * Math.pow(1 + rate, term)) / (Math.pow(1 + rate, term) - 1);
+      document.getElementById('loan-res').textContent = isNaN(payment) ? '' : `Monthly Payment: $${payment.toFixed(2)}`;
+    }
+
+    // Date Calculator Function
+    function calcDateDiff() {
+      let start = new Date(document.getElementById('date-start').value);
+      let end = new Date(document.getElementById('date-end').value);
+      let diff = Math.floor((end - start) / (1000 * 60 * 60 * 24));
+      document.getElementById('date-res').textContent = isNaN(diff) ? '' : `${diff} days between dates`;
+    }
+
+    // Unit Converter Functions
+    const units = {
+      length: { m: 1, cm: 100, mm: 1000, km: 0.001, inch: 39.3701, ft: 3.28084 },
+      weight: { kg: 1, g: 1000, mg: 1000000, lb: 2.20462, oz: 35.274 },
+      temperature: { c: (v) => v, f: (v) => (v * 9/5) + 32, k: (v) => v + 273.15 }
+    };
+    function updateUnits() {
+      let cat = document.getElementById('unit-category').value;
+      let fromSelect = document.getElementById('unit-from-type');
+      let toSelect = document.getElementById('unit-to-type');
+      fromSelect.innerHTML = '';
+      toSelect.innerHTML = '';
+      Object.keys(units[cat]).forEach(unit => {
+        let opt = document.createElement('option');
+        opt.value = unit; opt.text = unit.toUpperCase();
+        fromSelect.add(opt.cloneNode(true));
+        toSelect.add(opt);
+      });
+      toSelect.value = Object.keys(units[cat])[1]; // Default to second unit
+      convertUnit();
+    }
+    function convertUnit() {
+      let cat = document.getElementById('unit-category').value;
+      let value = parseFloat(document.getElementById('unit-from').value);
+      let from = document.getElementById('unit-from-type').value;
+      let to = document.getElementById('unit-to-type').value;
+      let res;
+      if (cat === 'temperature') {
+        let base = from === 'f' ? (value - 32) * 5/9 : from === 'k' ? value - 273.15 : value;
+        res = units[cat][to](base);
+      } else {
+        res = value / units[cat][from] * units[cat][to];
+      }
+      document.getElementById('unit-res').textContent = isNaN(res) ? '' : `${res.toFixed(2)} ${to.toUpperCase()}`;
+    }
+    updateUnits(); // Initialize
+  </script>
+</body>
+</html>
