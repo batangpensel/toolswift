@@ -1,1 +1,263 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>QR Code Generator - ToolSwift</title><script src="https://cdn.tailwindcss.com"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script></head><body class="bg-slate-50 dark:bg-slate-900 min-h-screen"><div class="max-w-2xl mx-auto p-8"><div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl p-10"><h1 class="text-5xl font-bold text-center mb-10">QR Code Generator</h1><input type="text" id="text" placeholder="Enter text or URL" class="w-full p-6 text-2xl border rounded-2xl mb-8"/><div class="flex justify-center gap-8 mb-8"><input type="range" min="100" max="600" value="300" id="size" class="w-64"/><button onclick="new QRious({element:document.getElementById('qr'),value:document.getElementById('text').value,size:document.getElementById('size').value});" class="bg-blue-600 text-white px-8 py-4 rounded-xl text-xl font-bold">Update</button></div><div class="flex justify-center"><canvas id="qr" class="border-8 border-white shadow-2xl rounded-3xl"></canvas></div><div class="text-center mt-8"><button onclick="document.getElementById('qr').toDataURL && (a=document.createElement('a'),a.href=document.getElementById('qr').toDataURL(),a.download='qrcode.png',a.click())" class="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-12 py-5 rounded-2xl text-2xl font-bold">Download PNG</button></div></div><p class="text-center mt-10"><a href="index.html" class="text-blue-600 text-xl">← All Tools</a></p></div><script>new QRious({element:document.getElementById('qr'),value:'https://toolswift.com',size:300});document.getElementById('text').addEventListener('input',e=>new QRious({element:document.getElementById('qr'),value:e.target.value,size:document.getElementById('size').value}));</script></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Image Tools — ToolSwift</title>
+  <meta name="description" content="Best free online image editor: crop, rotate, filters, watermark, compress, WebP — 100% private"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    .drop-zone { border: 4px dashed #94a3b8; transition: all 0.3s; }
+    .drop-zone.dragover { border-color: #6366f1; background-color: #eef2ff; }
+    canvas { max-width: 100%; height: auto; border-radius: 1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+    .filter-btn {
+      @apply px-6 py-3 rounded-full font-medium transition-all duration-200 border-2;
+    }
+    .filter-btn.active {
+      @apply bg-indigo-600 text-white border-indigo-600 shadow-lg ring-4 ring-indigo-300;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-slate-900 dark:to-slate-800 min-h-screen">
+  <div class="max-w-4xl mx-auto p-6">
+    <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl p-10 mt-10">
+      <h1 class="text-5xl font-bold text-center mb-4">QR Code Generator</h1>
+      <p class="text-center text-slate-600 dark:text-slate-400 mb-10">Now with logo overlay • 100% private • No data sent</p>
+
+      <div class="grid md:grid-cols-2 gap-10">
+        <!-- Left: Controls -->
+        <div class="space-y-6">
+          <div>
+            <label class="text-lg font-semibold">Type</label>
+            <select id="type" class="w-full p-4 text-lg border rounded-xl">
+              <option value="text">Text / URL</option>
+              <option value="wifi">Wi-Fi Network</option>
+              <option value="vcard">Contact (vCard)</option>
+              <option value="email">Send Email</option>
+              <option value="sms">SMS Message</option>
+              <option value="phone">Phone Number</option>
+            </select>
+          </div>
+
+          <div id="dynamic-fields">
+            <input type="text" id="text" placeholder="Enter text or URL" class="w-full p-5 text-xl border rounded-xl">
+          </div>
+
+          <!-- Logo Upload & Size -->
+          <div class="space-y-4 p-5 bg-gray-50 dark:bg-slate-700 rounded-2xl">
+            <label class="text-lg font-semibold flex items-center gap-2">
+              <i class="fa-solid fa-image"></i> Logo Overlay (optional)
+            </label>
+            <input type="file" id="logo-upload" accept="image/*" class="block w-full text-sm text-slate-500 file:mr-4 file:py-3 file:px-6 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-gradient-to-r file:from-purple-600 file:to-pink-600 file:text-white hover:file:brightness-110">
+            <div class="flex items-center gap-4 mt-3">
+              <input type="range" min="10" max="30" value="20" id="logo-size" class="flex-1">
+              <span id="logo-size-value" class="font-bold text-purple-600">20%</span>
+            </div>
+            <p class="text-xs text-slate-500">Tip: Use PNG with transparent background for best results</p>
+          </div>
+
+          <div class="grid grid-cols-2 gap-6">
+            <div>
+              <label>Size: <span id="size-value">400</span>px</label>
+              <input type="range" min="200" max="800" value="400" id="size" class="w-full">
+            </div>
+            <div>
+              <label>Error Correction</label>
+              <select id="level" class="w-full p-3 border rounded-xl">
+                <option value="L">L - Low</option>
+                <option value="M">M - Medium</option>
+                <option value="Q">Q - High</option>
+                <option value="H" selected>H - Max (recommended with logo)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="flex gap-6 justify-center">
+            <div>
+              <label>Color</label><br>
+              <input type="color" id="foreground" value="#000000" class="w-20 h-12 rounded cursor-pointer">
+            </div>
+            <div>
+              <label>Background</label><br>
+              <input type="color" id="background" value="#ffffff" class="w-20 h-12 rounded cursor-pointer">
+            </div>
+          </div>
+
+          <button onclick="generateQR()" class="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white py-5 rounded-2xl text-2xl font-bold hover:shadow-xl transition">
+            Generate QR Code
+          </button>
+        </div>
+
+        <!-- Right: Preview -->
+        <div class="flex flex-col items-center">
+          <div class="bg-white p-8 rounded-3xl shadow-2xl border-8 border-gray-100">
+            <canvas id="qr-canvas" width="400" height="400" class="border-4 border-dashed border-gray-300 rounded-xl"></canvas>
+          </div>
+          <button onclick="downloadQR()" class="mt-8 bg-gradient-to-r from-purple-600 to-pink-600 text-white px-12 py-5 rounded-2xl text-2xl font-bold">
+            Download PNG
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <p class="text-center mt-10"><a href="index.html" class="text-blue-600 text-xl hover:underline">← Back to All Tools</a></p>
+  </div>
+
+  <script>
+    let qr;
+    let logoImage = null;
+
+    function initQR() {
+      qr = new QRious({
+        element: document.getElementById('qr-canvas'),
+        size: 400,
+        value: 'https://toolswift.com',
+        level: 'H' // High error correction = logo safe
+      });
+      drawLogo();
+    }
+    initQR();
+
+    // Logo upload handler
+    document.getElementById('logo-upload').addEventListener('change', e => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = ev => {
+        logoImage = new Image();
+        logoImage.onload = () => generateQR();
+        logoImage.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Real-time inputs
+    ['text', 'size', 'level', 'foreground', 'background', 'logo-size'].forEach(id => {
+      document.getElementById(id)?.addEventListener('input', generateQR);
+    });
+
+    document.getElementById('size').addEventListener('input', e => {
+      document.getElementById('size-value').textContent = e.target.value;
+      document.getElementById('qr-canvas').width = e.target.value;
+      document.getElementById('qr-canvas').height = e.target.value;
+    });
+    document.getElementById('logo-size').addEventListener('input', e => {
+      document.getElementById('logo-size-value').textContent = e.target.value + '%';
+      generateQR();
+    });
+
+    // Dynamic fields (same as before)
+    const typeSelect = document.getElementById('type');
+    const dynamicDiv = document.getElementById('dynamic-fields');
+
+    const templates = {
+      text: `<input type="text" id="text" placeholder="Enter text or URL" class="w-full p-5 text-xl border rounded-xl">`,
+      wifi: `<input type="text" id="ssid" placeholder="WiFi Name (SSID)" class="w-full p-4 border rounded-xl mb-3">
+             <input type="password" id="password" placeholder="Password (optional)" class="w-full p-4 border rounded-xl mb-3">
+             <select id="encryption" class="w-full p-4 border rounded-xl">
+               <option value="WPA">WPA/WPA2/WPA3</option>
+               <option value="WEP">WEP</option>
+               <option value="">Open</option>
+             </select>`,
+      vcard: `<textarea id="vcard" placeholder="BEGIN:VCARD&#10;VERSION:3.0&#10;FN:Your Name&#10;TEL:123456789&#10;EMAIL:you@example.com&#10;END:VCARD" class="w-full p-5 text-lg border rounded-xl h-48"></textarea>`,
+      email: `<input type="email" id="email" placeholder="recipient@example.com" class="w-full p-5 border rounded-xl mb-3">
+              <input type="text" id="subject" placeholder="Subject" class="w-full p-5 border rounded-xl mb-3">
+              <textarea id="body" placeholder="Message" class="w-full p-5 border rounded-xl"></textarea>`,
+      sms: `<input type="tel" id="phone" placeholder="Phone number" class="w-full p-5 border rounded-xl mb-3">
+            <textarea id="message" placeholder="Message" class="w-full p-5 border rounded-xl"></textarea>`,
+      phone: `<input type="tel" id="phone" placeholder="+123456789" class="w-full p-5 text-xl border rounded-xl">`
+    };
+
+    typeSelect.addEventListener('change', () => {
+      dynamicDiv.innerHTML = templates[typeSelect.value];
+      document.getElementById('text')?.addEventListener('input', generateQR);
+      generateQR();
+    });
+
+    function getQRValue() {
+      const type = typeSelect.value;
+      if (type === 'text') return document.getElementById('text')?.value || '';
+      if (type === 'wifi') {
+        const ssid = document.getElementById('ssid').value;
+        const pass = document.getElementById('password').value;
+        const enc = document.getElementById('encryption').value;
+        return `WIFI:T:${enc};S:${ssid};P:${pass};;`;
+      }
+      if (type === 'email') {
+        const to = document.getElementById('email').value;
+        const sub = document.getElementById('subject').value;
+        const body = document.getElementById('body').value;
+        return `mailto:${to}?subject=${encodeURIComponent(sub)}&body=${encodeURIComponent(body)}`;
+      }
+      if (type === 'sms') return `SMSTO:${document.getElementById('phone').value}:${document.getElementById('message').value}`;
+      if (type === 'phone') return `tel:${document.getElementById('phone').value}`;
+      if (type === 'vcard') return document.getElementById('vcard').value;
+      return '';
+    }
+
+    function generateQR() {
+      const value = getQRValue();
+      if (!value) return;
+
+      const size = parseInt(document.getElementById('size').value);
+
+      qr.set({
+        background: document.getElementById('background').value,
+        foreground: document.getElementById('foreground').value,
+        level: document.getElementById('level').value,
+        size: size,
+        value: value
+      });
+
+      drawLogo();
+    }
+
+    function drawLogo() {
+      const canvas = document.getElementById('qr-canvas');
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(qr.element, 0, 0, canvas.width, canvas.height); // Draw QRious canvas
+
+      if (logoImage) {
+        const logoRatio = document.getElementById('logo-size').value / 100;
+        const logoSize = canvas.width * logoRatio;
+        const padding = logoSize * 0.15; // White border behind logo
+        const pos = (canvas.width - logoSize) / 2;
+
+        // White background (rounded)
+        ctx.fillStyle = 'white';
+        ctx.roundRect(pos - padding, pos - padding, logoSize + padding*2, logoSize + padding*2, 20).fill();
+
+        // Draw logo
+        ctx.drawImage(logoImage, pos, pos, logoSize, logoSize);
+      }
+    }
+
+    // Helper for rounded rect (modern browsers)
+    CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+      if (w < 2 * r) r = w / 2;
+      if (h < 2 * r) r = h / 2;
+      this.beginPath();
+      this.moveTo(x + r, y);
+      this.arcTo(x + w, y, x + w, y + h, r);
+      this.arcTo(x + w, y + h, x, y + h, r);
+      this.arcTo(x, y + h, x, y, r);
+      this.arcTo(x, y, x + w, y, r);
+      this.closePath();
+      return this;
+    };
+
+    function downloadQR() {
+      const link = document.createElement('a');
+      link.download = 'qrcode-with-logo.png';
+      link.href = document.getElementById('qr-canvas').toDataURL('image/png');
+      link.click();
+    }
+
+    // Initial
+    generateQR();
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
+</body>
+</html>
