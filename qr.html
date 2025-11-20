@@ -5,7 +5,37 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>QR Code Generator • ToolSwift</title>
   <meta name="description" content="Generate stunning QR codes with custom frames, logos, colors, and text.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    .drop-zone { transition: all 0.3s; border: 4px dashed #f472b6; }
+    .drop-zone.dragover { border-color: #ec4899; background-color: #fdf2f8; transform: scale(1.02); }
+    .copy-feedback { opacity: 0; transition: opacity 0.4s; }
+    .copy-feedback.show { opacity: 1; }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 dark:from-slate-950 dark:to-slate-900 min-h-screen">
 
+  <!-- Header -->
+  <header class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-lg sticky top-0 z-50">
+    <div class="container mx-auto px-6 py-5 flex flex-wrap items-center justify-between">
+      <a href="index.html" class="flex items-center gap-3">
+        <h1 class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">ToolSwift</h1>
+      </a>
+      <nav class="flex flex-wrap gap-4 md:gap-6 text-lg">
+        <a href="pdf.html" class="nav-link"><i class="fa-solid fa-file-pdf mr-1"></i>PDF</a>
+        <a href="image.html" class="nav-link"><i class="fa-solid fa-image mr-1"></i>Image</a>
+        <a href="qr.html" class="nav-link"><i class="fa-solid fa-qrcode mr-1"></i>QR</a>
+        <a href="ocr.html" class="nav-link"><i class="fa-solid fa-eye mr-1"></i>OCR</a>
+        <a href="calculator.html" class="nav-link"><i class="fa-solid fa-gauge-high mr-1"></i>Calculator</a>
+        <a href="password.html" class="nav-link"><i class="fa-solid fa-key mr-1"></i>Password</a>
+        <a href="json.html" class="nav-link"><i class="fa-solid fa-code mr-1"></i>JSON</a>
+        <a href="base64.html" class="nav-link"><i class="fa-solid fa-lock mr-1"></i>Base64</a>
+        <a href="timestamp.html" class="nav-link"><i class="fa-solid fa-clock mr-1"></i>Timestamp</a>
+      </nav>
+    </div>
+  </header>
+  
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
