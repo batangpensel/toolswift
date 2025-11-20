@@ -3,29 +3,36 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pro OCR - Image to Text • ToolSwift</title>
-  <meta name="description" content="Extract text from images instantly with Smart Enhancement • 100% private">
+  <title>OCR – Extract Text from Images • ToolSwift</title>
+  <meta name="description" content="Convert Image to Text with Smart AI Enhancement. Upscale low-quality images for high-accuracy OCR. Supports multi-language extraction. Download as .txt">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
-  <script src="https://unpkg.com/tesseract.js@5.1.0/dist/tesseract.min.js"></script>
   <style>
-    .drop-zone { transition: all 0.3s; border: 4px dashed #a78bfa; }
-    .drop-zone.dragover { border-color: #8b5cf6; background-color: #f5f3ff; transform: scale(1.02); }
-    #preview, #debug-preview { max-height: 400px; object-fit: contain; }
-    .scan-line {
-        position: absolute; top: 0; left: 0; width: 100%; height: 4px;
-        background: #a855f7; box-shadow: 0 0 10px #a855f7;
-        animation: scan 2s infinite linear; display: none;
-    }
-    @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+    .drop-zone { transition: all 0.3s; border: 4px dashed #f472b6; }
+    .drop-zone.dragover { border-color: #ec4899; background-color: #fdf2f8; transform: scale(1.02); }
+    .copy-feedback { opacity: 0; transition: opacity 0.4s; }
+    .copy-feedback.show { opacity: 1; }
   </style>
 </head>
-<body class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 dark:from-slate-950 dark:to-slate-900 min-h-screen text-slate-800 dark:text-slate-200">
+<body class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 dark:from-slate-950 dark:to-slate-900 min-h-screen">
 
+  <!-- Header -->
   <header class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-lg sticky top-0 z-50">
-    <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-      <a href="index.html" class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">ToolSwift</a>
-      <a href="index.html" class="font-medium hover:text-indigo-600 transition">Back to Home</a>
+    <div class="container mx-auto px-6 py-5 flex flex-wrap items-center justify-between">
+      <a href="index.html" class="flex items-center gap-3">
+        <h1 class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">ToolSwift</h1>
+      </a>
+      <nav class="flex flex-wrap gap-4 md:gap-6 text-lg">
+        <a href="pdf.html" class="nav-link"><i class="fa-solid fa-file-pdf mr-1"></i>PDF</a>
+        <a href="image.html" class="nav-link"><i class="fa-solid fa-image mr-1"></i>Image</a>
+        <a href="qr.html" class="nav-link"><i class="fa-solid fa-qrcode mr-1"></i>QR</a>
+        <a href="ocr.html" class="nav-link"><i class="fa-solid fa-eye mr-1"></i>OCR</a>
+        <a href="calculator.html" class="nav-link"><i class="fa-solid fa-gauge-high mr-1"></i>Calculator</a>
+        <a href="password.html" class="nav-link"><i class="fa-solid fa-key mr-1"></i>Password</a>
+        <a href="json.html" class="nav-link"><i class="fa-solid fa-code mr-1"></i>JSON</a>
+        <a href="base64.html" class="nav-link"><i class="fa-solid fa-lock mr-1"></i>Base64</a>
+        <a href="timestamp.html" class="nav-link"><i class="fa-solid fa-clock mr-1"></i>Timestamp</a>
+      </nav>
     </div>
   </header>
 
