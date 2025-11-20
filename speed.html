@@ -13,9 +13,24 @@
         /* Total dash array for a 280-degree arc is approx 707 */
         :root { --dash-array: 707; }
 
-        #gauge { transition: stroke-dashoffset 0.5s linear; }
+        #gauge { transition: stroke-dashoffset 0.1s linear; } /* Smoother, faster updates */
         .result-box { opacity: 0; transform: translateY(30px); transition: all 0.8s; }
         .result-box.show { opacity: 1; transform: translateY(0); }
+        
+        /* Ensure status text doesn't overlap speed value */
+        #status-container {
+            position: absolute;
+            top: 50%; /* Center vertically */
+            left: 50%; /* Center horizontally */
+            transform: translate(-50%, -10%); /* Adjust for gauge placement */
+            text-align: center;
+        }
+        #status {
+            font-size: 1.5rem; /* Smaller status text */
+            font-weight: bold;
+        }
+        /* Hide the status text when the speed value is active/testing */
+        .speed-active #status { display: none; } 
     </style>
 </head>
 <body class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 dark:from-slate-950 dark:to-slate-900 min-h-screen">
@@ -45,13 +60,15 @@
         </h1>
         <p class="text-2xl text-slate-700 dark:text-slate-300 mb-12">Real-time • Accurate • 100% Private • Instant Results</p>
 
-        <div class="relative inline-block">
+        <div class="relative inline-block" id="gauge-container">
             <svg width="500" height="300" viewBox="0 0 500 300" class="mx-auto">
                 <path d="M 100 250 A 150 150 0 1 1 400 250" fill="none" stroke="#e5e7eb" stroke-width="30"/>
                 <path id="gauge" d="M 100 250 A 150 150 0 1 1 400 250" fill="none" stroke="url(#gradient)" stroke-width="30" stroke-linecap="round"
                       stroke-dasharray="707" stroke-dashoffset="707"/>
+                
                 <text x="250" y="180" class="text-7xl font-bold fill-slate-800 dark:fill-white" id="speed-value">0</text>
-                <text x="250" y="230" class="text-3xl fill-slate-600 dark:fill-slate-400">Mbps</text>
+                <text x="250" y="230" class="text-3xl fill-slate-600 dark:fill-slate-400" id="speed-unit">Mbps</text>
+
                 <defs>
                     <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
                         <stop offset="0%" stop-color="#f97316"/>
@@ -60,8 +77,9 @@
                     </linearGradient>
                 </defs>
             </svg>
-            <div class="absolute inset-0 flex items-center justify-center">
-                <div id="status" class="text-3xl font-bold text-slate-700 dark:text-slate-300">Click Start</div>
+            <div id="status-container" class="text-slate-700 dark:text-slate-300">
+                <div id="status" class="text-3xl font-bold">Click Start</div>
+                <div id="test-type" class="text-lg"></div>
             </div>
         </div>
 
@@ -110,19 +128,23 @@
                     link.classList.add('text-slate-700', 'dark:text-slate-300', 'hover:text-indigo-600');
                 }
             });
+            // Initial state cleanup
+            document.getElementById('gauge').style.strokeDashoffset = '707';
         });
 
         // Constants and Elements
         const MAX_SPEED = 1000; // Mbps
-        const DASH_ARRAY = 707; // Total length of the path
+        const DASH_ARRAY = 707; // Total length of the path (SVG arc length)
+        const gaugeContainer = document.getElementById('gauge-container');
         const gauge = document.getElementById('gauge');
         const speedValue = document.getElementById('speed-value');
+        const speedUnit = document.getElementById('speed-unit');
         const status = document.getElementById('status');
+        const testType = document.getElementById('test-type');
         const startBtn = document.getElementById('start-btn');
         const results = ['download', 'upload', 'ping', 'jitter'].map(id => document.getElementById(id));
 
         let running = false;
-        let animationFrameId = null; // To hold the animation frame ID
 
         startBtn.addEventListener('click', () => {
             if (running) return;
@@ -132,104 +154,92 @@
         });
 
         function resetTest() {
-            // Cancel any previous animation
-            if (animationFrameId) {
-                cancelAnimationFrame(animationFrameId);
-            }
             gauge.style.strokeDashoffset = DASH_ARRAY;
             speedValue.textContent = '0';
+            speedUnit.textContent = 'Mbps';
             status.textContent = 'Initializing...';
+            testType.textContent = '';
+            gaugeContainer.classList.remove('speed-active');
             startBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-4"></i> Running Test...';
+            startBtn.disabled = true;
             results.forEach(el => el.parentElement.classList.remove('show'));
             results.forEach(el => el.textContent = '—');
         }
 
         /**
-         * Smoothly animates the gauge and speed display to a target speed.
-         * @param {number} targetSpeed - The speed to display (in Mbps).
+         * Updates the gauge and speed display in real-time.
+         * @param {number} currentSpeed - The current speed (in Mbps).
          */
-        function animateGauge(targetSpeed) {
-            const finalOffset = DASH_ARRAY - (DASH_ARRAY * Math.min(targetSpeed / MAX_SPEED, 1));
-
-            const update = () => {
-                const currentOffset = parseFloat(gauge.style.strokeDashoffset) || DASH_ARRAY;
-                const difference = finalOffset - currentOffset;
-
-                // Simple easing: move a fraction of the remaining distance
-                let newOffset = currentOffset + difference * 0.1;
-                
-                // Ensure the offset doesn't overshoot
-                if (difference > 0) newOffset = Math.min(newOffset, finalOffset);
-                else newOffset = Math.max(newOffset, finalOffset);
-
-                gauge.style.strokeDashoffset = newOffset;
-                
-                // Calculate and display the current speed
-                const currentSpeed = (DASH_ARRAY - newOffset) / DASH_ARRAY * MAX_SPEED;
-                speedValue.textContent = Math.round(currentSpeed);
-                
-                if (Math.abs(difference) > 0.5) { // Continue animation until close to target
-                    animationFrameId = requestAnimationFrame(update);
-                }
-            };
-            
-            // Start or continue the animation
-            if (animationFrameId) {
-                 cancelAnimationFrame(animationFrameId);
-            }
-            animationFrameId = requestAnimationFrame(update);
+        function updateGauge(currentSpeed) {
+            const normalizedSpeed = Math.min(currentSpeed, MAX_SPEED);
+            const offset = DASH_ARRAY - (DASH_ARRAY * (normalizedSpeed / MAX_SPEED));
+            gauge.style.strokeDashoffset = offset;
+            speedValue.textContent = currentSpeed.toFixed(0);
         }
 
         async function runSpeedTest() {
             // --- PING and JITTER ---
             status.textContent = 'Testing Ping...';
+            testType.textContent = 'Waiting for response...';
+            await fetchISPInfo(); // Start this early
+            
             const ping = await measurePing();
             document.getElementById('ping').textContent = ping + ' ms';
-            // Jitter is generally a random range based on ping stability, using a simple placeholder.
+            // Simple placeholder for Jitter
             document.getElementById('jitter').textContent = Math.round(Math.random() * 10 + 2) + ' ms'; 
-
+            
             // --- DOWNLOAD TEST ---
             status.textContent = 'Testing Download...';
-            const download = await measureDownload(animateGauge);
+            testType.textContent = 'Download Mbps';
+            gaugeContainer.classList.add('speed-active');
+            const download = await measureDownload(updateGauge);
             document.getElementById('download').textContent = download.toFixed(1);
 
             // --- UPLOAD TEST ---
             status.textContent = 'Testing Upload...';
-            const upload = await measureUpload(animateGauge);
+            testType.textContent = 'Upload Mbps';
+            // Reset gauge for upload start
+            updateGauge(0);
+            const upload = await measureUpload(updateGauge);
             document.getElementById('upload').textContent = upload.toFixed(1);
 
-            // Cancel animation after all tests are done
-            if (animationFrameId) {
-                cancelAnimationFrame(animationFrameId);
-            }
-            
-            // Set final gauge to the highest speed
+            // --- FINAL RESULTS ---
             const finalSpeed = Math.max(download, upload);
-            animateGauge(finalSpeed);
-            
+            updateGauge(finalSpeed);
+
             status.textContent = 'Complete!';
+            testType.textContent = '';
+            gaugeContainer.classList.remove('speed-active');
             startBtn.innerHTML = '<i class="fas fa-redo mr-4"></i> Test Again';
+            startBtn.disabled = false;
             running = false;
 
             // Show results
             document.querySelectorAll('.result-box').forEach((box, index) => {
                 setTimeout(() => box.classList.add('show'), index * 100);
             });
-
-            // --- Fetch ISP info ---
-            fetch('https://api.ipify.org?format=json').then(r => r.json()).then(d => {
-                fetch(`https://ipapi.co/${d.ip}/json/`).then(r => r.json()).then(info => {
-                    document.getElementById('isp').textContent = info.org || 'Unknown';
-                    document.getElementById('location').textContent = `${info.city || ''}, ${info.country_name || ''}`;
-                    // Changed the server info to reflect Cloudflare's speed test endpoint being used
-                    document.getElementById('server-info').textContent = `Server: Cloudflare • ${info.city || 'Global'}`;
-                }).catch(() => {
-                    document.getElementById('server-info').textContent = 'Server: Failed to get ISP Info';
-                });
-            }).catch(() => {
-                document.getElementById('server-info').textContent = 'Server: Failed to get IP';
-            });
         }
+        
+        // --- ISP & Location Fetch ---
+        async function fetchISPInfo() {
+            try {
+                // Get IP
+                const ipResponse = await fetch('https://api.ipify.org?format=json');
+                const ipData = await ipResponse.json();
+                
+                // Get Location/ISP info
+                const geoResponse = await fetch(`https://ipapi.co/${ipData.ip}/json/`);
+                const info = await geoResponse.json();
+                
+                document.getElementById('isp').textContent = info.org || 'Unknown';
+                document.getElementById('location').textContent = `${info.city || ''}, ${info.country_name || ''}`;
+                document.getElementById('server-info').textContent = `Server: Cloudflare • ${info.city || 'Global'}`;
+            } catch (error) {
+                console.error('Failed to fetch ISP/Location info:', error);
+                document.getElementById('server-info').textContent = 'Server: Failed to detect.';
+            }
+        }
+
 
         // --- Core Measurement Functions ---
 
@@ -237,96 +247,88 @@
             const times = [];
             for (let i = 0; i < 4; i++) {
                 const start = performance.now();
-                // Use a small, cache-busting resource for a simple ping
                 await fetch('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css?t=' + Date.now() + i, { cache: 'no-store' });
                 times.push(performance.now() - start);
             }
-            // Use the median ping (the second of the four sorted values)
             return Math.round(times.sort((a,b)=>a-b)[1]); 
         }
 
-        async function measureDownload(animationCallback) {
-            const size = 25 * 1024 * 1024; // 25MB (200 Megabits)
-            const duration = 10000; // Run for up to 10 seconds
+        async function measureDownload(updateCallback) {
+            const size = 25 * 1024 * 1024; // 25MB
+            const chunkSize = 1 * 1024 * 1024; // 1MB chunks
+            const testDuration = 10000; // max 10 seconds
 
-            // Set up a simple mock for real-time reporting
             const startTime = performance.now();
-            const chunkDuration = 500; // Update every 500ms
             let bytesDownloaded = 0;
+            let lastUpdateTime = startTime;
             let currentSpeed = 0;
 
-            const updateSpeed = () => {
-                const elapsed = (performance.now() - startTime) / 1000; // in seconds
-                if (elapsed > 0) {
-                    // Speed = (Bytes * 8) / (Elapsed time in seconds * 1,000,000) = Mbps
-                    currentSpeed = (bytesDownloaded * 8) / (elapsed * 1000000);
-                    animationCallback(currentSpeed);
-                }
-                if (performance.now() - startTime < duration) {
-                    setTimeout(updateSpeed, chunkDuration);
-                }
-            };
-            
-            // Start reporting animation
-            updateSpeed();
-
-            // Perform the actual download using Cloudflare's speed endpoint
+            // Use a local server endpoint if possible, but Cloudflare is a decent fallback
             const response = await fetch(`https://speed.cloudflare.com/__down?bytes=${size}`, { cache: 'no-store' });
             if (!response.body) return 0;
 
-            // Read stream to get real-time download progress
             const reader = response.body.getReader();
+            
             while (true) {
                 const { done, value } = await reader.read();
-                if (done) break;
+                if (done || performance.now() - startTime > testDuration) break;
+                
                 bytesDownloaded += value.length;
+                
+                // Real-time speed calculation
+                const now = performance.now();
+                const elapsed = (now - startTime) / 1000;
+                
+                if (elapsed > 0.5) { // Update every half second for smoothness
+                    // Speed = (Bytes * 8) / (Elapsed time in seconds * 1,000,000) = Mbps
+                    currentSpeed = (bytesDownloaded * 8) / (elapsed * 1000000);
+                    updateCallback(currentSpeed);
+                    lastUpdateTime = now;
+                }
             }
 
-            // Calculate final speed
+            // Final calculation
             const elapsed = (performance.now() - startTime) / 1000;
             return (bytesDownloaded * 8) / (elapsed * 1000000);
         }
 
-        async function measureUpload(animationCallback) {
-            const dataSize = 10 * 1024 * 1024; // 10MB (80 Megabits)
+        async function measureUpload(updateCallback) {
+            const dataSize = 10 * 1024 * 1024; // 10MB
             const data = new Uint8Array(dataSize); 
-            crypto.getRandomValues(data); // Fill with random data
-            const duration = 10000; // Run for up to 10 seconds
+            crypto.getRandomValues(data); 
+            const testDuration = 10000; // max 10 seconds
 
-            // Set up a simple mock for real-time reporting during upload
-            const startTime = performance.now();
-            const chunkDuration = 500;
+            // We cannot track upload progress directly via standard fetch/XHR, so we use timed segments.
+            // Split the data into 10 smaller chunks
+            const numChunks = 10;
+            const chunkSize = dataSize / numChunks;
             let currentSpeed = 0;
-            let isUploadDone = false;
+            let startTime = performance.now();
 
-            const updateSpeed = () => {
-                if (isUploadDone) return;
-                const elapsed = (performance.now() - startTime) / 1000;
-                if (elapsed > 0) {
-                    // Simple estimate for upload: assume linear progress
-                    const progress = Math.min(elapsed / 5, 1); // Estimated 5-second duration
-                    const bytesUploadedEstimate = dataSize * progress;
-                    currentSpeed = (bytesUploadedEstimate * 8) / (elapsed * 1000000);
-                    animationCallback(currentSpeed);
-                }
-                if (performance.now() - startTime < duration && !isUploadDone) {
-                    setTimeout(updateSpeed, chunkDuration);
-                }
-            };
-            
-            updateSpeed();
+            for (let i = 0; i < numChunks; i++) {
+                const chunk = data.slice(i * chunkSize, (i + 1) * chunkSize);
+                const chunkStart = performance.now();
 
-            // Perform the actual upload to httpbin (which supports POST)
-            const startTest = performance.now();
-            await fetch('https://httpbin.org/post', {
-                method: 'POST',
-                body: data,
-                cache: 'no-store'
-            });
+                // Use httpbin for upload testing
+                await fetch('https://httpbin.org/post', {
+                    method: 'POST',
+                    body: chunk,
+                    cache: 'no-store'
+                });
 
-            isUploadDone = true;
-            const elapsed = (performance.now() - startTest) / 1000;
-            return (data.byteLength * 8) / (elapsed * 1000000);
+                const chunkElapsed = (performance.now() - chunkStart) / 1000;
+                const totalElapsed = (performance.now() - startTime) / 1000;
+
+                // Update speed based on average of completed chunks
+                currentSpeed = ((i + 1) * chunkSize * 8) / (totalElapsed * 1000000);
+                updateCallback(currentSpeed);
+
+                if (totalElapsed > testDuration) break;
+            }
+
+            // Final calculation
+            const totalElapsed = (performance.now() - startTime) / 1000;
+            return (dataSize * 8) / (totalElapsed * 1000000);
         }
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
