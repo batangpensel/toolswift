@@ -496,5 +496,19 @@
     attachListeners();
     setTimeout(updateQR, 100);
   </script>
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const currentPage = location.pathname.split('/').pop() || 'index.html';
+
+    document.querySelectorAll('.nav-link').forEach(link => {
+      if (link.getAttribute('href') === currentPage) {
+        link.classList.add('text-indigo-600', 'font-bold');
+        link.classList.remove('text-slate-700', 'dark:text-slate-300', 'hover:text-indigo-600');
+      } else {
+        link.classList.add('text-slate-700', 'dark:text-slate-300', 'hover:text-indigo-600');
+      }
+    });
+  });
+</script>
 </body>
 </html>
