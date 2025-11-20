@@ -3,20 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Image Tools — ToolSwift</title>
-  <meta name="description" content="Best free online image editor: crop, rotate, filters, watermark, compress, WebP — 100% private"/>
+  <title>Timestamp Converter • ToolSwift</title>
+  <meta name="description" content="Convert Unix timestamps to human dates and vice versa • Live clock • All timezones • 100% private">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <style>
-    .drop-zone { border: 4px dashed #94a3b8; transition: all 0.3s; }
-    .drop-zone.dragover { border-color: #6366f1; background-color: #eef2ff; }
-    canvas { max-width: 100%; height: auto; border-radius: 1.5rem; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-    .filter-btn {
-      @apply px-6 py-3 rounded-full font-medium transition-all duration-200 border-2;
-    }
-    .filter-btn.active {
-      @apply bg-indigo-600 text-white border-indigo-600 shadow-lg ring-4 ring-indigo-300;
-    }
+    .copy-feedback { opacity: 0; transition: opacity 0.4s; }
+    .copy-feedback.show { opacity: 1; }
+    #live-clock { animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
   </style>
 </head>
 <body class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 dark:from-slate-950 dark:to-slate-900 min-h-screen">
@@ -27,16 +22,42 @@
       <a href="index.html" class="flex items-center gap-3">
         <h1 class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">ToolSwift</h1>
       </a>
-      <nav class="flex flex-wrap gap-6 text-lg">
-        <a href="pdf.html" class="text-slate-700 dark:text-slate-300 hover:text-indigo-600"><i class="fa-solid fa-file-pdf mr-1"></i>PDF</a>
-        <a href="image.html" class="text-indigo-600 font-bold"><i class="fa-solid fa-image mr-1"></i>Image</a>
-        <a href="qr.html" class="text-slate-700 dark:text-slate-300 hover:text-indigo-600"><i class="fa-solid fa-qrcode mr-1"></i>QR</a>
-        <a href="ocr.html" class="text-slate-700 dark:text-slate-300 hover:text-indigo-600"><i class="fa-solid fa-eye mr-1"></i>OCR</a>
-        <a href="speed.html" class="text-slate-700 dark:text-slate-300 hover:text-indigo-600"><i class="fa-solid fa-gauge-high mr-1"></i>Speed</a>
-        <a href="password.html" class="text-slate-700 dark:text-slate-300 hover:text-indigo-600"><i class="fa-solid fa-key mr-1"></i>Password</a>
+      <nav class="flex flex-wrap gap-4 md:gap-6 text-lg">
+        <a href="pdf.html" class="nav-link"><i class="fa-solid fa-file-pdf mr-1"></i>PDF</a>
+        <a href="image.html" class="nav-link"><i class="fa-solid fa-image mr-1"></i>Image</a>
+        <a href="qr.html" class="nav-link"><i class="fa-solid fa-qrcode mr-1"></i>QR</a>
+        <a href="ocr.html" class="nav-link"><i class="fa-solid fa-eye mr-1"></i>OCR</a>
+        <a href="speed.html" class="nav-link"><i class="fa-solid fa-gauge-high mr-1"></i>Speed</a>
+        <a href="password.html" class="nav-link"><i class="fa-solid fa-key mr-1"></i>Password</a>
+        <a href="json.html" class="nav-link"><i class="fa-solid fa-code mr-1"></i>JSON</a>
+        <a href="base64.html" class="nav-link"><i class="fa-solid fa-lock mr-1"></i>Base64</a>
+        <a href="timestamp.html" class="nav-link"><i class="fa-solid fa-clock mr-1"></i>Timestamp</a>
       </nav>
     </div>
   </header>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDF Merger + Rotate - ToolSwift</title>
+  <meta name="description" content="Merge PDFs, convert & rotate images with smooth animations — 100% private."/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+  <script src="https://unpkg.com/sortablejs@1.15.0/Sortable.min.js"></script>
+  <script src="https://unpkg.com/downloadjs@1.4.8/download.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    .rotate-animation {
+      transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transform-style: preserve-3d;
+    }
+    .drag-over { border-color: #8b5cf6 !important; background: rgba(139,92,246,0.1); }
+    .thumbnail:hover { transform: translateY(-8px) scale(1.03); }
+    .rotate-btn:hover { transform: scale(1.2); background: rgba(255,255,255,0.3) !important; }
+  </style>
+</head>
 
   <div class="container mx-auto px-6 py-16 max-w-7xl">
     <div class="text-center mb-12">
@@ -313,5 +334,19 @@
       r.readAsDataURL(f);
     });}
   </script>
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const currentPage = location.pathname.split('/').pop() || 'index.html';
+
+    document.querySelectorAll('.nav-link').forEach(link => {
+      if (link.getAttribute('href') === currentPage) {
+        link.classList.add('text-indigo-600', 'font-bold');
+        link.classList.remove('text-slate-700', 'dark:text-slate-300', 'hover:text-indigo-600');
+      } else {
+        link.classList.add('text-slate-700', 'dark:text-slate-300', 'hover:text-indigo-600');
+      }
+    });
+  });
+</script>
 </body>
 </html>
