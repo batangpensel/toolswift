@@ -1,5 +1,248 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>JSON Formatter - ToolSwift</title><script src="https://cdn.tailwindcss.com"></script></head><body class="bg-slate-50 dark:bg-slate-900 min-h-screen p-8"><div class="max-w-6xl mx-auto grid md:grid-cols-2 gap-8"><textarea id="input" placeholder="Paste JSON here..." class="w-full h-screen p-8 text-lg font-mono rounded-3xl shadow-2xl"></textarea><pre id="output" class="w-full h-screen p-8 text-lg font-mono bg-gray-100 dark:bg-slate-800 rounded-3xl shadow-2xl overflow-auto"></pre></div><div class="fixed bottom-8 right-8 flex gap-4"><button onclick="format()" class="bg-blue-600 text-white px-8 py-4 rounded-xl text-xl font-bold">Format</button><button onclick="minify()" class="bg-gray-600 text-white px-8 py-4 rounded-xl text-xl">Minify</button></div><script>
-function format() { try { document.getElementById('output').textContent = JSON.stringify(JSON.parse(document.getElementById('input').value), null, 2); } catch(e) { alert("Invalid JSON"); } }
-function minify() { try { document.getElementById('output').textContent = JSON.stringify(JSON.parse(document.getElementById('input').value)); } catch(e) { alert("Invalid JSON"); } }
-document.getElementById('input').addEventListener('input', format);
-</script></body></html>
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JSON Formatter & Validator • ToolSwift</title>
+  <meta name="description" content="Beautify, minify, validate, and explore JSON instantly • 100% private • No data sent">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    .json-tree { font-family: 'Fira Code', monospace; white-space: pre-wrap; }
+    .json-key { color: #a78bfa; font-weight: bold; }
+    .json-string { color: #86efac; }
+    .json-number { color: #fbbf24; }
+    .json-boolean { color: #f87171; }
+    .json-null { color: #94a3b8; }
+    .line-number { user-select: none; color: #64748b; padding-right: 1rem; }
+    .error-line { background-color: #fee2e2; border-left: 4px solid #ef4444; }
+    .copy-feedback { opacity: 0; transition: opacity 0.4s; }
+    .copy-feedback.show { opacity: 1; }
+  </style>
+  <link href="https://cdn.jsdelivr.net/npm/firacode@6.2.0/distr/css/fira_code.css" rel="stylesheet">
+</head>
+<body class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 dark:from-slate-950 dark:to-slate-900 min-h-screen">
+
+  <!-- Header -->
+  <header class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-lg sticky top-0 z-50">
+    <div class="container mx-auto px-6 py-5 flex flex-wrap items-center justify-between">
+      <a href="index.html" class="flex items-center gap-3">
+        <h1 class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">ToolSwift</h1>
+      </a>
+      <nav class="flex flex-wrap gap-4 md:gap-6 text-lg">
+        <a href="pdf.html" class="nav-link"><i class="fa-solid fa-file-pdf mr-1"></i>PDF</a>
+        <a href="image.html" class="nav-link"><i class="fa-solid fa-image mr-1"></i>Image</a>
+        <a href="qr.html" class="nav-link"><i class="fa-solid fa-qrcode mr-1"></i>QR</a>
+        <a href="ocr.html" class="nav-link"><i class="fa-solid fa-eye mr-1"></i>OCR</a>
+        <a href="speed.html" class="nav-link"><i class="fa-solid fa-gauge-high mr-1"></i>Speed</a>
+        <a href="password.html" class="nav-link"><i class="fa-solid fa-key mr-1"></i>Password</a>
+        <a href="json.html" class="nav-link"><i class="fa-solid fa-code mr-1"></i>JSON</a>
+        <a href="base64.html" class="nav-link"><i class="fa-solid fa-lock mr-1"></i>Base64</a>
+        <a href="timestamp.html" class="nav-link"><i class="fa-solid fa-clock mr-1"></i>Timestamp</a>
+      </nav>
+    </div>
+  </header>
+
+  <div class="container mx-auto px-6 py-16 max-w-7xl">
+    <div class="text-center mb-12">
+      <h1 class="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-500 to-cyan-600 mb-4">
+        JSON Formatter & Validator
+      </h1>
+      <p class="text-2xl text-slate-700 dark:text-slate-300">Beautify • Minify • Validate • Explore • 100% Private</p>
+    </div>
+
+    <div class="grid lg:grid-cols-3 gap-8">
+      <!-- Editor -->
+      <div class="lg:col-span-2">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl overflow-hidden">
+          <div class="bg-gradient-to-r from-green-600 to-cyan-600 text-white p-6 flex justify-between items-center">
+            <h2 class="text-3xl font-bold">JSON Input</h2>
+            <div class="flex gap-3">
+              <button onclick="loadSample()" class="bg-white/20 hover:bg-white/30 px-5 py-3 rounded-xl font-medium">Load Sample</button>
+            </div>
+          </div>
+          <div class="relative">
+            <textarea id="input" class="w-full h-96 p-6 font-mono text-lg bg-gray-50 dark:bg-slate-900 resize-none focus:outline-none" placeholder='Paste your JSON here...'></textarea>
+            <div id="line-numbers" class="absolute left-0 top-0 bottom-0 w-12 text-right pr-3 pt-6 text-slate-500 text-sm font-mono"></div>
+          </div>
+        </div>
+
+        <!-- Error Message -->
+        <div id="error" class="mt-4 p-6 bg-red-100 dark:bg-red-900/30 border border-red-500 rounded-2xl hidden">
+          <p class="text-red-700 dark:text-red-400 font-bold"><i class="fas fa-exclamation-triangle mr-2"></i> Invalid JSON</p>
+          <p id="error-msg" class="mt-2 font-mono text-sm"></p>
+        </div>
+      </div>
+
+      <!-- Controls & Tree View -->
+      <div class="space-y-6">
+        <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl p-8">
+          <h3 class="text-2xl font-bold mb-6">Actions</h3>
+          <div class="grid grid-cols-2 gap-4 mb-6">
+            <button onclick="beautify()" class="bg-gradient-to-r from-green-500 to-emerald-600 text-white py-5 rounded-2xl font-bold hover:shadow-xl transition">Beautify</button>
+            <button onclick="minify()" class="bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-5 rounded-2xl font-bold hover:shadow-xl transition">Minify</button>
+          </div>
+          <button onclick="copyResult()" class="w-full bg-gradient-to-r from-purple-600 to-pink-600 text-white py-5 rounded-2xl font-bold hover:shadow-xl transition relative">
+            <i class="fas fa-copy mr-3"></i> Copy Result
+            <div class="copy-feedback absolute -top-12 left-1/2 -translate-x-1/2 bg-black text-white px-6 py-3 rounded-lg font-bold">Copied!</div>
+          </button>
+          <button onclick="downloadJSON()" class="w-full mt-4 bg-gray-600 text-white py-5 rounded-2xl font-bold hover:bg-gray-700 transition">
+            <i class="fas fa-download mr-3"></i> Download .json
+          </button>
+        </div>
+
+        <div class="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl p-8">
+          <h3 class="text-2xl font-bold mb-4">Tree View</h3>
+          <input type="text" id="search" placeholder="Search keys/values..." class="w-full p-4 border rounded-xl mb-4">
+          <div id="tree" class="json-tree text-lg max-h-96 overflow-auto"></div>
+        </div>
+      </div>
+    </div>
+
+    <p class="text-center mt-12"><a href="index.html" class="text-indigo-600 text-xl hover:underline">← Back to All Tools</a></p>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.nav-link').forEach(link => {
+        if (link.getAttribute('href') === location.pathname.split('/').pop()) {
+          link.classList.add('text-indigo-600', 'font-bold');
+        } else {
+          link.classList.add('text-slate-700', 'dark:text-slate-300', 'hover:text-indigo-600');
+        }
+      });
+      updateLineNumbers();
+      document.getElementById('input').addEventListener('input', updateLineNumbers);
+      document.getElementById('input').addEventListener('scroll', syncScroll);
+    });
+
+    const input = document.getElementById('input');
+    const tree = document.getElementById('tree');
+    const error = document.getElementById('error');
+    const errorMsg = document.getElementById('error-msg');
+    const lineNumbers = document.getElementById('line-numbers');
+
+    function updateLineNumbers() {
+      const lines = input.value.split('\n').length;
+      lineNumbers.innerHTML = Array.from({length: lines}, (_, i) => i + 1).join('<br>');
+    }
+
+    function syncScroll() {
+      lineNumbers.scrollTop = input.scrollTop;
+    }
+
+    function beautify() {
+      try {
+        const obj = JSON.parse(input.value);
+        input.value = JSON.stringify(obj, null, 2);
+        renderTree(obj);
+        hideError();
+      } catch (e) {
+        showError(e);
+      }
+      updateLineNumbers();
+    }
+
+    function minify() {
+      try {
+        const obj = JSON.parse(input.value);
+        input.value = JSON.stringify(obj);
+        renderTree(obj);
+        hideError();
+      } catch (e) {
+        showError(e);
+      }
+    }
+
+    function showError(e) {
+      error.classList.remove('hidden');
+      errorMsg.textContent = `${e.message} (line ${e.lineNumber || 'unknown'})`;
+      tree.innerHTML = '';
+    }
+
+    function hideError() {
+      error.classList.add('hidden');
+    }
+
+    function renderTree(obj, parent = tree, path = '') {
+      tree.innerHTML = '';
+      const ul = document.createElement('ul');
+      ul.className = 'pl-6';
+      Object.keys(obj).forEach(key => {
+        const li = document.createElement('li');
+        li.className = 'my-1';
+        const span = document.createElement('span');
+        span.className = 'cursor-pointer hover:text-indigo-600';
+        span.innerHTML = `<span class="json-key">&quot;${key}&quot;</span>: `;
+        if (typeof obj[key] === 'object' && obj[key] !== null) {
+          span.innerHTML += Array.isArray(obj[key]) ? '[<i class="fas fa-chevron-down text-xs"></i>]' : '{<i class="fas fa-chevron-down text-xs"></i>}';
+          const subUl = document.createElement('ul');
+          subUl.className = 'hidden pl-6 border-l-2 border-slate-300 dark:border-slate-700 ml-2';
+          renderTree(obj[key], subUl, path + '.' + key);
+          li.appendChild(span);
+          li.appendChild(subUl);
+          span.onclick = () => subUl.classList.toggle('hidden');
+        } else {
+          let value = JSON.stringify(obj[key]);
+          let valueClass = 'json-string';
+          if (typeof obj[key] === 'number') valueClass = 'json-number';
+          if (typeof obj[key] === 'boolean') valueClass = 'json-boolean';
+          if (obj[key] === null) valueClass = 'json-null';
+          span.innerHTML += `<span class="${valueClass}">${value}</span>`;
+          li.appendChild(span);
+        }
+        ul.appendChild(li);
+      });
+      parent.appendChild(ul);
+    }
+
+    function copyResult() {
+      navigator.clipboard.writeText(input.value);
+      const feedback = document.querySelector('.copy-feedback');
+      feedback.classList.add('show');
+      setTimeout(() => feedback.classList.remove('show'), 2000);
+    }
+
+    function downloadJSON() {
+      try {
+        const obj = JSON.parse(input.value);
+        const blob = new Blob([JSON.stringify(obj, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'formatted.json';
+        a.click();
+      } catch (e) {
+        alert('Invalid JSON - fix errors first!');
+      }
+    }
+
+    function loadSample() {
+      input.value = `{
+  "name": "ToolSwift",
+  "version": "2.0",
+  "features": [
+    "100% private",
+    "No uploads",
+    "Instant"
+  ],
+  "tools": 9,
+  "awesome": true
+}`;
+      beautify();
+    }
+
+    // Live search
+    document.getElementById('search').addEventListener('input', e => {
+      const term = e.target.value.toLowerCase();
+      document.querySelectorAll('.json-key, .json-string').forEach(el => {
+        el.style.backgroundColor = el.textContent.toLowerCase().includes(term) ? '#fef08a' : '';
+      });
+    });
+
+    // Initial sample
+    loadSample();
+  </script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
+</body>
+</html>
