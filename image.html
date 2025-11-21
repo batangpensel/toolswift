@@ -3,24 +3,37 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Image Compressor, Converter & Editor • UtilityKit</title>
-  <meta name="description" content="All-in-one image toolkit: compress, resize, convert (WebP/AVIF), crop, rotate & add filters – 100% free.">
+  <title>Batch Image Converter • UtilityKit</title>
+  <meta name="description" content="Bulk convert images to WebP, AVIF, PNG, JPG, or BMP. Compress, resize, and edit locally in your browser.">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.1/dist/cropper.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.1/dist/cropper.min.css">
+  
   <style>
-    /* Added a style to ensure the canvas doesn't overflow visually even if high-res */
-    .edited-canvas {
-        max-width: 100%;
-        max-height: 100%;
-        object-fit: contain;
+    .canvas-wrapper {
+      background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+    .dark .canvas-wrapper {
+      background-image: radial-gradient(#334155 1px, transparent 1px);
     }
     .drop-zone.dragover { border-color: #6366f1 !important; background: rgba(99, 102, 241, 0.1); }
-    .filter-btn.active { border-color: #6366f1; background-color: rgba(99, 102, 241, 0.1); color: #6366f1; }
+    
+    .custom-scroll::-webkit-scrollbar { width: 6px; }
+    .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+    .custom-scroll::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 20px; }
+    .dark .custom-scroll::-webkit-scrollbar-thumb { background-color: #475569; }
+
+    .disabled-group { opacity: 0.4; pointer-events: none; filter: grayscale(1); }
   </style>
 </head>
-<body class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 dark:from-slate-950 dark:to-slate-900 min-h-screen pb-20">
+<body class="bg-gray-50 dark:bg-slate-950 min-h-screen flex flex-col">
 
-  <header class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-lg sticky top-0 z-50">
+<!-- Header -->
+<header class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-lg sticky top-0 z-50">
   <div class="container mx-auto px-6 py-5 flex flex-wrap items-center justify-between">
     <a href="index.html" class="flex items-center gap-3">
       <h1 class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">UtilityKit</h1>
@@ -36,6 +49,7 @@
       <a href="base64.html" class="nav-link hover:text-blue-600 dark:hover:text-blue-400 transition"><i class="fa-solid fa-lock mr-1"></i>Base64</a>
       <a href="timestamp.html" class="nav-link hover:text-blue-600 dark:hover:text-blue-400 transition"><i class="fa-solid fa-clock mr-1"></i>Timestamp</a>
       
+      <!-- === NEW TOOLS IN NAV === -->
       <a href="compress.html" class="nav-link hover:text-blue-600 dark:hover:text-blue-400 transition"><i class="fa-solid fa-file-zipper mr-1"></i>Compressor</a>
       <a href="markdown.html" class="nav-link hover:text-blue-600 dark:hover:text-blue-400 transition"><i class="fa-brands fa-markdown mr-1"></i>Markdown</a>
       <a href="currency.html" class="nav-link hover:text-blue-600 dark:hover:text-blue-400 transition"><i class="fa-solid fa-dollar-sign mr-1"></i>Currency</a>
@@ -43,424 +57,432 @@
   </div>
 </header>
 
-  <div class="container mx-auto px-6 py-16 max-w-7xl">
-    <div class="text-center mb-12">
-      <h2 class="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-500 to-teal-600 mb-4">Image Tools</h2>
-      <p class="text-2xl text-slate-700 dark:text-slate-300">Professional editing • Instant preview • Zero upload</p>
+<main class="container mx-auto px-4 py-12 max-w-6xl flex-grow">
+
+  <div class="text-center mb-10">
+    <h1 class="text-4xl md:text-5xl font-black text-slate-800 dark:text-white mb-4">Batch Image Converter</h1>
+    <p class="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+      Convert images to <span class="text-indigo-600 font-bold">WebP, AVIF, PNG, JPG, or BMP</span>. 
+      Resize, crop, and process locally.
+    </p>
+  </div>
+
+  <div id="dropZone" class="group relative border-4 border-dashed border-slate-300 dark:border-slate-700 rounded-3xl bg-white dark:bg-slate-900 p-16 text-center cursor-pointer hover:border-indigo-500 dark:hover:border-indigo-500 hover:bg-indigo-50/30 dark:hover:bg-indigo-900/10 transition-all duration-300 ease-out shadow-sm">
+    <input type="file" id="fileInput" multiple accept="image/*" class="hidden">
+    <div class="pointer-events-none">
+      <div class="w-20 h-20 bg-indigo-100 dark:bg-indigo-900/50 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-transform">
+        <i class="fa-solid fa-cloud-arrow-up text-4xl text-indigo-600 dark:text-indigo-400"></i>
+      </div>
+      <h3 class="text-2xl font-bold text-slate-700 dark:text-white mb-2">Drop images here</h3>
+      <p class="text-slate-500 dark:text-slate-400">or click to browse files</p>
     </div>
+  </div>
 
-    <div id="dropZone" class="drop-zone bg-white dark:bg-slate-800 rounded-3xl p-20 mb-12 text-center cursor-pointer border-4 border-dashed border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 transition-all group">
-      <i class="fa-solid fa-cloud-arrow-up text-8xl text-slate-400 group-hover:text-indigo-500 transition-colors mb-6"></i>
-      <p class="text-2xl font-semibold text-slate-700 dark:text-slate-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">Drop images or click to upload</p>
-      <input type="file" id="fileInput" multiple accept="image/*" class="hidden">
-    </div>
-
-    <div id="imageContainer" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10 mb-20"></div>
-
-    <div id="globalControls" class="hidden bg-white dark:bg-slate-800 rounded-3xl shadow-2xl p-8 max-w-5xl mx-auto">
-      <h3 class="text-2xl font-bold mb-6 text-center dark:text-white">Batch Export</h3>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+  <div id="conversionToolbar" class="hidden mt-12 sticky top-24 z-40">
+    <div class="bg-slate-800 text-white p-4 rounded-2xl shadow-2xl flex flex-col md:flex-row items-center gap-6 justify-between border border-slate-700 ring-4 ring-slate-200 dark:ring-slate-800">
+      
+      <div class="flex items-center gap-4 w-full md:w-auto">
+        <div class="bg-slate-700 p-3 rounded-xl">
+          <i class="fa-solid fa-sliders text-xl text-indigo-400"></i>
+        </div>
         <div>
-          <label class="block text-lg font-medium mb-2 dark:text-slate-200">Format</label>
-          <select id="outputFormat" class="w-full px-5 py-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-indigo-500">
-            <option value="image/jpeg">JPEG</option>
-            <option value="image/webp" selected>WebP (Best)</option>
-            <option value="image/png">PNG</option>
+          <p class="text-xs text-slate-400 uppercase font-bold tracking-wider mb-1">Convert To</p>
+          <select id="globalFormat" class="bg-transparent text-lg font-bold text-white focus:outline-none cursor-pointer hover:text-indigo-300 transition">
+            <option value="image/webp" class="bg-slate-800">WebP (Modern)</option>
+            <option value="image/avif" class="bg-slate-800">AVIF (Next Gen)</option>
+            <option value="image/jpeg" class="bg-slate-800">JPEG (Standard)</option>
+            <option value="image/png" class="bg-slate-800">PNG (Lossless)</option>
+            <option value="image/bmp" class="bg-slate-800">BMP (Bitmap)</option>
           </select>
         </div>
+      </div>
+
+      <div class="h-8 w-px bg-slate-600 hidden md:block"></div>
+
+      <div id="qualityControlGroup" class="flex items-center gap-4 w-full md:w-auto transition-opacity duration-300">
         <div>
-          <label class="block text-lg font-medium mb-2 dark:text-slate-200">Quality <span class="font-bold text-indigo-600" id="qualityValue">90</span>%</label>
-          <input type="range" id="quality" min="1" max="100" value="90" class="w-full h-3 rounded-lg appearance-none cursor-pointer bg-gray-200 dark:bg-slate-600 accent-indigo-600">
+          <p class="text-xs text-slate-400 uppercase font-bold tracking-wider mb-1">Quality: <span id="globalQualityVal">90</span>%</p>
+          <input type="range" id="globalQuality" min="10" max="100" value="90" class="w-48 h-2 bg-slate-600 rounded-lg appearance-none cursor-pointer accent-indigo-500">
         </div>
-        <div>
-          <button id="downloadAll" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 rounded-xl font-bold text-xl hover:from-indigo-700 hover:to-purple-700 transition shadow-lg hover:shadow-xl">
-            Download All as ZIP
-          </button>
-        </div>
+      </div>
+
+      <div class="w-full md:w-auto">
+        <button id="downloadAllBtn" class="w-full md:w-auto px-8 py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl shadow-lg hover:shadow-indigo-500/30 transition-all flex items-center justify-center gap-3">
+          <span>Convert All</span>
+          <i class="fa-solid fa-download"></i>
+        </button>
       </div>
     </div>
   </div>
 
-  <template id="imageTemplate">
-    <div class="image-item bg-white dark:bg-slate-800 rounded-3xl shadow-xl overflow-hidden border border-slate-100 dark:border-slate-700">
-      <div class="relative">
-        <div class="preview-container h-96 w-full flex items-center justify-center bg-gray-50 dark:bg-slate-900/50 p-4 relative group">
-            <canvas class="edited-canvas max-w-full max-h-full object-contain shadow-sm rounded-lg"></canvas>
-            
-            <button class="remove-btn absolute top-4 right-4 bg-red-500/90 hover:bg-red-600 text-white p-3 rounded-full shadow-lg transition-all opacity-0 group-hover:opacity-100 focus:opacity-100">
-              <i class="fa-solid fa-xmark text-lg"></i>
-            </button>
+  <div id="imageGrid" class="grid grid-cols-1 gap-8 mt-10"></div>
+</main>
+
+<footer class="py-8 text-center text-slate-500 text-sm">
+  <p>© 2025 UtilityKit • Privacy First Image Processing</p>
+</footer>
+
+<template id="cardTemplate">
+  <div class="image-card bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col md:flex-row">
+    
+    <div class="canvas-wrapper w-full md:w-1/3 lg:w-1/4 h-64 md:h-auto bg-slate-100 dark:bg-slate-950 flex items-center justify-center relative group">
+      <canvas class="preview-canvas max-w-full max-h-full object-contain shadow-lg rounded"></canvas>
+      <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+        <button class="btn-rotate-left bg-white/20 hover:bg-white/40 text-white p-3 rounded-full backdrop-blur-sm transition" title="Rotate Left"><i class="fa-solid fa-rotate-left"></i></button>
+        <button class="btn-crop bg-white/20 hover:bg-white/40 text-white p-3 rounded-full backdrop-blur-sm transition" title="Crop Image"><i class="fa-solid fa-crop-simple"></i></button>
+        <button class="btn-rotate-right bg-white/20 hover:bg-white/40 text-white p-3 rounded-full backdrop-blur-sm transition" title="Rotate Right"><i class="fa-solid fa-rotate-right"></i></button>
+      </div>
+    </div>
+
+    <div class="flex-1 p-6 md:p-8 flex flex-col justify-between">
+      <div class="flex justify-between items-start mb-4">
+        <div>
+          <h3 class="filename text-lg font-bold text-slate-800 dark:text-white truncate max-w-[200px] md:max-w-sm">image.jpg</h3>
+          <div class="flex items-center gap-3 mt-1">
+             <span class="filesize text-xs font-mono bg-slate-100 dark:bg-slate-800 text-slate-500 px-2 py-1 rounded">0 KB</span>
+             <i class="fa-solid fa-arrow-right text-slate-300 text-xs"></i>
+             <span class="target-badge text-xs font-bold bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 px-2 py-1 rounded border border-indigo-200 dark:border-indigo-800">WebP</span>
+          </div>
+        </div>
+        <button class="btn-remove text-slate-400 hover:text-red-500 transition px-2"><i class="fa-solid fa-trash"></i></button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        <div class="space-y-2">
+          <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Resize (px)</label>
+          <div class="flex items-center gap-2">
+            <div class="relative w-full">
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs">W</span>
+                <input type="number" class="input-w w-full pl-8 pr-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none dark:text-white" placeholder="Original">
+            </div>
+            <span class="text-slate-300">×</span>
+            <div class="relative w-full">
+                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs">H</span>
+                <input type="number" class="input-h w-full pl-8 pr-3 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none dark:text-white" placeholder="Original">
+            </div>
+          </div>
+        </div>
+
+        <div class="space-y-2">
+            <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">Enhance</label>
+            <div class="flex gap-2">
+                <button class="btn-filter flex-1 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-medium hover:bg-slate-100 dark:hover:bg-slate-700 dark:text-slate-300 transition active-filter" data-filter="none">Normal</button>
+                <button class="btn-filter flex-1 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-medium hover:bg-slate-100 dark:hover:bg-slate-700 dark:text-slate-300 transition" data-filter="grayscale(100%)">B&W</button>
+                <button class="btn-filter flex-1 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-xs font-medium hover:bg-slate-100 dark:hover:bg-slate-700 dark:text-slate-300 transition" data-filter="contrast(1.2) brightness(1.1)">Vivid</button>
+            </div>
         </div>
       </div>
-      
-      <div class="p-6 space-y-6">
-        <div class="grid grid-cols-2 gap-3">
-          <button class="crop-btn bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 py-3 rounded-xl font-semibold hover:bg-blue-200 dark:hover:bg-blue-900/50 transition">Crop</button>
-          <button class="flip-h bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 py-3 rounded-xl font-semibold hover:bg-purple-200 dark:hover:bg-purple-900/50 transition">Flip H</button>
-          <button class="rotate-left bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 py-3 rounded-xl font-semibold hover:bg-indigo-200 dark:hover:bg-indigo-900/50 transition flex items-center justify-center gap-2">
-            <i class="fa-solid fa-rotate-left"></i> -90°
-          </button>
-          <button class="rotate-right bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 py-3 rounded-xl font-semibold hover:bg-indigo-200 dark:hover:bg-indigo-900/50 transition flex items-center justify-center gap-2">
-            <i class="fa-solid fa-rotate-right"></i> +90°
-          </button>
-        </div>
 
-        <div>
-          <label class="block text-sm font-bold mb-3 text-slate-700 dark:text-slate-300 uppercase tracking-wider">Filters</label>
-          <div class="flex flex-wrap gap-2">
-            <button class="filter-btn px-4 py-2 rounded-lg border-2 border-slate-200 dark:border-slate-700 font-medium text-sm hover:border-indigo-300 dark:hover:border-indigo-700 transition dark:text-white active" data-filter="none">None</button>
-            <button class="filter-btn px-4 py-2 rounded-lg border-2 border-slate-200 dark:border-slate-700 font-medium text-sm hover:border-indigo-300 dark:hover:border-indigo-700 transition dark:text-white" data-filter="grayscale(100%)">Gray</button>
-            <button class="filter-btn px-4 py-2 rounded-lg border-2 border-slate-200 dark:border-slate-700 font-medium text-sm hover:border-indigo-300 dark:hover:border-indigo-700 transition dark:text-white" data-filter="sepia(100%)">Sepia</button>
-            <button class="filter-btn px-4 py-2 rounded-lg border-2 border-slate-200 dark:border-slate-700 font-medium text-sm hover:border-indigo-300 dark:hover:border-indigo-700 transition dark:text-white" data-filter="blur(2px)">Blur</button>
-            <button class="filter-btn px-4 py-2 rounded-lg border-2 border-slate-200 dark:border-slate-700 font-medium text-sm hover:border-indigo-300 dark:hover:border-indigo-700 transition dark:text-white" data-filter="brightness(1.2)">Bright</button>
-            <button class="filter-btn px-4 py-2 rounded-lg border-2 border-slate-200 dark:border-slate-700 font-medium text-sm hover:border-indigo-300 dark:hover:border-indigo-700 transition dark:text-white" data-filter="contrast(1.3)">Contrast</button>
-          </div>
-        </div>
-
-        <div>
-          <label class="block text-sm font-bold mb-3 text-slate-700 dark:text-slate-300 uppercase tracking-wider">Watermark</label>
-          <div class="flex gap-2">
-            <input type="text" class="watermark-text flex-1 px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-indigo-500" placeholder="Text...">
-            <button class="add-watermark bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-indigo-700 transition shadow-md">Add</button>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="block text-xs font-medium mb-2 dark:text-slate-300 uppercase">Width (px)</label>
-            <input type="number" class="resize-w w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-indigo-500" placeholder="Auto">
-          </div>
-          <div>
-            <label class="block text-xs font-medium mb-2 dark:text-slate-300 uppercase">Height (px)</label>
-            <input type="number" class="resize-h w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-indigo-500" placeholder="Auto">
-          </div>
-        </div>
-
-        <button class="download-single w-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white py-4 rounded-xl font-bold text-lg hover:from-emerald-600 hover:to-teal-700 transition shadow-md">
-          Download Image
+      <div class="pt-4 border-t border-slate-100 dark:border-slate-800 flex justify-end">
+        <button class="btn-download-single text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center gap-2 transition">
+            Download Single <i class="fa-solid fa-arrow-down"></i>
         </button>
       </div>
     </div>
-  </template>
-  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.1/dist/cropper.min.js"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.1/dist/cropper.min.css">
+  </div>
+</template>
 
-  <script>
-    const dropZone = document.getElementById('dropZone');
-    const fileInput = document.getElementById('fileInput');
-    const imageContainer = document.getElementById('imageContainer');
-    const template = document.getElementById('imageTemplate');
-    const globalControls = document.getElementById('globalControls');
-    const outputFormat = document.getElementById('outputFormat');
-    const quality = document.getElementById('quality');
-    const qualityValue = document.getElementById('qualityValue');
-    const downloadAll = document.getElementById('downloadAll');
-    let images = [];
+<script>
+  const els = {
+    dropZone: document.getElementById('dropZone'),
+    fileInput: document.getElementById('fileInput'),
+    imageGrid: document.getElementById('imageGrid'),
+    toolbar: document.getElementById('conversionToolbar'),
+    globalFormat: document.getElementById('globalFormat'),
+    globalQuality: document.getElementById('globalQuality'),
+    globalQualityVal: document.getElementById('globalQualityVal'),
+    qualityControlGroup: document.getElementById('qualityControlGroup'),
+    downloadAllBtn: document.getElementById('downloadAllBtn'),
+    template: document.getElementById('cardTemplate')
+  };
 
-    function addImage(src, filename) {
+  let images = []; 
+
+  const getExt = (mime) => {
+      switch(mime) {
+          case 'image/jpeg': return '.jpg';
+          case 'image/png': return '.png';
+          case 'image/webp': return '.webp';
+          case 'image/avif': return '.avif';
+          case 'image/bmp': return '.bmp';
+          default: return '.jpg';
+      }
+  };
+
+  els.globalQuality.oninput = () => els.globalQualityVal.textContent = els.globalQuality.value;
+  els.globalFormat.onchange = () => {
+    const fmt = els.globalFormat.value;
+    const shortName = fmt.split('/')[1].toUpperCase();
+    document.querySelectorAll('.target-badge').forEach(el => el.textContent = shortName);
+    const isLossless = fmt === 'image/png' || fmt === 'image/bmp';
+    if(isLossless) els.qualityControlGroup.classList.add('disabled-group');
+    else els.qualityControlGroup.classList.remove('disabled-group');
+  };
+
+  function formatBytes(bytes) {
+    if (!+bytes) return '0 Bytes';
+    const k = 1024, sizes = ['Bytes', 'KB', 'MB', 'GB'], i = Math.floor(Math.log(bytes) / Math.log(k));
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(0))} ${sizes[i]}`;
+  }
+
+  function addImage(file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
       const img = new Image();
-      img.onload = () => {
-        const clone = template.content.cloneNode(true);
-        const canvas = clone.querySelector('.edited-canvas');
-        const ctx = canvas.getContext('2d');
-        // Canvas internal resolution remains high for good editing
-        canvas.width = img.width;
-        canvas.height = img.height;
+      img.onload = () => createImageCard(img, file);
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
 
-        const state = {
-          canvas, ctx, originalImg: img, filename,
-          rotation: 0, flipH: 1, filter: 'none', crop: null
-        };
+  function createImageCard(originalImg, file) {
+    const clone = els.template.content.cloneNode(true);
+    const card = clone.querySelector('.image-card');
+    const canvas = clone.querySelector('.preview-canvas');
+    const ctx = canvas.getContext('2d');
 
-        redraw(state);
-        setupControls(clone, state);
-
-        imageContainer.appendChild(clone);
-        images.push(state);
-        globalControls.classList.remove('hidden');
-        
-        // Scroll to the new image
-        clone.querySelector('.image-item').scrollIntoView({ behavior: 'smooth', block: 'center' });
-      };
-      img.src = src;
-    }
-
-    function redraw(state) {
-      const { canvas, ctx, originalImg, rotation, flipH, filter, crop } = state;
-      ctx.filter = filter;
-      // Important: clear rect using the current canvas dimensions
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.save();
-      
-      // Move to center of canvas
-      ctx.translate(canvas.width / 2, canvas.height / 2);
-      ctx.rotate(rotation * Math.PI / 180);
-      ctx.scale(flipH, 1);
-
-      let srcX = 0, srcY = 0, srcW = originalImg.width, srcH = originalImg.height;
-      
-      // If cropped, define source rectangle from original image
-      if (crop) { 
-          srcX = crop.x; 
-          srcY = crop.y; 
-          srcW = crop.width; 
-          srcH = crop.height; 
-      }
-
-      // Determine draw dimensions based on rotation based on the SOURCE dimensions
-      // If rotated 90 or 270, we draw into an area that is HxW relative to the canvas center
-      let drawW = srcW;
-      let drawH = srcH;
-      if (Math.abs(rotation % 180) === 90) {
-          drawW = srcH;
-          drawH = srcW;
-      }
-
-      // Draw image centered around the translated point (-width/2, -height/2)
-      // drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
-      ctx.drawImage(
-          originalImg, 
-          srcX, srcY, srcW, srcH, // Source rect
-          -drawW/2, -drawH/2, drawW, drawH // Destination rect (centered)
-      );
-      
-      ctx.restore();
-    }
-
-    function setupControls(root, state) {
-      let cropper = null;
-      const filterBtns = root.querySelectorAll('.filter-btn');
-      const cropBtn = root.querySelector('.crop-btn');
-
-      // Filter buttons active state toggling
-      filterBtns.forEach(btn => btn.onclick = () => {
-        filterBtns.forEach(b => b.classList.remove('active', 'border-indigo-500', 'text-indigo-600', 'bg-indigo-50'));
-        btn.classList.add('active');
-        state.filter = btn.dataset.filter === 'none' ? 'none' : btn.dataset.filter;
-        redraw(state);
-      });
-
-      root.querySelector('.rotate-left').onclick = () => {
-        state.rotation -= 90;
-        // Swap canvas dimensions if rotating by 90 degrees
-        if (Math.abs(state.rotation % 180) === 90) {
-          [state.canvas.width, state.canvas.height] = [state.canvas.height, state.canvas.width];
-        }
-        redraw(state);
-        if(cropper) resetCropper();
-      };
-
-      root.querySelector('.rotate-right').onclick = () => {
-        state.rotation += 90;
-         // Swap canvas dimensions if rotating by 90 degrees
-        if (Math.abs(state.rotation % 180) === 90) {
-          [state.canvas.width, state.canvas.height] = [state.canvas.height, state.canvas.width];
-        }
-        redraw(state);
-        if(cropper) resetCropper();
-      };
-
-      root.querySelector('.flip-h').onclick = () => { state.flipH *= -1; redraw(state); if(cropper) resetCropper(); };
-
-      function resetCropper() {
-          if(cropper) {
-            cropper.destroy();
-            cropper = null;
-            cropBtn.textContent = 'Crop';
-            cropBtn.classList.remove('bg-emerald-100', 'text-emerald-700');
-             // Remove temporary crop image if it exists
-            const tempImg = root.querySelector('.cropper-temp-img');
-            if (tempImg) tempImg.remove();
-            state.canvas.classList.remove('hidden');
-          }
-      }
-
-      cropBtn.onclick = () => {
-        if (cropper) {
-          // Apply Crop
-          const data = cropper.getData(true); // true get exact pixels based on original image size
-          
-          // Important: Cropper calculates coordinates based on the image it is given.
-          // Since we gave it the CURRENT canvas state (which might be rotated/flipped),
-          // these coordinates are relative to that current state, not the raw original image.
-          // For simple cropping of current view:
-          state.crop = { x: data.x, y: data.y, width: data.width, height: data.height };
-          state.canvas.width = data.width;
-          state.canvas.height = data.height;
-          state.rotation = 0; // Reset rotation after crop as it's baked in
-          state.flipH = 1; // Reset flip after crop as it's baked in
-          
-          // We need to create a temporary image of the current canvas state to become the new "original" for subsequent draws
-          const newOriginal = new Image();
-          newOriginal.onload = () => {
-               state.originalImg = newOriginal;
-               state.crop = null; // crop is now baked into originalImg
-               redraw(state);
-               resetCropper();
-          }
-          newOriginal.src = state.canvas.toDataURL(); // Get current state as new base
-
-        } else {
-          // Start Cropping
-          const tempImg = new Image();
-          tempImg.classList.add('cropper-temp-img', 'max-w-full', 'max-h-full', 'object-contain');
-          // Use current canvas state for cropping source
-          tempImg.src = state.canvas.toDataURL(); 
-          
-          const previewContainer = root.querySelector('.preview-container');
-          state.canvas.classList.add('hidden');
-          previewContainer.appendChild(tempImg);
-          
-          cropper = new Cropper(tempImg, { 
-              viewMode: 1, 
-              autoCropArea: 0.9,
-              ready() {
-                  // Ensure cropper container fits nicely
-                  this.cropper.container.style.height = '100%';
-                  this.cropper.container.style.width = '100%';
-              }
-           });
-          cropBtn.textContent = 'Apply';
-          cropBtn.classList.add('bg-emerald-100', 'text-emerald-700');
-        }
-      };
-
-      root.querySelector('.add-watermark').onclick = () => {
-        const text = root.querySelector('.watermark-text').value || 'Watermark';
-        // Scale font size relative to image width for consistency
-        const fontSize = Math.max(20, Math.floor(state.canvas.width / 15));
-        state.ctx.font = `bold ${fontSize}px Arial`;
-        state.ctx.fillStyle = 'rgba(255,255,255,0.8)';
-        state.ctx.strokeStyle = 'rgba(0,0,0,0.8)';
-        state.ctx.lineWidth = fontSize / 10;
-        state.ctx.textAlign = 'center';
-        state.ctx.textBaseline = 'middle';
-        // Draw on top of existing content
-        state.ctx.save();
-        state.ctx.translate(state.canvas.width / 2, state.canvas.height / 2);
-        // No rotation/flip needed here as we are drawing *on top* of the final canvas state
-        state.ctx.strokeText(text, 0, 0);
-        state.ctx.fillText(text, 0, 0);
-        state.ctx.restore();
-      };
-
-      const wInput = root.querySelector('.resize-w');
-      const hInput = root.querySelector('.resize-h');
-      
-      // Use change event for resize to avoid excessive redraws during typing
-      const handleResize = () => {
-         // Get current aspect ratio from current canvas dimensions
-         const currentAspectRatio = state.canvas.width / state.canvas.height;
-         let w = parseInt(wInput.value);
-         let h = parseInt(hInput.value);
-
-         if (!w && !h) return; // Do nothing if both empty
-
-         if (w && !h) {
-             h = Math.round(w / currentAspectRatio);
-             hInput.value = h; // Update input for user
-         } else if (!w && h) {
-             w = Math.round(h * currentAspectRatio);
-             wInput.value = w; // Update input for user
-         }
-         // If both provided, we stretch (allow aspect ratio break) OR you could enforce it here. Let's stretch as per user input.
-
-         // Update canvas size and redraw content at new size
-         state.canvas.width = w; 
-         state.canvas.height = h;
-         // We need to bake current state into a new original image before resizing to avoid complex recalculations
-          const newOriginal = new Image();
-          newOriginal.onload = () => {
-               state.originalImg = newOriginal;
-               state.rotation = 0; 
-               state.flipH = 1;
-               state.crop = null;
-               redraw(state);
-          }
-          // Capture current state *before* resize happens in redraw
-          newOriginal.src = state.canvas.toDataURL(); 
-      };
-      
-      wInput.onchange = handleResize;
-      hInput.onchange = handleResize;
-
-
-      root.querySelector('.download-single').onclick = () => {
-        // Ensure watermark/edits are baked in before download by requesting Blob
-        state.canvas.toBlob(blob => {
-          saveAs(blob, state.filename.replace(/\.[^.]+$/, '') + '_edited' + (outputFormat.value.includes('png') ? '.png' : (outputFormat.value.includes('jpeg') ? '.jpg' : '.webp')));
-        }, outputFormat.value, quality.value / 100);
-      };
-
-      root.querySelector('.remove-btn').onclick = () => {
-        // Clean up cropper instance if it exists
-        if (cropper) cropper.destroy();
-        root.remove();
-        images = images.filter(i => i !== state);
-        if (images.length === 0) globalControls.classList.add('hidden');
-      };
-    }
-
-    quality.oninput = () => qualityValue.textContent = quality.value;
-
-    downloadAll.onclick = async () => {
-      downloadAll.disabled = true;
-      downloadAll.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Zipping...';
-      const zip = new JSZip();
-      for (const state of images) {
-         // Ensure any active cropper is applied or cancelled before batch download
-         // Simplified: just grab current canvas state
-        await new Promise(r => {
-          state.canvas.toBlob(blob => {
-             // Determine extension
-             let ext = '.webp';
-             if (outputFormat.value === 'image/png') ext = '.png';
-             if (outputFormat.value === 'image/jpeg') ext = '.jpg';
-             
-            zip.file(state.filename.replace(/\.[^.]+$/, '') + '_edited' + ext, blob);
-            r();
-          }, outputFormat.value, quality.value / 100);
-        });
-      }
-      const content = await zip.generateAsync({type:'blob'});
-      saveAs(content, 'UtilityKit_Images.zip');
-      downloadAll.disabled = false;
-      downloadAll.innerHTML = 'Download All as ZIP';
+    const state = {
+      id: Math.random().toString(36).substr(2, 9),
+      file, originalImg, canvas, ctx,
+      rotation: 0, crop: null, filter: 'none', flipH: 1,
+      cropperInst: null 
     };
 
-    // Drag & drop setup
-    ['dragenter','dragover','dragleave','drop'].forEach(e => dropZone.addEventListener(e, ev => {ev.preventDefault();ev.stopPropagation();}));
-    ['dragenter','dragover'].forEach(e => dropZone.addEventListener(e, () => dropZone.classList.add('dragover')));
-    ['dragleave','drop'].forEach(e => dropZone.addEventListener(e, () => dropZone.classList.remove('dragover')));
-    dropZone.onclick = () => fileInput.click();
-    dropZone.ondrop = e => handleFiles(e.dataTransfer.files);
-    fileInput.onchange = () => handleFiles(fileInput.files);
-    
-    function handleFiles(files) { 
-        const imageFiles = [...files].filter(f=>f.type.startsWith('image/'));
-        if(imageFiles.length > 0) {
-            imageFiles.forEach(f => {
-              const r = new FileReader();
-              r.onload = e => addImage(e.target.result, f.name);
-              r.readAsDataURL(f);
+    const elFilename = clone.querySelector('.filename');
+    const elSize = clone.querySelector('.filesize');
+    const elBadge = clone.querySelector('.target-badge');
+    const inpW = clone.querySelector('.input-w');
+    const inpH = clone.querySelector('.input-h');
+    const btnCrop = clone.querySelector('.btn-crop');
+
+    elFilename.textContent = file.name;
+    elSize.textContent = formatBytes(file.size);
+    elBadge.textContent = els.globalFormat.value.split('/')[1].toUpperCase();
+    canvas.width = originalImg.width;
+    canvas.height = originalImg.height;
+
+    const redraw = () => {
+      ctx.filter = state.filter;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.save();
+      ctx.translate(canvas.width / 2, canvas.height / 2);
+      ctx.rotate(state.rotation * Math.PI / 180);
+      ctx.scale(state.flipH, 1);
+
+      let sx = 0, sy = 0, sW = state.originalImg.width, sH = state.originalImg.height;
+      if(state.crop) {
+        sx = state.crop.x; sy = state.crop.y; sW = state.crop.width; sH = state.crop.height;
+      }
+
+      let dW = sW, dH = sH;
+      if(Math.abs(state.rotation % 180) === 90) { dW = sH; dH = sW; }
+
+      ctx.drawImage(state.originalImg, sx, sy, sW, sH, -dW/2, -dH/2, dW, dH);
+      ctx.restore();
+    };
+    redraw();
+
+    // === FIX 1: Correct Confirm Logic ===
+    const confirmCrop = () => {
+        if(!state.cropperInst) return;
+
+        // 1. Get the CROPPED canvas specifically (contains the pixels)
+        const croppedCanvas = state.cropperInst.getCroppedCanvas({
+            imageSmoothingQuality: 'high'
+        });
+
+        if(!croppedCanvas) return; // Safety
+
+        // 2. Convert that to a new URL
+        const croppedDataUrl = croppedCanvas.toDataURL();
+
+        // 3. Destroy cropper BEFORE modifying main canvas state
+        state.cropperInst.destroy();
+        state.cropperInst = null;
+        
+        // 4. Reset UI first
+        btnCrop.innerHTML = '<i class="fa-solid fa-crop-simple"></i>';
+        btnCrop.classList.remove('bg-green-500', 'text-white', 'hover:bg-green-600');
+        btnCrop.classList.add('bg-white/20', 'hover:bg-white/40', 'text-white');
+        canvas.classList.remove('hidden');
+        card.querySelector('.cropper-temp')?.remove();
+
+        // 5. Load the NEW cropped image as the "Original"
+        const temp = new Image();
+        temp.onload = () => {
+            state.originalImg = temp;
+            state.crop = null;
+            state.rotation = 0;
+            // Important: Update canvas size to match new crop
+            canvas.width = temp.width;
+            canvas.height = temp.height;
+            redraw();
+        };
+        temp.src = croppedDataUrl; 
+    };
+
+    clone.querySelector('.btn-rotate-left').onclick = () => {
+      if(state.cropperInst) confirmCrop();
+      state.rotation -= 90;
+      if (Math.abs(state.rotation % 180) === 90) [canvas.width, canvas.height] = [canvas.height, canvas.width];
+      redraw();
+    };
+    clone.querySelector('.btn-rotate-right').onclick = () => {
+        if(state.cropperInst) confirmCrop();
+        state.rotation += 90;
+        if (Math.abs(state.rotation % 180) === 90) [canvas.width, canvas.height] = [canvas.height, canvas.width];
+        redraw();
+    };
+
+    clone.querySelectorAll('.btn-filter').forEach(btn => {
+        btn.onclick = () => {
+            card.querySelectorAll('.btn-filter').forEach(b => {
+                b.classList.remove('bg-slate-100','dark:bg-slate-700', 'border-indigo-500', 'text-indigo-600');
+                b.classList.add('border-slate-200', 'dark:border-slate-700');
+            });
+            btn.classList.remove('border-slate-200', 'dark:border-slate-700');
+            btn.classList.add('bg-slate-100','dark:bg-slate-700', 'border-indigo-500', 'text-indigo-600');
+            state.filter = btn.dataset.filter;
+            redraw();
+        };
+    });
+
+    const handleResize = () => {
+        const aspect = state.canvas.width / state.canvas.height;
+        let w = parseInt(inpW.value), h = parseInt(inpH.value);
+        if(w && !h) { h = Math.round(w / aspect); inpH.value = h; }
+        else if(!w && h) { w = Math.round(h * aspect); inpW.value = w; }
+        
+        if(w && h) {
+            const temp = new Image();
+            temp.onload = () => {
+                state.originalImg = temp;
+                state.rotation = 0; state.crop = null;
+                canvas.width = w; canvas.height = h;
+                redraw();
+            };
+            temp.src = canvas.toDataURL();
+        }
+    };
+    inpW.onchange = inpH.onchange = handleResize;
+
+    btnCrop.onclick = () => {
+        if(state.cropperInst) {
+            confirmCrop();
+        } else {
+            const tempImg = new Image();
+            tempImg.src = canvas.toDataURL();
+            tempImg.className = 'cropper-temp max-w-full max-h-full object-contain';
+            const wrapper = card.querySelector('.canvas-wrapper');
+            canvas.classList.add('hidden');
+            wrapper.appendChild(tempImg);
+            
+            state.cropperInst = new Cropper(tempImg, { viewMode: 1, autoCropArea: 0.8 });
+            
+            btnCrop.innerHTML = '<i class="fa-solid fa-check"></i>';
+            btnCrop.classList.remove('bg-white/20', 'hover:bg-white/40');
+            btnCrop.classList.add('bg-green-500', 'text-white', 'hover:bg-green-600');
+        }
+    };
+
+    clone.querySelector('.btn-remove').onclick = () => {
+        if(state.cropperInst) state.cropperInst.destroy();
+        card.remove();
+        images = images.filter(i => i.id !== state.id);
+        if(images.length === 0) els.toolbar.classList.add('hidden');
+    };
+
+    // === FIX 2: Download Logic using Direct Cropper Data ===
+    clone.querySelector('.btn-download-single').onclick = async () => {
+        const fmt = els.globalFormat.value;
+        
+        let sourceCanvas = canvas;
+        
+        // If cropping is active, grab data directly from cropper without messing with DOM state
+        if(state.cropperInst) {
+            sourceCanvas = state.cropperInst.getCroppedCanvas({
+                imageSmoothingQuality: 'high'
             });
         }
-    }
-    
-    // Active link highlight (Nav)
-    document.addEventListener('DOMContentLoaded', () => {
-      const currentPage = location.pathname.split('/').pop() || 'index.html';
-      document.querySelectorAll('.nav-link').forEach(link => {
-        if (link.getAttribute('href') === currentPage) {
-          link.classList.add('text-indigo-600', 'font-bold');
-          link.classList.remove('text-slate-700', 'dark:text-slate-300', 'hover:text-indigo-600');
-        } else {
-          link.classList.add('text-slate-700', 'dark:text-slate-300', 'hover:text-indigo-600');
+
+        if(sourceCanvas) {
+            sourceCanvas.toBlob(blob => {
+                saveAs(blob, file.name.split('.')[0] + '_converted' + getExt(fmt));
+                
+                // Optional: If we downloaded a crop, applying it to the UI now is safe
+                if(state.cropperInst) confirmCrop(); 
+            }, fmt, els.globalQuality.value / 100);
         }
-      });
+    };
+
+    els.imageGrid.appendChild(clone);
+    images.push(state);
+    els.toolbar.classList.remove('hidden');
+  }
+
+  // === FIX 3: Batch Download Logic ===
+  els.downloadAllBtn.onclick = async () => {
+    const zip = new JSZip();
+    const btn = els.downloadAllBtn;
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Processing...';
+
+    const format = els.globalFormat.value;
+    const quality = els.globalQuality.value / 100;
+    const ext = getExt(format);
+
+    for (const imgState of images) {
+        let sourceCanvas = imgState.canvas;
+        
+        if(imgState.cropperInst) {
+            sourceCanvas = imgState.cropperInst.getCroppedCanvas({
+                imageSmoothingQuality: 'high'
+            });
+        }
+
+        await new Promise(resolve => {
+            sourceCanvas.toBlob(blob => {
+                zip.file(imgState.file.name.split('.')[0] + ext, blob);
+                resolve();
+            }, format, quality);
+        });
+        
+        // Optional: Confirm crop on UI after batch processing
+        // We do this manually to avoid async complexity inside loop
+        if(imgState.cropperInst) {
+            // Just cleanup UI visually
+            // (In a real app, we'd properly call confirmCrop but we can leave it active or close it)
+        }
+    }
+
+    const content = await zip.generateAsync({type: 'blob'});
+    saveAs(content, 'UtilityKit_Batch_Images.zip');
+    btn.disabled = false; btn.innerHTML = originalText;
+  };
+
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(e => els.dropZone.addEventListener(e, ev => {ev.preventDefault(); ev.stopPropagation();}));
+  ['dragenter', 'dragover'].forEach(e => els.dropZone.addEventListener(e, () => els.dropZone.classList.add('border-indigo-500', 'bg-indigo-50/30')));
+  ['dragleave', 'drop'].forEach(e => els.dropZone.addEventListener(e, () => els.dropZone.classList.remove('border-indigo-500', 'bg-indigo-50/30')));
+  els.dropZone.addEventListener('drop', e => handleFiles(e.dataTransfer.files));
+  els.dropZone.onclick = () => els.fileInput.click();
+  els.fileInput.onchange = () => handleFiles(els.fileInput.files);
+  function handleFiles(files) { ([...files]).forEach(file => { if(file.type.startsWith('image/')) addImage(file); }); }
+</script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const currentPage = location.pathname.split('/').pop() || 'index.html';
+
+    document.querySelectorAll('.nav-link').forEach(link => {
+      if (link.getAttribute('href') === currentPage) {
+        link.classList.add('text-indigo-600', 'font-bold');
+        link.classList.remove('text-slate-700', 'dark:text-slate-300', 'hover:text-indigo-600');
+      } else {
+        link.classList.add('text-slate-700', 'dark:text-slate-300', 'hover:text-indigo-600');
+      }
     });
-  </script>
+  });
+</script>
 </body>
 </html>
