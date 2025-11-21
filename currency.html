@@ -51,10 +51,11 @@
     <div class="bg-white dark:bg-slate-800 rounded-3xl p-8 md:p-12 shadow-2xl">
       <div id="converter-app">
         <!-- Tabs: Fiat vs Crypto -->
-        <div class="flex justify-center mb-8 gap-4">
-          <button id="tab-fiat" class="tab-active px-8 py-3 rounded-xl font-semibold transition">Fiat Currencies</button>
-          <button id="tab-crypto" class="px-8 py-3 rounded-xl font-semibold bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 transition">Cryptocurrencies</button>
-        </div>
+        <div class="flex justify-center mb-8 gap-2 md:gap-4 p-1 bg-slate-100 dark:bg-slate-800 rounded-2xl w-fit mx-auto">
+  <button id="tab-fiat" class="px-6 py-2 rounded-xl font-semibold text-sm transition">Fiat</button>
+  <button id="tab-crypto" class="px-6 py-2 rounded-xl font-semibold text-sm transition">Crypto</button>
+  <button id="tab-all" class="px-6 py-2 rounded-xl font-semibold text-sm transition">Universal</button>
+</div>
 
         <!-- FROM -->
         <div class="rounded-2xl p-6 bg-slate-50 dark:bg-slate-700 mb-6 border border-slate-200 dark:border-slate-600">
@@ -116,9 +117,9 @@
     </footer>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+ <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // 1. CORRECT CURRENCY DEFINITIONS
+    // --- 1. DATA DEFINITIONS ---
     const FIAT_CURRENCIES = {
       "USD": "United States Dollar", "EUR": "Euro", "GBP": "British Pound", "JPY": "Japanese Yen", 
       "AUD": "Australian Dollar", "CAD": "Canadian Dollar", "CHF": "Swiss Franc", "CNY": "Chinese Yuan", 
@@ -130,7 +131,6 @@
       "SEK": "Swedish Krona", "DKK": "Danish Krone"
     };
 
-    // 2. MAP SYMBOLS TO COINGECKO IDs (Crucial for Crypto)
     const CRYPTO_CURRENCIES = {
       "BTC": { name: "Bitcoin", id: "bitcoin" },
       "ETH": { name: "Ethereum", id: "ethereum" },
@@ -141,17 +141,20 @@
       "DOGE": { name: "Dogecoin", id: "dogecoin" },
       "DOT": { name: "Polkadot", id: "polkadot" },
       "LTC": { name: "Litecoin", id: "litecoin" },
-      "AVAX": { name: "Avalanche", id: "avalanche-2" }
+      "AVAX": { name: "Avalanche", id: "avalanche-2" },
+      "USDT": { name: "Tether", id: "tether" },
+      "USDC": { name: "USDC", id: "usd-coin" }
     };
 
-    let rates = {}; 
-    let cryptoPricesUSD = {}; // Store raw USD prices for crypto cross-calc
-    let currentTab = 'fiat';
-    let chart = null;
+    // We store the value of 1 unit of every currency in USD
+    // Example: pricesInUSD['EUR'] = 1.05; pricesInUSD['BTC'] = 98000;
+    let pricesInUSD = { "USD": 1.0 }; 
+    let currentTab = 'fiat'; // 'fiat', 'crypto', or 'all'
 
     const els = {
       tabFiat: document.getElementById('tab-fiat'),
       tabCrypto: document.getElementById('tab-crypto'),
+      tabAll: document.getElementById('tab-all'),
       fromSearch: document.getElementById('search-from'),
       toSearch: document.getElementById('search-to'),
       fromSelect: document.getElementById('currency-from'),
@@ -172,20 +175,36 @@
 
     function formatNumber(num) {
       if (isNaN(num)) return "0.00";
-      // Show more decimals for small crypto numbers
+      // Smart formatting: use more decimals for tiny numbers (crypto)
       return Number(num).toLocaleString(undefined, { 
         minimumFractionDigits: 2, 
-        maximumFractionDigits: num < 1 ? 6 : 2 
+        maximumFractionDigits: num < 1 ? 8 : 2 
       });
     }
 
-    function populateSelect(selectEl, isFiat) {
+    // Populate the dropdown list based on the selected tab
+    function populateSelect(selectEl, mode) {
       selectEl.innerHTML = '';
-      if(isFiat) {
+      
+      // 1. Add Fiat
+      if(mode === 'fiat' || mode === 'all') {
+        if(mode === 'all') {
+          const group = document.createElement('optgroup');
+          group.label = "Fiat Currencies";
+          selectEl.add(group);
+        }
         Object.keys(FIAT_CURRENCIES).sort().forEach(code => {
           selectEl.add(new Option(`${code} - ${FIAT_CURRENCIES[code]}`, code));
         });
-      } else {
+      }
+
+      // 2. Add Crypto
+      if(mode === 'crypto' || mode === 'all') {
+        if(mode === 'all') {
+          const group = document.createElement('optgroup');
+          group.label = "Cryptocurrencies";
+          selectEl.add(group);
+        }
         Object.keys(CRYPTO_CURRENCIES).forEach(code => {
           selectEl.add(new Option(`${code} - ${CRYPTO_CURRENCIES[code].name}`, code));
         });
@@ -195,6 +214,8 @@
     function filterSelect(inputEl, selectEl) {
       const term = inputEl.value.toLowerCase();
       Array.from(selectEl.options).forEach(opt => {
+        // Skip optgroups
+        if(opt.tagName === 'OPTGROUP') return;
         opt.hidden = !opt.text.toLowerCase().includes(term);
       });
     }
@@ -202,90 +223,98 @@
     function switchTab(tab) {
       currentTab = tab;
       
-      // Toggle Classes
-      const activeClass = ['bg-white', 'dark:bg-slate-600', 'shadow-sm'];
-      const inactiveClass = ['bg-slate-200', 'dark:bg-slate-700'];
+      // Visual Styles for Tabs
+      const activeClass = "bg-indigo-600 text-white shadow-lg transform scale-105";
+      const inactiveClass = "bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-slate-600";
 
-      els.tabFiat.className = tab === 'fiat' ? "tab-active px-8 py-3 rounded-xl font-semibold transition bg-indigo-600 text-white shadow-lg" : "px-8 py-3 rounded-xl font-semibold bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 transition";
-      els.tabCrypto.className = tab === 'crypto' ? "tab-active px-8 py-3 rounded-xl font-semibold transition bg-indigo-600 text-white shadow-lg" : "px-8 py-3 rounded-xl font-semibold bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 transition";
+      const resetBtn = (btn) => { btn.className = `px-6 py-2 rounded-xl font-semibold text-sm transition ${inactiveClass}`; };
+      const setBtn = (btn) => { btn.className = `px-6 py-2 rounded-xl font-semibold text-sm transition ${activeClass}`; };
 
-      // Populate & Reset
-      populateSelect(els.fromSelect, tab === 'fiat');
-      populateSelect(els.toSelect, tab === 'fiat');
+      resetBtn(els.tabFiat); resetBtn(els.tabCrypto); resetBtn(els.tabAll);
+
+      if (tab === 'fiat') setBtn(els.tabFiat);
+      else if (tab === 'crypto') setBtn(els.tabCrypto);
+      else setBtn(els.tabAll);
+
+      // Populate Lists
+      populateSelect(els.fromSelect, tab);
+      populateSelect(els.toSelect, tab);
       
-      els.fromSearch.value = '';
-      els.toSearch.value = '';
-      
-      if (tab === 'fiat') {
-        els.fromSelect.value = 'USD';
-        els.toSelect.value = 'MYR';
-      } else {
-        els.fromSelect.value = 'BTC';
-        els.toSelect.value = 'ETH';
-      }
-      
+      // Set Defaults & Fill Input Text
+      let defFrom = 'USD'; 
+      let defTo = 'MYR';
+
+      if (tab === 'crypto') { defFrom = 'BTC'; defTo = 'ETH'; }
+      if (tab === 'all')    { defFrom = 'USD'; defTo = 'BTC'; }
+
+      // Apply Defaults
+      els.fromSelect.value = defFrom;
+      els.toSelect.value = defTo;
+
+      // FIX: Immediately update the "Fill" text to match the selection
+      updateSearchInput(els.fromSelect, els.fromSearch);
+      updateSearchInput(els.toSelect, els.toSearch);
+
+      // Disable Chart for stability (APIs don't support mixed history easily free)
       els.chartContainer.classList.add('hidden');
-      els.chartBtn.textContent = "View Chart (Not Available)"; 
-      els.chartBtn.disabled = true; // Disable chart for stability without API Key
+      els.chartBtn.textContent = "Chart Unavailable in this mode"; 
+      els.chartBtn.disabled = true;
       els.chartBtn.classList.add('opacity-50', 'cursor-not-allowed');
 
-      fetchRates();
+      // Fetch fresh data
+      fetchAllRates();
     }
 
-    // --- API FUNCTIONS ---
-
-    async function fetchFiatRates() {
-      try {
-        const base = els.fromSelect.value;
-        els.status.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Fetching rates...';
-        
-        // USE OPEN.ER-API (Free & No Key Required)
-        const res = await fetch(`https://open.er-api.com/v6/latest/${base}`);
-        const data = await res.json();
-        
-        if(data.result === "success") {
-          rates = data.rates;
-          els.status.innerHTML = '<span class="text-emerald-500"><i class="fa-solid fa-check-circle"></i> Live rates active</span>';
-          els.updated.textContent = `Updated: ${new Date().toLocaleTimeString()}`;
-        } else {
-          throw new Error('API Error');
-        }
-      } catch (e) {
-        console.error(e);
-        els.status.innerHTML = '<span class="text-red-500">Error fetching rates. Check connection.</span>';
+    // Helper to sync Select -> Input Text
+    function updateSearchInput(selectEl, inputEl) {
+      const selectedOpt = selectEl.options[selectEl.selectedIndex];
+      if(selectedOpt) {
+        // Shows "USD" instead of "USD - United States Dollar" for cleaner look, 
+        // or remove .split if you want full text.
+        inputEl.value = selectedOpt.text.split(' - ')[0]; 
       }
     }
 
-    async function fetchCryptoRates() {
+    // --- API FUNCTIONS (UNIFIED) ---
+
+    async function fetchAllRates() {
+      els.status.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Updating rates...';
+      
       try {
-        els.status.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Fetching crypto prices...';
+        // 1. Fetch Fiat (Base USD) - Free API
+        const fiatRes = await fetch('https://open.er-api.com/v6/latest/USD');
+        const fiatData = await fiatRes.json();
         
-        // Construct IDs string (e.g. "bitcoin,ethereum,solana")
+        if(fiatData.result === "success") {
+          // API returns: 1 USD = x Currency. 
+          // We need Price in USD. So Price = 1 / rate.
+          Object.keys(fiatData.rates).forEach(code => {
+            pricesInUSD[code] = 1 / fiatData.rates[code];
+          });
+          pricesInUSD["USD"] = 1.0; // Anchor
+        }
+
+        // 2. Fetch Crypto (Target USD) - CoinGecko
         const ids = Object.values(CRYPTO_CURRENCIES).map(c => c.id).join(',');
-        
-        const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd`);
-        const data = await res.json();
-        
-        // Map response back to Symbols (e.g. BTC -> 95000)
+        const cryptoRes = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=usd`);
+        const cryptoData = await cryptoRes.json();
+
         Object.keys(CRYPTO_CURRENCIES).forEach(sym => {
           const apiId = CRYPTO_CURRENCIES[sym].id;
-          if (data[apiId]) {
-            cryptoPricesUSD[sym] = data[apiId].usd;
+          if (cryptoData[apiId]) {
+            pricesInUSD[sym] = cryptoData[apiId].usd;
           }
         });
 
-        els.status.innerHTML = '<span class="text-emerald-500"><i class="fa-solid fa-check-circle"></i> Crypto live</span>';
+        els.status.innerHTML = '<span class="text-emerald-500"><i class="fa-solid fa-check-circle"></i> Live Rates</span>';
         els.updated.textContent = `Updated: ${new Date().toLocaleTimeString()}`;
+        
+        convert();
+
       } catch (e) {
         console.error(e);
-        els.status.innerHTML = '<span class="text-red-500">CoinGecko API limit. Wait 1 min.</span>';
+        els.status.innerHTML = '<span class="text-amber-500">Using cached/partial data</span>';
       }
-    }
-
-    async function fetchRates() {
-      if (currentTab === 'fiat') await fetchFiatRates();
-      else await fetchCryptoRates();
-      convert();
     }
 
     function convert() {
@@ -296,30 +325,24 @@
 
       if (isNaN(amount)) amount = 0;
 
-      // Logic for calculation
-      let finalRate = 0;
+      // Math: (Amount * PriceFromInUSD) / PriceToInUSD
+      const priceFrom = pricesInUSD[from] || 0;
+      const priceTo = pricesInUSD[to] || 0;
+      
+      let result = 0;
+      let rate = 0;
 
-      if (currentTab === 'fiat') {
-        // Simple direct rate lookup
-        finalRate = rates[to] || 0;
-      } else {
-        // Crypto Cross-Rate Calculation (Price A in USD / Price B in USD)
-        const priceFrom = cryptoPricesUSD[from] || 0;
-        const priceTo = cryptoPricesUSD[to] || 0;
-        if (priceTo > 0) {
-          finalRate = priceFrom / priceTo;
-        }
+      if (priceTo > 0) {
+        result = (amount * priceFrom) / priceTo;
+        rate = priceFrom / priceTo;
       }
 
-      if (from === to) finalRate = 1;
-
-      const result = amount * finalRate;
       els.amountTo.value = formatNumber(result);
 
-      // Display Rate Text
-      if (finalRate > 0) {
-        els.rateFrom.textContent = `1 ${from} = ${finalRate < 0.01 ? finalRate.toPrecision(6) : finalRate.toFixed(4)} ${to}`;
-        els.rateTo.textContent = `1 ${to} = ${(1/finalRate) < 0.01 ? (1/finalRate).toPrecision(6) : (1/finalRate).toFixed(4)} ${from}`;
+      // Update Rate Text
+      if (rate > 0) {
+        els.rateFrom.textContent = `1 ${from} = ${rate < 0.01 ? rate.toPrecision(6) : rate.toFixed(4)} ${to}`;
+        els.rateTo.textContent = `1 ${to} = ${(1/rate) < 0.01 ? (1/rate).toPrecision(6) : (1/rate).toFixed(4)} ${from}`;
       } else {
         els.rateFrom.textContent = "Rate unavailable";
         els.rateTo.textContent = "-";
@@ -329,32 +352,26 @@
     // --- EVENTS & INIT ---
 
     document.addEventListener('DOMContentLoaded', () => {
-      // Initial Load
-      switchTab('fiat');
       
-      // Auto Refresh every 60s
-      setInterval(() => { if(!document.hidden) fetchRates(); }, 60000);
-
-      // Tab Switching
       els.tabFiat.onclick = () => switchTab('fiat');
       els.tabCrypto.onclick = () => switchTab('crypto');
+      els.tabAll.onclick = () => switchTab('all');
 
-      // Search Filtering
+      // Input Filter Logic
       els.fromSearch.oninput = () => filterSelect(els.fromSearch, els.fromSelect);
       els.toSearch.oninput = () => filterSelect(els.toSearch, els.toSearch);
 
-      // Dropdown Visibility Logic
+      // Dropdown Toggling
       const toggleDropdown = (type) => {
         const select = type === 'from' ? els.fromSelect : els.toSelect;
-        const search = type === 'from' ? els.fromSearch : els.toSearch;
         select.classList.remove('hidden');
-        search.focus();
+        select.size = 10; // Make sure it has height
       };
 
       els.fromSearch.onclick = () => toggleDropdown('from');
       els.toSearch.onclick = () => toggleDropdown('to');
 
-      // Hide Dropdowns on Outside Click
+      // Hide on click outside
       document.addEventListener('click', (e) => {
         if (!e.target.closest('#search-from') && !e.target.closest('#currency-from')) els.fromSelect.classList.add('hidden');
         if (!e.target.closest('#search-to') && !e.target.closest('#currency-to')) els.toSelect.classList.add('hidden');
@@ -362,57 +379,39 @@
 
       // Selection Logic
       els.fromSelect.onchange = () => { 
-        els.fromSearch.value = els.fromSelect.options[els.fromSelect.selectedIndex].text.split(' - ')[0]; 
+        updateSearchInput(els.fromSelect, els.fromSearch); 
         els.fromSelect.classList.add('hidden'); 
-        fetchRates(); 
+        convert(); 
       };
       els.toSelect.onchange = () => { 
-        els.toSearch.value = els.toSelect.options[els.toSelect.selectedIndex].text.split(' - ')[0]; 
+        updateSearchInput(els.toSelect, els.toSearch); 
         els.toSelect.classList.add('hidden'); 
         convert(); 
       };
 
-      // Input Handling
+      // Amount Input
       els.amountFrom.oninput = (e) => {
-        // Allow only numbers and one decimal
         let val = e.target.value.replace(/[^0-9.]/g, '');
-        // Check for multiple decimals
-        if ((val.match(/\./g) || []).length > 1) return;
+        if ((val.match(/\./g) || []).length > 1) return; // Prevent double decimals
         convert();
       };
 
-      // Swap Button
+      // Swap
       document.getElementById('swap-button').onclick = () => {
-        const oldFromVal = els.fromSelect.value;
-        const oldToVal = els.toSelect.value;
+        const oldFrom = els.fromSelect.value;
+        els.fromSelect.value = els.toSelect.value;
+        els.toSelect.value = oldFrom;
         
-        els.fromSelect.value = oldToVal;
-        els.toSelect.value = oldFromVal;
-
-        // Update search text boxes
-        const optFrom = Array.from(els.fromSelect.options).find(o => o.value === els.fromSelect.value);
-        const optTo = Array.from(els.toSelect.options).find(o => o.value === els.toSelect.value);
-        
-        if(optFrom) els.fromSearch.value = optFrom.text.split(' - ')[0];
-        if(optTo) els.toSearch.value = optTo.text.split(' - ')[0];
-
-        fetchRates();
+        updateSearchInput(els.fromSelect, els.fromSearch);
+        updateSearchInput(els.toSelect, els.toSearch);
+        convert();
       };
 
-      // Convert Button (Manual Trigger)
       document.getElementById('convert-btn').onclick = convert;
 
-      // Copy to Clipboard
-      els.amountTo.onclick = els.copyBtn.onclick = () => {
-        if(!els.amountTo.value) return;
-        navigator.clipboard.writeText(els.amountTo.value);
-        els.copyFeedback.classList.add('show');
-        els.copyBtn.style.opacity = 1;
-        setTimeout(() => { 
-          els.copyFeedback.classList.remove('show'); 
-          els.copyBtn.style.opacity = 0; 
-        }, 1500);
-      };
+      // Init
+      switchTab('fiat'); // Loads default fiat view
+      setInterval(fetchAllRates, 60000); // Refresh every minute
     });
 </script>
   <script>
