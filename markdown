@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Markdown to HTML Converter - Live Editor • ToolSwift</title>
+  <title>Markdown to HTML Converter - Live Editor • UtilityKit</title>
   <meta name="description" content="Convert Markdown to HTML with live preview. Write Markdown and instantly see the rendered HTML. Fast, free, and offline Markdown editor.">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
@@ -20,7 +20,7 @@
 <header class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-lg sticky top-0 z-50">
   <div class="container mx-auto px-6 py-5 flex flex-wrap items-center justify-between">
     <a href="index.html" class="flex items-center gap-3">
-      <h1 class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">ToolSwift</h1>
+      <h1 class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">UtilityKit</h1>
     </a>
     <nav class="flex flex-wrap gap-4 md:gap-6 text-lg">
       <a href="pdf.html" class="nav-link hover:text-blue-600 dark:hover:text-blue-400 transition"><i class="fa-solid fa-file-pdf mr-1"></i>PDF</a>
