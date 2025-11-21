@@ -4,39 +4,48 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Online Calculator • UtilityKit</title>
-  <meta name="description" content="Free online scientific calculator, percentage, age, BMI, loan, tip & unit converter. 100% private.">
+  <meta name="description" content="Free online scientific calculator with history, keyboard support, percentage, age, BMI, loan, tip & unit converter. 100% private.">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <style>
+    /* Custom Scrollbar for History */
+    .history-scroll::-webkit-scrollbar { width: 6px; }
+    .history-scroll::-webkit-scrollbar-track { background: transparent; }
+    .history-scroll::-webkit-scrollbar-thumb { background-color: #4b5563; border-radius: 20px; }
+    
     /* Animation for the live clock if used */
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
-    /* Hide scrollbar for cleaner look in some containers */
-    .no-scrollbar::-webkit-scrollbar { display: none; }
-    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
   </style>
 </head>
 <body class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 dark:from-slate-950 dark:to-slate-900 min-h-screen font-sans text-slate-800 dark:text-slate-200">
 
  <!-- Header -->
- <header class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-lg sticky top-0 z-50">
-  <div class="container mx-auto px-6 h-16 flex items-center justify-between">
-    <a href="index.html" class="flex items-center gap-3 group">
-      <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white text-xl font-bold shadow-indigo-200 dark:shadow-none shadow-lg group-hover:scale-105 transition-transform">
-        <i class="fa-solid fa-calculator"></i>
-      </div>
-      <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">
-        UtilityKit
-      </span>
+<header class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-lg sticky top-0 z-50">
+  <div class="container mx-auto px-6 py-5 flex flex-wrap items-center justify-between">
+    <a href="index.html" class="flex items-center gap-3">
+      <h1 class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">UtilityKit</h1>
     </a>
-    
-    <a href="index.html" class="text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 transition-colors">
-      <i class="fa-solid fa-arrow-left mr-2"></i> Back to Tools
-    </a>
+    <nav class="flex flex-wrap gap-4 md:gap-6 text-lg">
+      <a href="pdf.html" class="nav-link hover:text-blue-600 dark:hover:text-blue-400 transition"><i class="fa-solid fa-file-pdf mr-1"></i>PDF</a>
+      <a href="image.html" class="nav-link hover:text-blue-600 dark:hover:text-blue-400 transition"><i class="fa-solid fa-image mr-1"></i>Image</a>
+      <a href="qr.html" class="nav-link hover:text-blue-600 dark:hover:text-blue-400 transition"><i class="fa-solid fa-qrcode mr-1"></i>QR</a>
+      <a href="ocr.html" class="nav-link hover:text-blue-600 dark:hover:text-blue-400 transition"><i class="fa-solid fa-eye mr-1"></i>OCR</a>
+      <a href="calculator.html" class="nav-link hover:text-blue-600 dark:hover:text-blue-400 transition"><i class="fa-solid fa-gauge-high mr-1"></i>Calculator</a>
+      <a href="password.html" class="nav-link hover:text-blue-600 dark:hover:text-blue-400 transition"><i class="fa-solid fa-key mr-1"></i>Password</a>
+      <a href="json.html" class="nav-link hover:text-blue-600 dark:hover:text-blue-400 transition"><i class="fa-solid fa-code mr-1"></i>JSON</a>
+      <a href="base64.html" class="nav-link hover:text-blue-600 dark:hover:text-blue-400 transition"><i class="fa-solid fa-lock mr-1"></i>Base64</a>
+      <a href="timestamp.html" class="nav-link hover:text-blue-600 dark:hover:text-blue-400 transition"><i class="fa-solid fa-clock mr-1"></i>Timestamp</a>
+      
+      <!-- === NEW TOOLS IN NAV === -->
+      <a href="compress.html" class="nav-link hover:text-blue-600 dark:hover:text-blue-400 transition"><i class="fa-solid fa-file-zipper mr-1"></i>Compressor</a>
+      <a href="markdown.html" class="nav-link hover:text-blue-600 dark:hover:text-blue-400 transition"><i class="fa-brands fa-markdown mr-1"></i>Markdown</a>
+      <a href="currency.html" class="nav-link hover:text-blue-600 dark:hover:text-blue-400 transition"><i class="fa-solid fa-dollar-sign mr-1"></i>Currency</a>
+    </nav>
   </div>
- </header>
+</header>
 
  <!-- Main Content -->
- <main class="container mx-auto px-4 py-12 max-w-5xl">
+ <main class="container mx-auto px-4 py-12 max-w-6xl">
     
     <!-- Tab Navigation -->
     <div class="flex flex-wrap justify-center gap-2 mb-12 bg-white dark:bg-slate-800 p-2 rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700">
@@ -63,43 +72,71 @@
         </button>
     </div>
 
-    <!-- 1. Scientific Calculator -->
+    <!-- 1. Scientific Calculator (UPDATED WITH HISTORY & FEATURES) -->
     <div id="scientific" class="tab-content text-center">
         <h2 class="text-3xl font-bold mb-8">Scientific Calculator</h2>
-        <div class="max-w-md mx-auto bg-slate-900 p-6 rounded-3xl shadow-2xl border border-slate-700">
-            <input type="text" id="calc-display" class="w-full bg-slate-800 text-right text-4xl text-white p-6 rounded-2xl mb-6 font-mono border-none outline-none" placeholder="0" readonly>
+        
+        <div class="flex flex-col lg:flex-row gap-6 justify-center items-start max-w-5xl mx-auto">
             
-            <div class="grid grid-cols-4 gap-3">
-                <button onclick="clearAll()" class="col-span-2 p-4 rounded-xl bg-red-500/10 text-red-500 font-bold hover:bg-red-500/20">AC</button>
-                <button onclick="calculateSpecial('perc')" class="p-4 rounded-xl bg-slate-700 text-white hover:bg-slate-600">%</button>
-                <button onclick="handleOperator('/')" class="p-4 rounded-xl bg-indigo-600 text-white hover:bg-indigo-500">÷</button>
+            <!-- Calculator Pad -->
+            <div class="w-full max-w-md mx-auto bg-slate-900 p-6 rounded-3xl shadow-2xl border border-slate-700 relative z-10">
+                <!-- Mode Toggles & Status -->
+                <div class="flex justify-between items-center mb-4 text-xs font-bold text-slate-400 px-2">
+                    <button id="deg-rad-btn" onclick="toggleDegRad()" class="px-2 py-1 rounded hover:bg-slate-700 text-indigo-400 transition-colors">DEG</button>
+                    <span><i class="fa-regular fa-keyboard mr-1"></i> Keyboard Active</span>
+                </div>
+
+                <input type="text" id="calc-display" class="w-full bg-slate-800 text-right text-4xl text-white p-6 rounded-2xl mb-6 font-mono border-none outline-none overflow-hidden" placeholder="0" readonly>
                 
-                <button onclick="inputDigit('7')" class="p-4 rounded-xl bg-slate-800 text-white hover:bg-slate-700 font-bold text-xl">7</button>
-                <button onclick="inputDigit('8')" class="p-4 rounded-xl bg-slate-800 text-white hover:bg-slate-700 font-bold text-xl">8</button>
-                <button onclick="inputDigit('9')" class="p-4 rounded-xl bg-slate-800 text-white hover:bg-slate-700 font-bold text-xl">9</button>
-                <button onclick="handleOperator('*')" class="p-4 rounded-xl bg-indigo-600 text-white hover:bg-indigo-500">×</button>
+                <div class="grid grid-cols-4 gap-3">
+                    <button onclick="clearAll()" class="p-4 rounded-xl bg-red-500/10 text-red-500 font-bold hover:bg-red-500/20 text-sm">AC</button>
+                    <button onclick="deleteLastChar()" class="p-4 rounded-xl bg-slate-700 text-orange-400 hover:bg-slate-600 text-sm font-bold">DEL</button>
+                    <button onclick="calculateSpecial('perc')" class="p-4 rounded-xl bg-slate-700 text-white hover:bg-slate-600 text-lg">%</button>
+                    <button onclick="handleOperator('/')" class="p-4 rounded-xl bg-indigo-600 text-white hover:bg-indigo-500 text-xl">÷</button>
+                    
+                    <button onclick="inputDigit('7')" class="p-4 rounded-xl bg-slate-800 text-white hover:bg-slate-700 font-bold text-xl">7</button>
+                    <button onclick="inputDigit('8')" class="p-4 rounded-xl bg-slate-800 text-white hover:bg-slate-700 font-bold text-xl">8</button>
+                    <button onclick="inputDigit('9')" class="p-4 rounded-xl bg-slate-800 text-white hover:bg-slate-700 font-bold text-xl">9</button>
+                    <button onclick="handleOperator('*')" class="p-4 rounded-xl bg-indigo-600 text-white hover:bg-indigo-500 text-xl">×</button>
+                    
+                    <button onclick="inputDigit('4')" class="p-4 rounded-xl bg-slate-800 text-white hover:bg-slate-700 font-bold text-xl">4</button>
+                    <button onclick="inputDigit('5')" class="p-4 rounded-xl bg-slate-800 text-white hover:bg-slate-700 font-bold text-xl">5</button>
+                    <button onclick="inputDigit('6')" class="p-4 rounded-xl bg-slate-800 text-white hover:bg-slate-700 font-bold text-xl">6</button>
+                    <button onclick="handleOperator('-')" class="p-4 rounded-xl bg-indigo-600 text-white hover:bg-indigo-500 text-xl">−</button>
+                    
+                    <button onclick="inputDigit('1')" class="p-4 rounded-xl bg-slate-800 text-white hover:bg-slate-700 font-bold text-xl">1</button>
+                    <button onclick="inputDigit('2')" class="p-4 rounded-xl bg-slate-800 text-white hover:bg-slate-700 font-bold text-xl">2</button>
+                    <button onclick="inputDigit('3')" class="p-4 rounded-xl bg-slate-800 text-white hover:bg-slate-700 font-bold text-xl">3</button>
+                    <button onclick="handleOperator('+')" class="p-4 rounded-xl bg-indigo-600 text-white hover:bg-indigo-500 text-xl">+</button>
+                    
+                    <button onclick="inputDigit('0')" class="col-span-2 p-4 rounded-xl bg-slate-800 text-white hover:bg-slate-700 font-bold text-xl">0</button>
+                    <button onclick="inputDecimal('.')" class="p-4 rounded-xl bg-slate-800 text-white hover:bg-slate-700 text-xl">.</button>
+                    <button onclick="handleOperator('=')" class="p-4 rounded-xl bg-indigo-500 text-white hover:bg-indigo-400 text-xl">=</button>
+                </div>
                 
-                <button onclick="inputDigit('4')" class="p-4 rounded-xl bg-slate-800 text-white hover:bg-slate-700 font-bold text-xl">4</button>
-                <button onclick="inputDigit('5')" class="p-4 rounded-xl bg-slate-800 text-white hover:bg-slate-700 font-bold text-xl">5</button>
-                <button onclick="inputDigit('6')" class="p-4 rounded-xl bg-slate-800 text-white hover:bg-slate-700 font-bold text-xl">6</button>
-                <button onclick="handleOperator('-')" class="p-4 rounded-xl bg-indigo-600 text-white hover:bg-indigo-500">−</button>
-                
-                <button onclick="inputDigit('1')" class="p-4 rounded-xl bg-slate-800 text-white hover:bg-slate-700 font-bold text-xl">1</button>
-                <button onclick="inputDigit('2')" class="p-4 rounded-xl bg-slate-800 text-white hover:bg-slate-700 font-bold text-xl">2</button>
-                <button onclick="inputDigit('3')" class="p-4 rounded-xl bg-slate-800 text-white hover:bg-slate-700 font-bold text-xl">3</button>
-                <button onclick="handleOperator('+')" class="p-4 rounded-xl bg-indigo-600 text-white hover:bg-indigo-500">+</button>
-                
-                <button onclick="inputDigit('0')" class="col-span-2 p-4 rounded-xl bg-slate-800 text-white hover:bg-slate-700 font-bold text-xl">0</button>
-                <button onclick="inputDecimal('.')" class="p-4 rounded-xl bg-slate-800 text-white hover:bg-slate-700">.</button>
-                <button onclick="handleOperator('=')" class="p-4 rounded-xl bg-indigo-500 text-white hover:bg-indigo-400">=</button>
+                <!-- Scientific Row -->
+                <div class="grid grid-cols-4 gap-3 mt-3 pt-3 border-t border-slate-700">
+                    <button onclick="calculateSpecial('sqrt')" class="p-3 rounded-lg bg-slate-800 text-slate-300 text-sm hover:text-white transition-colors">√</button>
+                    <button onclick="calculateSpecial('pow2')" class="p-3 rounded-lg bg-slate-800 text-slate-300 text-sm hover:text-white transition-colors">x²</button>
+                    <button onclick="calculateSpecial('pi')" class="p-3 rounded-lg bg-slate-800 text-slate-300 text-sm hover:text-white transition-colors">π</button>
+                    <button onclick="calculateSpecial('log')" class="p-3 rounded-lg bg-slate-800 text-slate-300 text-sm hover:text-white transition-colors">log</button>
+                    <button onclick="calculateSpecial('sin')" class="p-3 rounded-lg bg-slate-800 text-slate-300 text-sm hover:text-white transition-colors">sin</button>
+                    <button onclick="calculateSpecial('cos')" class="p-3 rounded-lg bg-slate-800 text-slate-300 text-sm hover:text-white transition-colors">cos</button>
+                    <button onclick="calculateSpecial('tan')" class="p-3 rounded-lg bg-slate-800 text-slate-300 text-sm hover:text-white transition-colors">tan</button>
+                    <button onclick="calculateSpecial('1/x')" class="p-3 rounded-lg bg-slate-800 text-slate-300 text-sm hover:text-white transition-colors">1/x</button>
+                </div>
             </div>
-            
-            <!-- Scientific Row -->
-            <div class="grid grid-cols-4 gap-3 mt-3 pt-3 border-t border-slate-700">
-                <button onclick="calculateSpecial('sqrt')" class="p-3 rounded-lg bg-slate-800 text-slate-300 text-sm">√</button>
-                <button onclick="calculateSpecial('pow2')" class="p-3 rounded-lg bg-slate-800 text-slate-300 text-sm">x²</button>
-                <button onclick="calculateSpecial('pi')" class="p-3 rounded-lg bg-slate-800 text-slate-300 text-sm">π</button>
-                <button onclick="calculateSpecial('log')" class="p-3 rounded-lg bg-slate-800 text-slate-300 text-sm">log</button>
+
+            <!-- History Panel -->
+            <div class="w-full lg:w-80 bg-white dark:bg-slate-800 rounded-3xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden flex flex-col h-[600px] lg:h-auto self-stretch">
+                <div class="p-4 bg-slate-100 dark:bg-slate-900 border-b dark:border-slate-700 flex justify-between items-center">
+                    <h3 class="font-bold text-slate-700 dark:text-slate-300"><i class="fa-solid fa-clock-rotate-left mr-2"></i>History</h3>
+                    <button onclick="clearHistory()" class="text-xs text-red-500 hover:text-red-600 font-semibold px-2 py-1 hover:bg-red-50 dark:hover:bg-red-900/20 rounded">Clear</button>
+                </div>
+                <div id="history-list" class="flex-1 overflow-y-auto p-4 space-y-3 history-scroll text-left">
+                    <div class="text-center text-slate-400 text-sm mt-10 italic" id="empty-history-msg">No history yet</div>
+                    <!-- History items will be injected here -->
+                </div>
             </div>
         </div>
     </div>
@@ -124,7 +161,7 @@
         </div>
     </div>
 
-    <!-- 3. Age Calculator (FIXED: 2 Dates) -->
+    <!-- 3. Age Calculator -->
     <div id="age" class="tab-content hidden text-center">
       <h2 class="text-3xl font-bold mb-8">Age Calculator</h2>
       <div class="max-w-xl mx-auto bg-gray-50 dark:bg-slate-900 p-6 rounded-2xl shadow-sm">
@@ -146,7 +183,7 @@
       </div>
     </div>
 
-    <!-- 4. BMI Calculator (FIXED: Table & Logic) -->
+    <!-- 4. BMI Calculator -->
     <div id="bmi" class="tab-content hidden text-center">
       <h2 class="text-3xl font-bold mb-8">BMI Calculator</h2>
       
@@ -299,6 +336,8 @@
     let previousInput = '';
     let operator = null;
     let waitForSecondOperand = true;
+    let isDegrees = true; // Feature: Degree/Radian toggle
+    let calcHistory = []; // Feature: History array
     const display = document.getElementById('calc-display');
 
     // --- INITIALIZATION ---
@@ -345,55 +384,173 @@
         // 3. Init Age "To" Date
         const ageTo = document.getElementById('age-to');
         if (ageTo) ageTo.valueAsDate = new Date();
+
+        // 4. Keyboard Support Listener
+        document.addEventListener('keydown', handleKeyboardInput);
     });
 
 
     // --- CALCULATOR FUNCTIONS ---
 
     // 1. Scientific Calculator
+    
+    // Feature: Keyboard Support
+    function handleKeyboardInput(e) {
+        // Only trigger if Scientific tab is active
+        const sciTab = document.getElementById('scientific');
+        if (sciTab.classList.contains('hidden')) return;
+
+        const key = e.key;
+        
+        if (/[0-9]/.test(key)) inputDigit(key);
+        if (key === '.') inputDecimal('.');
+        if (key === '=' || key === 'Enter') { e.preventDefault(); handleOperator('='); }
+        if (key === 'Backspace') deleteLastChar();
+        if (key === 'Escape') clearAll();
+        if (key === '+') handleOperator('+');
+        if (key === '-') handleOperator('-');
+        if (key === '*' || key === 'x') handleOperator('*');
+        if (key === '/') handleOperator('/');
+    }
+
+    // Feature: Backspace
+    function deleteLastChar() {
+        if (currentInput.length > 1) {
+            currentInput = currentInput.slice(0, -1);
+        } else {
+            currentInput = '0';
+        }
+        updateDisplay();
+    }
+
+    // Feature: Toggle Deg/Rad
+    function toggleDegRad() {
+        isDegrees = !isDegrees;
+        const btn = document.getElementById('deg-rad-btn');
+        btn.textContent = isDegrees ? 'DEG' : 'RAD';
+        // Visual feedback
+        btn.classList.add('bg-indigo-600', 'text-white');
+        setTimeout(() => btn.classList.remove('bg-indigo-600', 'text-white'), 200);
+    }
+
     function clearAll() {
         currentInput = '0'; previousInput = ''; operator = null; waitForSecondOperand = true;
         updateDisplay();
     }
+
     function updateDisplay() { if(display) display.value = currentInput; }
+
     function inputDigit(digit) {
         if (waitForSecondOperand) { currentInput = digit; waitForSecondOperand = false; }
         else { currentInput = currentInput === '0' ? digit : currentInput + digit; }
         updateDisplay();
     }
+
     function inputDecimal(dot) {
         if (waitForSecondOperand) { currentInput = '0.'; waitForSecondOperand = false; }
         else if (!currentInput.includes(dot)) { currentInput += dot; }
         updateDisplay();
     }
+
     function handleOperator(nextOp) {
         const inputValue = parseFloat(currentInput);
         if (operator && waitForSecondOperand) { operator = nextOp; return; }
         if (previousInput === '') { previousInput = inputValue; }
         else if (operator) {
             const result = performCalculation[operator](previousInput, inputValue);
+            // Feature: Add to History
+            addToHistory(`${previousInput} ${operator} ${inputValue}`, result);
             currentInput = String(result); previousInput = result;
         }
         waitForSecondOperand = true; operator = nextOp; updateDisplay();
     }
+
     const performCalculation = {
         '/': (first, second) => first / second, '*': (first, second) => first * second,
         '+': (first, second) => first + second, '-': (first, second) => first - second,
         '=': (first, second) => second
     };
+
     function calculateSpecial(type) {
         let val = parseFloat(currentInput); if (isNaN(val)) return;
         let result = val;
+        let expr = `${type}(${val})`;
+
         switch (type) {
             case 'sqrt': result = Math.sqrt(val); break;
-            case 'pow2': result = val * val; break;
-            case '1/x': result = 1 / val; break;
-            case 'pi': result = Math.PI; break;
+            case 'pow2': result = val * val; expr = `${val}²`; break;
+            case '1/x': result = 1 / val; expr = `1/${val}`; break;
+            case 'pi': result = Math.PI; expr = 'π'; break;
             case 'log': result = Math.log10(val); break;
-            case 'perc': result = val / 100; break;
+            // Trig functions respecting Deg/Rad mode
+            case 'sin': 
+                result = Math.sin(isDegrees ? val * Math.PI / 180 : val); 
+                expr = `sin(${val}${isDegrees ? '°' : 'rad'})`;
+                break;
+            case 'cos': 
+                result = Math.cos(isDegrees ? val * Math.PI / 180 : val); 
+                expr = `cos(${val}${isDegrees ? '°' : 'rad'})`;
+                break;
+            case 'tan': 
+                result = Math.tan(isDegrees ? val * Math.PI / 180 : val); 
+                expr = `tan(${val}${isDegrees ? '°' : 'rad'})`;
+                break;
+            case 'perc': result = val / 100; expr = `${val}%`; break;
         }
-        currentInput = String(result); waitForSecondOperand = true; updateDisplay();
+
+        // Format result for display (Scientific Notation if too large/small)
+        let displayResult = result;
+        if (Math.abs(result) < 0.000001 || Math.abs(result) > 1000000000) {
+             displayResult = result.toExponential(4);
+        }
+
+        currentInput = String(displayResult); 
+        waitForSecondOperand = true; 
+        updateDisplay();
+        addToHistory(expr, displayResult);
     }
+
+    // Feature: History Management
+    function addToHistory(expr, res) {
+        // Prevent adding duplicate equals press
+        if(calcHistory.length > 0 && calcHistory[0].expr === expr) return;
+
+        calcHistory.unshift({ expr: expr, res: res });
+        if (calcHistory.length > 20) calcHistory.pop(); // Keep last 20
+        renderHistory();
+    }
+
+    function renderHistory() {
+        const list = document.getElementById('history-list');
+        const emptyMsg = document.getElementById('empty-history-msg');
+        
+        if (calcHistory.length === 0) {
+            emptyMsg.style.display = 'block';
+            list.innerHTML = '';
+            list.appendChild(emptyMsg);
+            return;
+        }
+        
+        emptyMsg.style.display = 'none';
+        list.innerHTML = calcHistory.map((item, index) => `
+            <div onclick="loadHistory(${item.res})" class="p-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl hover:bg-indigo-50 dark:hover:bg-slate-700 cursor-pointer transition-colors group">
+                <div class="text-xs text-slate-400 font-mono mb-1">${item.expr} =</div>
+                <div class="text-lg font-bold text-slate-700 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400">${item.res}</div>
+            </div>
+        `).join('');
+    }
+
+    function clearHistory() {
+        calcHistory = [];
+        renderHistory();
+    }
+
+    function loadHistory(val) {
+        currentInput = String(val);
+        waitForSecondOperand = true; // allow typing new number immediately replaces
+        updateDisplay();
+    }
+
 
     // 2. Percentage Calculator
     function calcPercentage() {
