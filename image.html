@@ -8,17 +8,19 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <style>
-    .copy-feedback { opacity: 0; transition: opacity 0.4s; }
-    .copy-feedback.show { opacity: 1; }
-    #live-clock { animation: pulse 2s infinite; }
-    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+    /* Added a style to ensure the canvas doesn't overflow visually even if high-res */
+    .edited-canvas {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+    .drop-zone.dragover { border-color: #6366f1 !important; background: rgba(99, 102, 241, 0.1); }
+    .filter-btn.active { border-color: #6366f1; background-color: rgba(99, 102, 241, 0.1); color: #6366f1; }
   </style>
 </head>
-<body class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 dark:from-slate-950 dark:to-slate-900 min-h-screen">
+<body class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 dark:from-slate-950 dark:to-slate-900 min-h-screen pb-20">
 
-  <!-- Header -->
- <!-- Header -->
-<header class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-lg sticky top-0 z-50">
+  <header class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-lg sticky top-0 z-50">
   <div class="container mx-auto px-6 py-5 flex flex-wrap items-center justify-between">
     <a href="index.html" class="flex items-center gap-3">
       <h1 class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">UtilityKit</h1>
@@ -34,36 +36,12 @@
       <a href="base64.html" class="nav-link hover:text-blue-600 dark:hover:text-blue-400 transition"><i class="fa-solid fa-lock mr-1"></i>Base64</a>
       <a href="timestamp.html" class="nav-link hover:text-blue-600 dark:hover:text-blue-400 transition"><i class="fa-solid fa-clock mr-1"></i>Timestamp</a>
       
-      <!-- === NEW TOOLS IN NAV === -->
       <a href="compress.html" class="nav-link hover:text-blue-600 dark:hover:text-blue-400 transition"><i class="fa-solid fa-file-zipper mr-1"></i>Compressor</a>
       <a href="markdown.html" class="nav-link hover:text-blue-600 dark:hover:text-blue-400 transition"><i class="fa-brands fa-markdown mr-1"></i>Markdown</a>
       <a href="currency.html" class="nav-link hover:text-blue-600 dark:hover:text-blue-400 transition"><i class="fa-solid fa-dollar-sign mr-1"></i>Currency</a>
     </nav>
   </div>
 </header>
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PDF Merger + Rotate - UtilityKit</title>
-  <meta name="description" content="Merge PDFs, convert & rotate images with smooth animations — 100% private."/>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-  <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
-  <script src="https://unpkg.com/sortablejs@1.15.0/Sortable.min.js"></script>
-  <script src="https://unpkg.com/downloadjs@1.4.8/download.min.js"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
-  <style>
-    .rotate-animation {
-      transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
-      transform-style: preserve-3d;
-    }
-    .drag-over { border-color: #8b5cf6 !important; background: rgba(139,92,246,0.1); }
-    .thumbnail:hover { transform: translateY(-8px) scale(1.03); }
-    .rotate-btn:hover { transform: scale(1.2); background: rgba(255,255,255,0.3) !important; }
-  </style>
-</head>
 
   <div class="container mx-auto px-6 py-16 max-w-7xl">
     <div class="text-center mb-12">
@@ -71,31 +49,31 @@
       <p class="text-2xl text-slate-700 dark:text-slate-300">Professional editing • Instant preview • Zero upload</p>
     </div>
 
-    <div id="dropZone" class="drop-zone bg-white dark:bg-slate-800 rounded-3xl p-20 mb-12 text-center cursor-pointer">
-      <i class="fa-solid fa-cloud-arrow-up text-8xl text-slate-400 mb-6"></i>
-      <p class="text-2xl font-semibold text-slate-700 dark:text-slate-300">Drop images or click to upload</p>
+    <div id="dropZone" class="drop-zone bg-white dark:bg-slate-800 rounded-3xl p-20 mb-12 text-center cursor-pointer border-4 border-dashed border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 transition-all group">
+      <i class="fa-solid fa-cloud-arrow-up text-8xl text-slate-400 group-hover:text-indigo-500 transition-colors mb-6"></i>
+      <p class="text-2xl font-semibold text-slate-700 dark:text-slate-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">Drop images or click to upload</p>
       <input type="file" id="fileInput" multiple accept="image/*" class="hidden">
     </div>
 
     <div id="imageContainer" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10 mb-20"></div>
 
     <div id="globalControls" class="hidden bg-white dark:bg-slate-800 rounded-3xl shadow-2xl p-8 max-w-5xl mx-auto">
-      <h3 class="text-2xl font-bold mb-6 text-center">Batch Export</h3>
+      <h3 class="text-2xl font-bold mb-6 text-center dark:text-white">Batch Export</h3>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
         <div>
-          <label class="block text-lg font-medium mb-2">Format</label>
-          <select id="outputFormat" class="w-full px-5 py-3 rounded-xl border dark:bg-slate-700">
+          <label class="block text-lg font-medium mb-2 dark:text-slate-200">Format</label>
+          <select id="outputFormat" class="w-full px-5 py-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-indigo-500">
             <option value="image/jpeg">JPEG</option>
             <option value="image/webp" selected>WebP (Best)</option>
             <option value="image/png">PNG</option>
           </select>
         </div>
         <div>
-          <label class="block text-lg font-medium mb-2">Quality <span class="font-bold text-indigo-600" id="qualityValue">90</span>%</label>
-          <input type="range" id="quality" min="1" max="100" value="90" class="w-full h-3 rounded-lg appearance-none cursor-pointer bg-gray-300">
+          <label class="block text-lg font-medium mb-2 dark:text-slate-200">Quality <span class="font-bold text-indigo-600" id="qualityValue">90</span>%</label>
+          <input type="range" id="quality" min="1" max="100" value="90" class="w-full h-3 rounded-lg appearance-none cursor-pointer bg-gray-200 dark:bg-slate-600 accent-indigo-600">
         </div>
         <div>
-          <button id="downloadAll" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 rounded-xl font-bold text-xl hover:from-indigo-700 hover:to-purple-700 transition shadow-lg">
+          <button id="downloadAll" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 rounded-xl font-bold text-xl hover:from-indigo-700 hover:to-purple-700 transition shadow-lg hover:shadow-xl">
             Download All as ZIP
           </button>
         </div>
@@ -104,70 +82,72 @@
   </div>
 
   <template id="imageTemplate">
-    <div class="image-item bg-white dark:bg-slate-800 rounded-3xl shadow-xl overflow-hidden">
+    <div class="image-item bg-white dark:bg-slate-800 rounded-3xl shadow-xl overflow-hidden border border-slate-100 dark:border-slate-700">
       <div class="relative">
-        <canvas class="edited-canvas block mx-auto"></canvas>
-        <button class="remove-btn absolute top-4 right-4 bg-red-600 text-white p-4 rounded-full hover:bg-red-700 shadow-lg z-10">
-          <i class="fa-solid fa-xmark text-xl"></i>
-        </button>
+        <div class="preview-container h-96 w-full flex items-center justify-center bg-gray-50 dark:bg-slate-900/50 p-4 relative group">
+            <canvas class="edited-canvas max-w-full max-h-full object-contain shadow-sm rounded-lg"></canvas>
+            
+            <button class="remove-btn absolute top-4 right-4 bg-red-500/90 hover:bg-red-600 text-white p-3 rounded-full shadow-lg transition-all opacity-0 group-hover:opacity-100 focus:opacity-100">
+              <i class="fa-solid fa-xmark text-lg"></i>
+            </button>
+        </div>
       </div>
-      <div class="p-8 space-y-8">
+      
+      <div class="p-6 space-y-6">
+        <div class="grid grid-cols-2 gap-3">
+          <button class="crop-btn bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 py-3 rounded-xl font-semibold hover:bg-blue-200 dark:hover:bg-blue-900/50 transition">Crop</button>
+          <button class="flip-h bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 py-3 rounded-xl font-semibold hover:bg-purple-200 dark:hover:bg-purple-900/50 transition">Flip H</button>
+          <button class="rotate-left bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 py-3 rounded-xl font-semibold hover:bg-indigo-200 dark:hover:bg-indigo-900/50 transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-rotate-left"></i> -90°
+          </button>
+          <button class="rotate-right bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 py-3 rounded-xl font-semibold hover:bg-indigo-200 dark:hover:bg-indigo-900/50 transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-rotate-right"></i> +90°
+          </button>
+        </div>
+
+        <div>
+          <label class="block text-sm font-bold mb-3 text-slate-700 dark:text-slate-300 uppercase tracking-wider">Filters</label>
+          <div class="flex flex-wrap gap-2">
+            <button class="filter-btn px-4 py-2 rounded-lg border-2 border-slate-200 dark:border-slate-700 font-medium text-sm hover:border-indigo-300 dark:hover:border-indigo-700 transition dark:text-white active" data-filter="none">None</button>
+            <button class="filter-btn px-4 py-2 rounded-lg border-2 border-slate-200 dark:border-slate-700 font-medium text-sm hover:border-indigo-300 dark:hover:border-indigo-700 transition dark:text-white" data-filter="grayscale(100%)">Gray</button>
+            <button class="filter-btn px-4 py-2 rounded-lg border-2 border-slate-200 dark:border-slate-700 font-medium text-sm hover:border-indigo-300 dark:hover:border-indigo-700 transition dark:text-white" data-filter="sepia(100%)">Sepia</button>
+            <button class="filter-btn px-4 py-2 rounded-lg border-2 border-slate-200 dark:border-slate-700 font-medium text-sm hover:border-indigo-300 dark:hover:border-indigo-700 transition dark:text-white" data-filter="blur(2px)">Blur</button>
+            <button class="filter-btn px-4 py-2 rounded-lg border-2 border-slate-200 dark:border-slate-700 font-medium text-sm hover:border-indigo-300 dark:hover:border-indigo-700 transition dark:text-white" data-filter="brightness(1.2)">Bright</button>
+            <button class="filter-btn px-4 py-2 rounded-lg border-2 border-slate-200 dark:border-slate-700 font-medium text-sm hover:border-indigo-300 dark:hover:border-indigo-700 transition dark:text-white" data-filter="contrast(1.3)">Contrast</button>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-sm font-bold mb-3 text-slate-700 dark:text-slate-300 uppercase tracking-wider">Watermark</label>
+          <div class="flex gap-2">
+            <input type="text" class="watermark-text flex-1 px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-indigo-500" placeholder="Text...">
+            <button class="add-watermark bg-indigo-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-indigo-700 transition shadow-md">Add</button>
+          </div>
+        </div>
+
         <div class="grid grid-cols-2 gap-4">
-          <button class="crop-btn bg-blue-600 text-white py-4 rounded-2xl font-semibold hover:bg-blue-700 shadow-md transition">Crop</button>
-          <button class="rotate-left bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 rounded-2xl font-semibold hover:shadow-xl transition flex items-center justify-center gap-2">
-            <i class="fa-solid fa-rotate-left"></i> Rotate Left
-          </button>
-          <button class="rotate-right bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-4 rounded-2xl font-semibold hover:shadow-xl transition flex items-center justify-center gap-2">
-            <i class="fa-solid fa-rotate-right"></i> Rotate Right
-          </button>
-          <button class="flip-h bg-purple-600 text-white py-4 rounded-2xl font-semibold hover:bg-purple-700 shadow-md transition">Flip Horizontal</button>
-        </div>
-
-        <div>
-          <label class="block text-xl font-bold mb-4 text-slate-800 dark:text-slate-200">Filters</label>
-          <div class="grid grid-cols-3 sm:grid-cols-6 gap-4">
-            <button class="filter-btn border-slate-300 dark:border-slate-600 active" data-filter="none">None</button>
-            <button class="filter-btn border-slate-300 dark:border-slate-600" data-filter="grayscale(100%)">Gray</button>
-            <button class="filter-btn border-slate-300 dark:border-slate-600" data-filter="sepia(100%)">Sepia</button>
-            <button class="filter-btn border-slate-300 dark:border-slate-600" data-filter="blur(4px)">Blur</button>
-            <button class="filter-btn border-slate-300 dark:border-slate-600" data-filter="brightness(1.4)">Bright</button>
-            <button class="filter-btn border-slate-300 dark:border-slate-600" data-filter="contrast(1.5)">Contrast</button>
-          </div>
-        </div>
-
-        <div>
-          <label class="block text-xl font-bold mb-3 text-slate-800 dark:text-slate-200">Watermark</label>
-          <div class="flex gap-3">
-            <input type="text" class="watermark-text flex-1 px-5 py-4 rounded-xl border dark:bg-slate-700 text-lg" placeholder="Your text here">
-            <button class="add-watermark bg-gradient-to-r from-pink-600 to-rose-600 text-white px-8 py-4 rounded-xl font-bold hover:shadow-xl transition">Add</button>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-6">
           <div>
-            <label class="block text-lg font-medium mb-2">Width (px)</label>
-            <input type="number" class="resize-w w-full px-5 py-4 rounded-xl border dark:bg-slate-700" placeholder="Auto">
+            <label class="block text-xs font-medium mb-2 dark:text-slate-300 uppercase">Width (px)</label>
+            <input type="number" class="resize-w w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-indigo-500" placeholder="Auto">
           </div>
           <div>
-            <label class="block text-lg font-medium mb-2">Height (px)</label>
-            <input type="number" class="resize-h w-full px-5 py-4 rounded-xl border dark:bg-slate-700" placeholder="Auto">
+            <label class="block text-xs font-medium mb-2 dark:text-slate-300 uppercase">Height (px)</label>
+            <input type="number" class="resize-h w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 dark:text-white focus:ring-2 focus:ring-indigo-500" placeholder="Auto">
           </div>
         </div>
 
-        <button class="download-single w-full bg-gradient-to-r from-green-600 to-teal-600 text-white py-5 rounded-2xl font-bold text-xl hover:shadow-2xl transition">
+        <button class="download-single w-full bg-gradient-to-r from-emerald-500 to-teal-600 text-white py-4 rounded-xl font-bold text-lg hover:from-emerald-600 hover:to-teal-700 transition shadow-md">
           Download Image
         </button>
       </div>
     </div>
   </template>
-
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.1/dist/cropper.min.js"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.1/dist/cropper.min.css">
 
   <script>
-    // Same variables as before...
     const dropZone = document.getElementById('dropZone');
     const fileInput = document.getElementById('fileInput');
     const imageContainer = document.getElementById('imageContainer');
@@ -179,14 +159,13 @@
     const downloadAll = document.getElementById('downloadAll');
     let images = [];
 
-    // Drag & drop code (unchanged)...
-
     function addImage(src, filename) {
       const img = new Image();
       img.onload = () => {
         const clone = template.content.cloneNode(true);
         const canvas = clone.querySelector('.edited-canvas');
         const ctx = canvas.getContext('2d');
+        // Canvas internal resolution remains high for good editing
         canvas.width = img.width;
         canvas.height = img.height;
 
@@ -201,6 +180,9 @@
         imageContainer.appendChild(clone);
         images.push(state);
         globalControls.classList.remove('hidden');
+        
+        // Scroll to the new image
+        clone.querySelector('.image-item').scrollIntoView({ behavior: 'smooth', block: 'center' });
       };
       img.src = src;
     }
@@ -208,26 +190,53 @@
     function redraw(state) {
       const { canvas, ctx, originalImg, rotation, flipH, filter, crop } = state;
       ctx.filter = filter;
+      // Important: clear rect using the current canvas dimensions
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.save();
+      
+      // Move to center of canvas
       ctx.translate(canvas.width / 2, canvas.height / 2);
       ctx.rotate(rotation * Math.PI / 180);
       ctx.scale(flipH, 1);
 
       let srcX = 0, srcY = 0, srcW = originalImg.width, srcH = originalImg.height;
-      if (crop) { srcX = crop.x; srcY = crop.y; srcW = crop.width; srcH = crop.height; }
+      
+      // If cropped, define source rectangle from original image
+      if (crop) { 
+          srcX = crop.x; 
+          srcY = crop.y; 
+          srcW = crop.width; 
+          srcH = crop.height; 
+      }
 
-      ctx.drawImage(originalImg, srcX, srcY, srcW, srcH, -srcW/2, -srcH/2, srcW, srcH);
+      // Determine draw dimensions based on rotation based on the SOURCE dimensions
+      // If rotated 90 or 270, we draw into an area that is HxW relative to the canvas center
+      let drawW = srcW;
+      let drawH = srcH;
+      if (Math.abs(rotation % 180) === 90) {
+          drawW = srcH;
+          drawH = srcW;
+      }
+
+      // Draw image centered around the translated point (-width/2, -height/2)
+      // drawImage(image, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
+      ctx.drawImage(
+          originalImg, 
+          srcX, srcY, srcW, srcH, // Source rect
+          -drawW/2, -drawH/2, drawW, drawH // Destination rect (centered)
+      );
+      
       ctx.restore();
     }
 
     function setupControls(root, state) {
       let cropper = null;
       const filterBtns = root.querySelectorAll('.filter-btn');
+      const cropBtn = root.querySelector('.crop-btn');
 
-      // Professional active state
+      // Filter buttons active state toggling
       filterBtns.forEach(btn => btn.onclick = () => {
-        filterBtns.forEach(b => b.classList.remove('active'));
+        filterBtns.forEach(b => b.classList.remove('active', 'border-indigo-500', 'text-indigo-600', 'bg-indigo-50'));
         btn.classList.add('active');
         state.filter = btn.dataset.filter === 'none' ? 'none' : btn.dataset.filter;
         redraw(state);
@@ -235,76 +244,159 @@
 
       root.querySelector('.rotate-left').onclick = () => {
         state.rotation -= 90;
+        // Swap canvas dimensions if rotating by 90 degrees
         if (Math.abs(state.rotation % 180) === 90) {
           [state.canvas.width, state.canvas.height] = [state.canvas.height, state.canvas.width];
         }
         redraw(state);
+        if(cropper) resetCropper();
       };
 
       root.querySelector('.rotate-right').onclick = () => {
         state.rotation += 90;
+         // Swap canvas dimensions if rotating by 90 degrees
         if (Math.abs(state.rotation % 180) === 90) {
           [state.canvas.width, state.canvas.height] = [state.canvas.height, state.canvas.width];
         }
         redraw(state);
+        if(cropper) resetCropper();
       };
 
-      // Rest of controls (crop, flip, watermark, resize, download) remain perfect from previous version
-      // ... (same as last working version)
+      root.querySelector('.flip-h').onclick = () => { state.flipH *= -1; redraw(state); if(cropper) resetCropper(); };
 
-      root.querySelector('.flip-h').onclick = () => { state.flipH *= -1; redraw(state); };
+      function resetCropper() {
+          if(cropper) {
+            cropper.destroy();
+            cropper = null;
+            cropBtn.textContent = 'Crop';
+            cropBtn.classList.remove('bg-emerald-100', 'text-emerald-700');
+             // Remove temporary crop image if it exists
+            const tempImg = root.querySelector('.cropper-temp-img');
+            if (tempImg) tempImg.remove();
+            state.canvas.classList.remove('hidden');
+          }
+      }
 
-      root.querySelector('.crop-btn').onclick = () => {
+      cropBtn.onclick = () => {
         if (cropper) {
-          const data = cropper.getData(true);
+          // Apply Crop
+          const data = cropper.getData(true); // true get exact pixels based on original image size
+          
+          // Important: Cropper calculates coordinates based on the image it is given.
+          // Since we gave it the CURRENT canvas state (which might be rotated/flipped),
+          // these coordinates are relative to that current state, not the raw original image.
+          // For simple cropping of current view:
           state.crop = { x: data.x, y: data.y, width: data.width, height: data.height };
           state.canvas.width = data.width;
           state.canvas.height = data.height;
-          redraw(state);
-          cropper.destroy(); cropper = null;
-          root.querySelector('.crop-btn').textContent = 'Crop';
+          state.rotation = 0; // Reset rotation after crop as it's baked in
+          state.flipH = 1; // Reset flip after crop as it's baked in
+          
+          // We need to create a temporary image of the current canvas state to become the new "original" for subsequent draws
+          const newOriginal = new Image();
+          newOriginal.onload = () => {
+               state.originalImg = newOriginal;
+               state.crop = null; // crop is now baked into originalImg
+               redraw(state);
+               resetCropper();
+          }
+          newOriginal.src = state.canvas.toDataURL(); // Get current state as new base
+
         } else {
-          const tempImg = document.createElement('img');
-          tempImg.src = state.canvas.toDataURL();
-          root.querySelector('.relative').appendChild(tempImg);
-          cropper = new Cropper(tempImg, { viewMode: 1, autoCropArea: 0.9 });
-          root.querySelector('.crop-btn').textContent = 'Apply Crop';
+          // Start Cropping
+          const tempImg = new Image();
+          tempImg.classList.add('cropper-temp-img', 'max-w-full', 'max-h-full', 'object-contain');
+          // Use current canvas state for cropping source
+          tempImg.src = state.canvas.toDataURL(); 
+          
+          const previewContainer = root.querySelector('.preview-container');
+          state.canvas.classList.add('hidden');
+          previewContainer.appendChild(tempImg);
+          
+          cropper = new Cropper(tempImg, { 
+              viewMode: 1, 
+              autoCropArea: 0.9,
+              ready() {
+                  // Ensure cropper container fits nicely
+                  this.cropper.container.style.height = '100%';
+                  this.cropper.container.style.width = '100%';
+              }
+           });
+          cropBtn.textContent = 'Apply';
+          cropBtn.classList.add('bg-emerald-100', 'text-emerald-700');
         }
       };
 
       root.querySelector('.add-watermark').onclick = () => {
         const text = root.querySelector('.watermark-text').value || 'Watermark';
-        state.ctx.font = 'bold 100px Arial';
+        // Scale font size relative to image width for consistency
+        const fontSize = Math.max(20, Math.floor(state.canvas.width / 15));
+        state.ctx.font = `bold ${fontSize}px Arial`;
         state.ctx.fillStyle = 'rgba(255,255,255,0.8)';
         state.ctx.strokeStyle = 'rgba(0,0,0,0.8)';
-        state.ctx.lineWidth = 16;
+        state.ctx.lineWidth = fontSize / 10;
         state.ctx.textAlign = 'center';
         state.ctx.textBaseline = 'middle';
-        state.ctx.strokeText(text, state.canvas.width / 2, state.canvas.height / 2);
-        state.ctx.fillText(text, state.canvas.width / 2, state.canvas.height / 2);
+        // Draw on top of existing content
+        state.ctx.save();
+        state.ctx.translate(state.canvas.width / 2, state.canvas.height / 2);
+        // No rotation/flip needed here as we are drawing *on top* of the final canvas state
+        state.ctx.strokeText(text, 0, 0);
+        state.ctx.fillText(text, 0, 0);
+        state.ctx.restore();
       };
 
       const wInput = root.querySelector('.resize-w');
       const hInput = root.querySelector('.resize-h');
-      wInput.oninput = hInput.oninput = () => {
-        let w = parseInt(wInput.value) || state.originalImg.width;
-        let h = parseInt(hInput.value) || state.originalImg.height;
-        if (wInput.value) h = state.originalImg.height * (w / state.originalImg.width);
-        if (hInput.value) w = state.originalImg.width * (h / state.originalImg.height);
-        state.canvas.width = w; state.canvas.height = h;
-        redraw(state);
+      
+      // Use change event for resize to avoid excessive redraws during typing
+      const handleResize = () => {
+         // Get current aspect ratio from current canvas dimensions
+         const currentAspectRatio = state.canvas.width / state.canvas.height;
+         let w = parseInt(wInput.value);
+         let h = parseInt(hInput.value);
+
+         if (!w && !h) return; // Do nothing if both empty
+
+         if (w && !h) {
+             h = Math.round(w / currentAspectRatio);
+             hInput.value = h; // Update input for user
+         } else if (!w && h) {
+             w = Math.round(h * currentAspectRatio);
+             wInput.value = w; // Update input for user
+         }
+         // If both provided, we stretch (allow aspect ratio break) OR you could enforce it here. Let's stretch as per user input.
+
+         // Update canvas size and redraw content at new size
+         state.canvas.width = w; 
+         state.canvas.height = h;
+         // We need to bake current state into a new original image before resizing to avoid complex recalculations
+          const newOriginal = new Image();
+          newOriginal.onload = () => {
+               state.originalImg = newOriginal;
+               state.rotation = 0; 
+               state.flipH = 1;
+               state.crop = null;
+               redraw(state);
+          }
+          // Capture current state *before* resize happens in redraw
+          newOriginal.src = state.canvas.toDataURL(); 
       };
+      
+      wInput.onchange = handleResize;
+      hInput.onchange = handleResize;
+
 
       root.querySelector('.download-single').onclick = () => {
+        // Ensure watermark/edits are baked in before download by requesting Blob
         state.canvas.toBlob(blob => {
-          const a = document.createElement('a');
-          a.href = URL.createObjectURL(blob);
-          a.download = state.filename.replace(/\.[^.]+$/, '') + '_edited' + (outputFormat.value.includes('png') ? '.png' : '.webp');
-          a.click();
+          saveAs(blob, state.filename.replace(/\.[^.]+$/, '') + '_edited' + (outputFormat.value.includes('png') ? '.png' : (outputFormat.value.includes('jpeg') ? '.jpg' : '.webp')));
         }, outputFormat.value, quality.value / 100);
       };
 
       root.querySelector('.remove-btn').onclick = () => {
+        // Clean up cropper instance if it exists
+        if (cropper) cropper.destroy();
         root.remove();
         images = images.filter(i => i !== state);
         if (images.length === 0) globalControls.classList.add('hidden');
@@ -314,45 +406,61 @@
     quality.oninput = () => qualityValue.textContent = quality.value;
 
     downloadAll.onclick = async () => {
+      downloadAll.disabled = true;
+      downloadAll.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Zipping...';
       const zip = new JSZip();
       for (const state of images) {
+         // Ensure any active cropper is applied or cancelled before batch download
+         // Simplified: just grab current canvas state
         await new Promise(r => {
           state.canvas.toBlob(blob => {
-            zip.file(state.filename.replace(/\.[^.]+$/, '') + '_edited' + (outputFormat.value === 'image/png' ? '.png' : '.webp'), blob);
+             // Determine extension
+             let ext = '.webp';
+             if (outputFormat.value === 'image/png') ext = '.png';
+             if (outputFormat.value === 'image/jpeg') ext = '.jpg';
+             
+            zip.file(state.filename.replace(/\.[^.]+$/, '') + '_edited' + ext, blob);
             r();
           }, outputFormat.value, quality.value / 100);
         });
       }
       const content = await zip.generateAsync({type:'blob'});
       saveAs(content, 'UtilityKit_Images.zip');
+      downloadAll.disabled = false;
+      downloadAll.innerHTML = 'Download All as ZIP';
     };
 
-    // Drag & drop setup (same as before)
+    // Drag & drop setup
     ['dragenter','dragover','dragleave','drop'].forEach(e => dropZone.addEventListener(e, ev => {ev.preventDefault();ev.stopPropagation();}));
     ['dragenter','dragover'].forEach(e => dropZone.addEventListener(e, () => dropZone.classList.add('dragover')));
     ['dragleave','drop'].forEach(e => dropZone.addEventListener(e, () => dropZone.classList.remove('dragover')));
     dropZone.onclick = () => fileInput.click();
     dropZone.ondrop = e => handleFiles(e.dataTransfer.files);
     fileInput.onchange = () => handleFiles(fileInput.files);
-    function handleFiles(files) { [...files].filter(f=>f.type.startsWith('image/')).forEach(f => {
-      const r = new FileReader();
-      r.onload = e => addImage(e.target.result, f.name);
-      r.readAsDataURL(f);
-    });}
-  </script>
-  <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const currentPage = location.pathname.split('/').pop() || 'index.html';
-
-    document.querySelectorAll('.nav-link').forEach(link => {
-      if (link.getAttribute('href') === currentPage) {
-        link.classList.add('text-indigo-600', 'font-bold');
-        link.classList.remove('text-slate-700', 'dark:text-slate-300', 'hover:text-indigo-600');
-      } else {
-        link.classList.add('text-slate-700', 'dark:text-slate-300', 'hover:text-indigo-600');
-      }
+    
+    function handleFiles(files) { 
+        const imageFiles = [...files].filter(f=>f.type.startsWith('image/'));
+        if(imageFiles.length > 0) {
+            imageFiles.forEach(f => {
+              const r = new FileReader();
+              r.onload = e => addImage(e.target.result, f.name);
+              r.readAsDataURL(f);
+            });
+        }
+    }
+    
+    // Active link highlight (Nav)
+    document.addEventListener('DOMContentLoaded', () => {
+      const currentPage = location.pathname.split('/').pop() || 'index.html';
+      document.querySelectorAll('.nav-link').forEach(link => {
+        if (link.getAttribute('href') === currentPage) {
+          link.classList.add('text-indigo-600', 'font-bold');
+          link.classList.remove('text-slate-700', 'dark:text-slate-300', 'hover:text-indigo-600');
+        } else {
+          link.classList.add('text-slate-700', 'dark:text-slate-300', 'hover:text-indigo-600');
+        }
+      });
     });
-  });
-</script>
+  </script>
 </body>
 </html>
