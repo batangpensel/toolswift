@@ -3,164 +3,345 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UtilityKit Articles – Guides, Tips & Data Security</title>
-  <meta name="description" content="Explore articles and guides on client-side data processing, image compression techniques, privacy in online tools, and utilizing development utilities.">
+  <title>UtilityKit Articles — Privacy, Speed & Web Tech</title>
+  <meta name="description" content="In-depth articles explaining the technology and philosophy behind UtilityKit's private, client-side tools.">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <style>
-    .article-card { transition: all 0.3s ease; }
-    .article-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.15); }
-    .dark .article-card:hover { box-shadow: 0 15px 30px rgba(0,0,0,0.3); }
+    .article-link.active {
+      @apply bg-indigo-100 dark:bg-slate-700 font-semibold text-indigo-700 dark:text-indigo-300 border-indigo-500;
+    }
+    .article-link {
+      @apply block p-3 rounded-xl transition-colors text-slate-700 dark:text-slate-300 border-l-4 border-transparent hover:bg-slate-100 dark:hover:bg-slate-800;
+    }
+    .article-content h2 {
+      @apply text-3xl font-bold mt-8 mb-4 border-b pb-2 border-slate-200 dark:border-slate-700;
+    }
+    .article-content h3 {
+      @apply text-2xl font-semibold mt-6 mb-3 text-indigo-600 dark:text-indigo-400;
+    }
+    .article-content p, .article-content ul, .article-content ol {
+      @apply mb-4 leading-relaxed text-lg text-slate-700 dark:text-slate-300;
+    }
+    .article-content ul, .article-content ol {
+      @apply list-disc list-inside ml-4;
+    }
+    .article-content ol {
+        @apply list-decimal;
+    }
+    .article-content code {
+      @apply bg-slate-200 dark:bg-slate-800 text-sm p-1 rounded-md;
+    }
   </style>
 </head>
 <body class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 dark:from-slate-950 dark:to-slate-900 min-h-screen">
-  
-  <!-- Header (Standard Header) -->
+
+  <!-- Header (Copied from your index.html) -->
   <header class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-lg sticky top-0 z-50">
-    <div class="container mx-auto px-6 py-4 flex flex-wrap items-center justify-between">
-      <a href="index.html" class="flex items-center gap-3">
-        <div class="w-10 h-10 bg-gradient-to-br from-indigo-600 to-violet-600 rounded-lg flex items-center justify-center text-white font-bold text-xl">
-          <i class="fa-solid fa-layer-group"></i>
-        </div>
-        <h1 class="text-2xl font-bold text-slate-800 dark:text-white">UtilityKit</h1>
+    <div class="container mx-auto px-6 py-4 max-w-7xl flex justify-between items-center">
+      <a href="index.html" class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">
+        UtilityKit
       </a>
-      <nav class="hidden md:flex gap-6 text-sm font-medium text-slate-600 dark:text-slate-400">
-        <a href="image.html" class="hover:text-indigo-600 transition">Image Tools</a>
-        <a href="currency.html" class="hover:text-indigo-600 transition">Finance</a>
-        <a href="articles.html" class="text-indigo-600 font-bold transition">Articles</a>
+      <nav class="space-x-4 flex items-center">
+        <a href="index.html" class="nav-link text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 p-2 rounded-lg transition-colors">Tools</a>
+        <a href="articles.html" class="nav-link text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 p-2 rounded-lg transition-colors">Articles</a>
+        <!-- Dark Mode Toggle -->
+        <button id="theme-toggle" class="p-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:ring-2 ring-indigo-500 transition-all">
+          <i class="fa-solid fa-moon text-lg" id="theme-icon"></i>
+        </button>
       </nav>
     </div>
   </header>
 
-  <main class="container mx-auto px-6 py-16 max-w-7xl">
-    <div class="text-center mb-12">
-      <h1 class="text-6xl font-black text-slate-800 dark:text-white mb-4">
-        Guides & Tutorials
-      </h1>
-      <p class="text-xl text-slate-600 dark:text-slate-300 max-w-3xl mx-auto">
-        Deep dives into client-side processing, data utility, and digital privacy. Expand your knowledge while you use our tools.
-      </p>
-    </div>
+  <!-- Main Content Layout -->
+  <div class="container mx-auto px-6 py-12 max-w-7xl grid grid-cols-1 lg:grid-cols-4 gap-12">
 
-    <!-- Article Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        
-        <!-- Article 1: Privacy Focus -->
-        <a href="#" class="article-card bg-white dark:bg-slate-900 rounded-2xl shadow-xl overflow-hidden flex flex-col border border-slate-200 dark:border-slate-800">
-            <div class="p-6 flex-grow">
-                <p class="text-sm font-semibold text-teal-600 dark:text-teal-400 mb-2 uppercase tracking-wider">Privacy & Security</p>
-                <h2 class="text-2xl font-bold text-slate-800 dark:text-white mb-3">
-                    Why Client-Side Processing is the Future of Utility
-                </h2>
-                <p class="text-slate-600 dark:text-slate-400 text-base">
-                    Discover how local data processing keeps your sensitive files safe, eliminates upload times, and guarantees your privacy when using online tools.
-                </p>
-            </div>
-            <div class="p-6 border-t border-slate-200 dark:border-slate-800 flex justify-between items-center">
-                <span class="text-sm text-indigo-600 dark:text-indigo-400 font-semibold">
-                    Read Time: 5 min
-                </span>
-                <i class="fa-solid fa-arrow-right text-indigo-500"></i>
-            </div>
-        </a>
-
-        <!-- Article 2: Image Compression -->
-        <a href="#" class="article-card bg-white dark:bg-slate-900 rounded-2xl shadow-xl overflow-hidden flex flex-col border border-slate-200 dark:border-slate-800">
-            <div class="p-6 flex-grow">
-                <p class="text-sm font-semibold text-orange-600 dark:text-orange-400 mb-2 uppercase tracking-wider">Image Optimization</p>
-                <h2 class="text-2xl font-bold text-slate-800 dark:text-white mb-3">
-                    WebP vs. JPEG: Choosing the Right Format for Speed and Quality
-                </h2>
-                <p class="text-slate-600 dark:text-slate-400 text-base">
-                    A comprehensive guide to modern image formats. Learn when to use WebP, AVIF, and the traditional JPEG to optimize your website or document size.
-                </p>
-            </div>
-            <div class="p-6 border-t border-slate-200 dark:border-slate-800 flex justify-between items-center">
-                <span class="text-sm text-indigo-600 dark:text-indigo-400 font-semibold">
-                    Read Time: 7 min
-                </span>
-                <i class="fa-solid fa-arrow-right text-indigo-500"></i>
-            </div>
-        </a>
-
-        <!-- Article 3: Financial Data -->
-        <a href="#" class="article-card bg-white dark:bg-slate-900 rounded-2xl shadow-xl overflow-hidden flex flex-col border border-slate-200 dark:border-slate-800">
-            <div class="p-6 flex-grow">
-                <p class="text-sm font-semibold text-purple-600 dark:text-purple-400 mb-2 uppercase tracking-wider">Finance & Data</p>
-                <h2 class="text-2xl font-bold text-slate-800 dark:text-white mb-3">
-                    The Hidden Costs of Free Currency Converters (and how to avoid them)
-                </h2>
-                <p class="text-slate-600 dark:text-slate-400 text-base">
-                    Understanding the volatility of exchange rates and how different data sources can impact the accuracy of your financial conversion calculations.
-                </p>
-            </div>
-            <div class="p-6 border-t border-slate-200 dark:border-slate-800 flex justify-between items-center">
-                <span class="text-sm text-indigo-600 dark:text-indigo-400 font-semibold">
-                    Read Time: 4 min
-                </span>
-                <i class="fa-solid fa-arrow-right text-indigo-500"></i>
-            </div>
-        </a>
-        
-    </div>
-    
-    <!-- Placeholder for more content -->
-    <div class="text-center mt-16 p-8 bg-indigo-50/50 dark:bg-slate-800/50 rounded-2xl border border-indigo-200 dark:border-slate-700">
-        <h3 class="text-3xl font-bold text-slate-800 dark:text-white mb-3">
-            More Articles Coming Soon!
-        </h3>
-        <p class="text-slate-600 dark:text-slate-400">
-            We are constantly researching and writing new guides on optimizing JSON, mastering Base64 encoding, and improving your digital workflow. Check back soon for updates.
-        </p>
-    </div>
-
-  </main>
-
-  <!-- Footer (Standard Footer) -->
-  <footer class="bg-slate-900 text-white mt-16 border-t border-slate-700">
-    <div class="container mx-auto px-6 py-12 max-w-7xl">
-      <div class="grid grid-cols-2 md:grid-cols-5 gap-8 border-b border-slate-800 pb-8 mb-8">
-        <div>
-          <h4 class="text-lg font-bold mb-4 text-indigo-400">UtilityKit</h4>
-          <ul class="space-y-2 text-sm text-slate-400">
-            <li><a href="about_us.html" class="hover:text-white transition">About Us</a></li>
-            <li><a href="articles.html" class="hover:text-white transition">Articles & Guides</a></li>
-            <li><a href="contact_us.html" class="hover:text-white transition">Contact Support</a></li>
-          </ul>
-        </div>
-        
-        <div>
-          <h4 class="text-lg font-bold mb-4 text-indigo-400">Image Tools</h4>
-          <ul class="space-y-2 text-sm text-slate-400">
-            <li><a href="image.html" class="hover:text-white transition">Image Converter</a></li>
-            <li><a href="compress.html" class="hover:text-white transition">Image Compressor</a></li>
-            <li><a href="ocr.html" class="hover:text-white transition">Image OCR</a></li>
-          </ul>
-        </div>
-        
-        <div>
-          <h4 class="text-lg font-bold mb-4 text-indigo-400">Data Tools</h4>
-          <ul class="space-y-2 text-sm text-slate-400">
-            <li><a href="json.html" class="hover:text-white transition">JSON Formatter</a></li>
-            <li><a href="base64.html" class="hover:text-white transition">Base64 Encoder</a></li>
-            <li><a href="timestamp.html" class="hover:text-white transition">Timestamp Converter</a></li>
-          </ul>
-        </div>
-        
-        <div class="col-span-2 md:col-span-1">
-          <h4 class="text-lg font-bold mb-4 text-red-400">Legal</h4>
-          <ul class="space-y-2 text-sm text-slate-400">
-            <li><a href="privacy_policy.html" class="hover:text-white transition text-white font-bold">Privacy Policy (AdSense Required)</a></li>
-            <li><a href="terms_of_service.html" class="hover:text-white transition">Terms of Service</a></li>
-            <li><a href="disclaimer.html" class="hover:text-white transition">Disclaimer</a></li>
-          </ul>
-        </div>
+    <!-- Sidebar Navigation (Col 1) -->
+    <aside class="lg:col-span-1">
+      <div class="sticky top-24 p-6 bg-white dark:bg-slate-900 rounded-3xl shadow-xl">
+        <h2 class="text-2xl font-bold mb-6 text-indigo-700 dark:text-indigo-300">Articles</h2>
+        <nav class="space-y-2" id="article-nav">
+          <a href="#client-side-utility" class="article-link active" data-article="client-side-utility">
+            <span class="text-sm font-light text-slate-500 dark:text-slate-400 block">Tech Philosophy</span>
+            Why Client-Side Processing is the Future
+          </a>
+          <a href="#webp-jpeg-guide" class="article-link" data-article="webp-jpeg-guide">
+            <span class="text-sm font-light text-slate-500 dark:text-slate-400 block">Image Formats</span>
+            WebP vs. JPEG: Choosing the Right Format
+          </a>
+          <a href="#currency-costs" class="article-link" data-article="currency-costs">
+            <span class="text-sm font-light text-slate-500 dark:text-slate-400 block">Data Privacy</span>
+            The Hidden Costs of Free Currency Converters
+          </a>
+        </nav>
       </div>
+    </aside>
+
+    <!-- Article Content (Col 2-4) -->
+    <main class="lg:col-span-3">
       
-      <div class="text-center text-slate-500 text-sm">
-        <p>&copy; 2025 UtilityKit. All rights reserved. | <span class="font-semibold text-teal-400">Powered by client-side technology for your privacy.</span></p>
+      <!-- Article 1: Client-Side Processing -->
+      <article class="bg-white dark:bg-slate-800 rounded-3xl p-8 sm:p-12 shadow-2xl article-content" id="client-side-utility">
+        <h1 class="text-5xl font-extrabold mb-8 text-slate-900 dark:text-white">Why Client-Side Processing is the Future of Utility (And Why It Matters to You)</h1>
+
+        <p>In today's digital world, online tools are everywhere—from image converters to password generators. But have you ever stopped to think about where your data goes when you use them? The fundamental difference between traditional tools and modern utilities like those on UtilityKit lies in one technical concept: **Client-Side Processing**.</p>
+
+        <p>This shift is crucial. It changes how your files are handled, offering significant advantages in privacy, speed, and security.</p>
+
+        <h2 id="what-is-csp">What is Client-Side Processing?</h2>
+
+        <p>When you use a typical online tool, your web browser (the client) sends your file or data to the tool’s remote computer (the server) for processing. The server does the work and sends the result back to you.</p>
+
+        <p>**Client-Side Processing**, however, means the heavy lifting is done entirely within your web browser, using its own computational power. **Your data never leaves your device.** The server is only used to deliver the initial tool code (HTML, CSS, JavaScript) to your browser. Once the tool loads, it's self-contained.</p>
+        
+        <figure class="my-8 text-center">
+            
+            <figcaption class="text-sm text-slate-500 dark:text-slate-400 mt-2">Diagram illustrating the flow of data for Server-Side (upload/process/download) versus Client-Side (process/download).</figcaption>
+        </figure>
+
+        <h3 id="how-data-stays-local">How Your Data Stays Local</h3>
+
+        <p>The magic behind this is modern web technology, specifically JavaScript APIs. For instance, when you compress an image on UtilityKit, the JavaScript code running in your browser uses APIs like <code>FileReader</code> to access the file data locally and <code>Canvas</code> or dedicated compression libraries to perform the conversion or compression right on your machine. Your file is only written back to your device when you click **"Download."**</p>
+
+        <h2 id="privacy-advantage">1. The Ultimate Privacy Advantage</h2>
+
+        <p>The single biggest reason to prioritize client-side tools is privacy. In a world of increasing data breaches and surveillance, control over your information is paramount.</p>
+
+        <p>When a tool processes files on its server, the server owner temporarily possesses a copy of your data—be it a sensitive JSON file, a personal photograph, or a private document. Even if the server owner promises to delete it, that file has still been transmitted and stored somewhere.</p>
+
+        <p>With client-side processing, this risk is eliminated entirely:</p>
+
+        <ul>
+            <li>**No Transmission:** Your files are never uploaded over the internet.</li>
+            <li>**No Storage:** Your data is never stored on UtilityKit's servers or any third-party cloud.</li>
+            <li>**Zero Logs:** There are no server logs to track what files you processed or when you processed them, because the server wasn't involved in the transaction.</li>
+        </ul>
+
+        <p>Your privacy is guaranteed by the browser itself.</p>
+
+        <h2 id="speed-efficiency">2. Unmatched Speed and Efficiency</h2>
+
+        <p>Beyond privacy, client-side tools offer a tangible advantage in performance, especially for tasks involving large files or bulk processing.</p>
+
+        <p>Traditional server-side processing requires four steps:</p>
+
+        <ol>
+            <li>**Upload:** Sending the file from your computer to the server.</li>
+            <li>**Server Process:** The server runs the operation.</li>
+            <li>**Download:** Sending the processed file back to your computer.</li>
+            <li>**Local Save:** Saving the result.</li>
+        </ol>
+
+        <p>Client-side processing skips the most time-consuming steps—the upload and download phases. The process simplifies to:</p>
+
+        <ol>
+            <li>**Local Process:** Your browser runs the operation instantly.</li>
+            <li>**Local Save:** Saving the result.</li>
+        </ol>
+
+        <p>For users on slower internet connections or those handling gigabytes of data (like bulk image conversions), the time saved by eliminating upload/download latency is massive.</p>
+
+        <h2 id="future-private-fast">The Future is Private and Fast</h2>
+
+        <p>Client-side utilities are the next evolution of online tools. They represent a fundamental shift toward respecting user privacy and leveraging the power already present in modern devices.</p>
+
+        <p>By choosing client-side tools, you are not just getting a fast service; you are making a conscious choice to keep your data secure, local, and entirely in your own hands. UtilityKit is committed to this standard, ensuring every tool you use upholds the highest levels of speed and privacy.</p>
+
+      </article>
+
+      <!-- Article 2: WebP vs. JPEG -->
+      <article id="webp-jpeg-guide" class="article-content bg-white dark:bg-slate-800 rounded-3xl p-8 sm:p-12 shadow-2xl mt-8 hidden">
+        <h1 class="text-5xl font-extrabold mb-8 text-slate-900 dark:text-white">WebP vs. JPEG: Choosing the Right Format for Speed and Quality</h1>
+        
+        <p>The format you choose for your website's images is one of the single biggest factors affecting page load speed and user experience. While JPEG has been the long-standing champion, newer formats like WebP have fundamentally changed the game. Understanding these differences is key to optimizing your digital presence.</p>
+
+        <h2 id="the-classic-jpeg">The Classic: JPEG (.jpg or .jpeg)</h2>
+        
+        <p>JPEG (Joint Photographic Experts Group) has been the standard for decades, prized for its ability to compress complex, full-color photographs efficiently. However, it relies on **lossy compression**, which means some original image data is permanently discarded to achieve a smaller file size.</p>
+
+        <ul>
+            <li>**Best For:** Complex, real-world photographs and images with smooth color gradients.</li>
+            <li>**Limitations:** Does not support transparency (Alpha channel). File sizes are often significantly larger than modern formats.</li>
+        </ul>
+
+        <h2 id="the-modern-standard-webp">The Modern Standard: WebP (.webp)</h2>
+        
+        <p>WebP, developed by Google, is a next-generation image format designed specifically for the web. It offers superior compression for both lossy and lossless formats, resulting in files that are typically 25-35% smaller than comparable JPEGs or PNGs.</p>
+
+        <ul>
+            <li>**Key Advantages:** Supports both **lossy and lossless** compression, supports **transparency** (like PNG), and supports **animation** (like GIF).</li>
+            <li>**Adoption:** Widely supported across all modern browsers (Chrome, Firefox, Edge, Safari).</li>
+        </ul>
+
+        <h2 id="when-to-use-which">When to Use Which Format</h2>
+        
+        <p>The choice often comes down to balancing compatibility, file size, and the specific image content.</p>
+
+        <figure class="my-8 text-center">
+            
+            <figcaption class="text-sm text-slate-500 dark:text-slate-400 mt-2">WebP offers significantly better compression efficiency compared to both JPEG and PNG.</figcaption>
+        </figure>
+
+        <h3 id="use-webp">Use WebP for Almost Everything</h3>
+        <p>For modern web projects, WebP should be your default choice:</p>
+        <p class="text-green-600 dark:text-green-400 font-semibold mt-2">**Example Use Cases:** All site logos, product images, graphics with transparency, and main hero images.</p>
+
+        <h3 id="use-jpeg">Keep JPEG for Legacy or Compatibility</h3>
+        <p>You may only need to revert to JPEG if you must support very old browsers or systems that have not updated to support WebP.</p>
+        <p class="text-red-600 dark:text-red-400 font-semibold mt-2">**Example Use Cases:** Documents or email templates where image format support is unpredictable.</p>
+        
+        <h2 id="webp-in-utilitykit">Optimizing with UtilityKit</h2>
+        <p>Our client-side Image Toolkit allows you to quickly convert your entire image library to WebP without uploading your files to a server. This gives you both the performance boost of WebP and the privacy assurance of client-side processing.</p>
+
+      </article>
+
+      <!-- Article 3: Currency Converters -->
+      <article id="currency-costs" class="article-content bg-white dark:bg-slate-800 rounded-3xl p-8 sm:p-12 shadow-2xl mt-8 hidden">
+        <h1 class="text-5xl font-extrabold mb-8 text-slate-900 dark:text-white">The Hidden Costs of Free Currency Converters</h1>
+        
+        <p>In a globalized economy, quick access to currency conversion is essential. While many tools offer "free" services, the price you pay isn't in money, but in **data accuracy** and **timeliness**. Understanding the source and speed of the exchange rate data is critical, especially for business or investment decisions.</p>
+
+        <h2 id="the-cost-of-free-data">The "Cost" of Free Data: Latency</h2>
+        
+        <p>Currency exchange rates are volatile and change minute by minute. A "free" converter often operates on a model where the data is either delayed or aggregated.</p>
+
+        <h3 id="what-is-latency">What is Data Latency?</h3>
+        
+        <p>Latency is the delay between when a currency rate changes on the global market and when that change is reflected in the tool you are using. Most free converters rely on:**</p>
+        
+        <ul>
+            <li>**End-of-Day Aggregation:** Rates are updated only once per day, based on the closing market price. This is useless for transactions happening during peak trading hours.</li>
+            <li>**Arbitrary Delays:** The data provider may only release updates every 15, 30, or 60 minutes to non-paying users, selling "real-time" access to large financial institutions.</li>
+        </ul>
+
+        <p>If you use a delayed rate for a large e-commerce transaction or international invoice, the actual rate applied by the bank or payment processor will differ, leading to unexpected costs or losses.</p>
+
+        <h2 id="data-source-matters">Why the Data Source Matters</h2>
+        
+        <p>Not all "live" rates are created equal. The most accurate rates come directly from reliable financial data APIs that pull from major stock exchanges and interbank quotes. Tools that scrape or rely on peer-to-peer data can be wildly inaccurate.</p>
+
+        <p>When using any currency converter, always check their data source and update frequency. A lack of transparency here is a major red flag.</p>
+
+        <h2 id="utilitykit-approach">UtilityKit's Approach to Currency Data</h2>
+        
+        <p>Because accurate currency conversion requires external, real-time data, this is the one tool on UtilityKit that relies on a secure, server-side data call (not client-side processing). However, we prioritize a few key factors:</p>
+        
+        <ol>
+            <li>**Rate Credibility:** We partner with high-quality, widely-trusted financial data providers to ensure the rates are as close to live market data as possible.</li>
+            <li>**Transparency:** We display the time the data was last updated, allowing you to gauge the rate's freshness before making any critical decision.</li>
+        </ol>
+        
+        <p class="text-indigo-600 dark:text-indigo-400 font-semibold mt-4">For mission-critical financial transactions, always confirm the final rate directly with your bank or payment institution. Use online converters as reliable estimates, not final guarantees.</p>
+
+      </article>
+
+    </main>
+  </div>
+
+  <!-- Footer (Copied from your index.html) -->
+  <footer class="text-center py-10 border-t border-slate-200 dark:border-slate-800 mt-16">
+    <div class="container mx-auto px-6">
+      <p class="text-slate-600 dark:text-slate-400 mb-2">UtilityKit is a collection of 100% free, client-side tools designed for privacy and speed.</p>
+      <p class="text-sm text-slate-500 dark:text-slate-500">Built with <i class="fa-solid fa-heart text-red-500 mx-1"></i> and powered by modern web APIs.</p>
+      <div class="flex justify-center space-x-4 mt-4">
+        <a href="articles.html" class="text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors text-sm">Articles</a>
+        <span class="text-slate-400 dark:text-slate-600">|</span>
+        <a href="privacy_policy.html" class="text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors text-sm">Privacy Policy</a>
       </div>
     </div>
   </footer>
+
+  <script>
+    // Theme toggle logic (copied from your existing files)
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeIcon = document.getElementById('theme-icon');
+    const isDark = () => localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+    const applyTheme = () => {
+      if (isDark()) {
+        document.documentElement.classList.add('dark');
+        themeIcon.classList.remove('fa-moon');
+        themeIcon.classList.add('fa-sun');
+      } else {
+        document.documentElement.classList.remove('dark');
+        themeIcon.classList.remove('fa-sun');
+        themeIcon.classList.add('fa-moon');
+      }
+    };
+
+    themeToggle.addEventListener('click', () => {
+      localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'light' : 'dark');
+      applyTheme();
+    });
+
+    // Run on load
+    applyTheme();
+
+    // Article Navigation Logic
+    document.addEventListener('DOMContentLoaded', () => {
+      const articleNav = document.getElementById('article-nav');
+      const articles = {
+        'client-side-utility': document.getElementById('client-side-utility'),
+        'webp-jpeg-guide': document.getElementById('webp-jpeg-guide'),
+        'currency-costs': document.getElementById('currency-costs'),
+      };
+      
+      const updateContentVisibility = (hash) => {
+        const articleId = hash.substring(1) || 'client-side-utility';
+        
+        // Hide all articles
+        Object.values(articles).forEach(article => article.classList.add('hidden'));
+
+        // Show the current article
+        if (articles[articleId]) {
+          articles[articleId].classList.remove('hidden');
+        }
+
+        // Update active class in sidebar
+        document.querySelectorAll('.article-link').forEach(link => {
+          link.classList.remove('active');
+          if (link.getAttribute('href') === hash) {
+            link.classList.add('active');
+          } else if (!hash && link.getAttribute('href') === '#client-side-utility') {
+            link.classList.add('active');
+          }
+        });
+      };
+
+      // Handle initial load and hash changes
+      updateContentVisibility(window.location.hash);
+      window.addEventListener('hashchange', () => updateContentVisibility(window.location.hash));
+
+      // Use event delegation for smooth scrolling and updating state
+      articleNav.addEventListener('click', (e) => {
+          if (e.target.closest('.article-link')) {
+              e.preventDefault();
+              const link = e.target.closest('.article-link');
+              const targetId = link.getAttribute('href');
+              
+              // Change the URL hash
+              window.history.pushState(null, '', targetId);
+              
+              // Trigger the visibility update
+              updateContentVisibility(targetId);
+              
+              // Manually scroll to top of the article content (main element)
+              document.querySelector('main').scrollIntoView({ behavior: 'smooth' });
+          }
+      });
+
+      // Ensure the correct nav link is active in the main header
+      document.querySelectorAll('.nav-link').forEach(link => {
+        const href = link.getAttribute('href');
+        if (href === 'articles.html' || href === location.pathname.split('/').pop()) {
+          link.classList.add('text-indigo-600', 'font-bold');
+          link.classList.remove('text-slate-700', 'dark:text-slate-300');
+        } else {
+          link.classList.remove('text-indigo-600', 'font-bold');
+          link.classList.add('text-slate-700', 'dark:text-slate-300');
+        }
+      });
+    });
+  </script>
 </body>
 </html>
