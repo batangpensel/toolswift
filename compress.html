@@ -3,20 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OCR – Extract Text from Images • UtilityKit</title>
-  <meta name="description" content="Convert Image to Text with Smart AI Enhancement. Upscale low-quality images for high-accuracy OCR. Supports multi-language extraction. Download as .txt">
+  <title>Compressor – Reduce Image & PDF Size • UtilityKit</title>
+  <meta name="description" content="Compress JPG, PNG, WebP, and PDF files locally. 100% Private.">
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/compressorjs/1.2.1/compressor.min.js"></script>
+  <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+
   <style>
-    .copy-feedback { opacity: 0; transition: opacity 0.4s; }
-    .copy-feedback.show { opacity: 1; }
-    #live-clock { animation: pulse 2s infinite; }
-    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+    .nav-link.active { color: #4f46e5; font-weight: bold; }
+    /* Smooth progress bar transition */
+    .progress-bar { transition: width 0.5s ease-in-out; }
   </style>
 </head>
 <body class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 dark:from-slate-950 dark:to-slate-900 min-h-screen">
 
-  <!-- Header -->
+ <!-- Header -->
 <header class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-lg sticky top-0 z-50">
   <div class="container mx-auto px-6 py-5 flex flex-wrap items-center justify-between">
     <a href="index.html" class="flex items-center gap-3">
@@ -41,48 +44,48 @@
   </div>
 </header>
 
-  <div class="container mx-auto px-6 py-16 max-w-7xl">
+<div class="container mx-auto px-6 py-16 max-w-7xl">
     <div class="text-center mb-12">
-      &nbsp;
       <h1 class="text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-blue-600 mb-4">
         Image & PDF Compressor
       </h1>
-      <p class="text-2xl text-slate-700 dark:text-slate-300">Reduce file size instantly — 100% private, no uploads</p>
+      <p class="text-2xl text-slate-700 dark:text-slate-300">Optimize files efficiently — processed entirely in your browser.</p>
     </div>
 
-    <!-- Drop Zone -->
     <div class="max-w-4xl mx-auto">
-      <div id="dropZone" class="border-4 border-dashed border-teal-400 rounded-3xl p-16 text-center cursor-pointer hover:border-teal-500 transition mb-10 bg-white/50 dark:bg-slate-800/50">
-        <i class="fa-solid fa-cloud-arrow-up text-8xl text-teal-500 mb-6"></i>
+      <div id="dropZone" class="border-4 border-dashed border-teal-400 rounded-3xl p-16 text-center cursor-pointer hover:border-teal-500 transition mb-10 bg-white/50 dark:bg-slate-800/50 group">
+        <i class="fa-solid fa-cloud-arrow-up text-8xl text-teal-500 mb-6 group-hover:scale-110 transition-transform"></i>
         <p class="text-2xl font-bold text-slate-700 dark:text-slate-300">Drop files here or click to select</p>
-        <p class="text-lg text-slate-600 dark:text-slate-400 mt-2">JPG, PNG, WebP, PDF • Multiple files supported</p>
+        <p class="text-lg text-slate-600 dark:text-slate-400 mt-2">JPG, PNG, WebP, PDF</p>
         <input type="file" id="fileInput" multiple accept="image/jpeg,image/png,image/webp,application/pdf" class="hidden"/>
       </div>
 
-      <!-- Quality Slider -->
       <div class="bg-white dark:bg-slate-800 rounded-2xl p-8 shadow-xl mb-10">
-        <label class="block text-xl font-bold mb-4 text-slate-700 dark:text-slate-300">
-          Compression Level: <span id="qualityValue">80</span>%
-        </label>
-        <input type="range" id="quality" min="10" max="100" value="80" class="w-full h-4 bg-gray-200 rounded-lg appearance-none cursor-pointer"/>
+        <div class="flex justify-between items-center mb-4">
+            <label class="text-xl font-bold text-slate-700 dark:text-slate-300">
+                <i class="fa-solid fa-sliders mr-2 text-teal-500"></i>Compression Strength
+            </label>
+            <span class="text-teal-600 font-bold text-lg"><span id="qualityValue">80</span>%</span>
+        </div>
+        <input type="range" id="quality" min="10" max="100" value="80" class="w-full h-4 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-teal-500"/>
+        <p class="text-sm text-slate-500 mt-2 text-right">Lower value = Smaller size (lower quality)</p>
       </div>
 
-      <!-- Files List & Preview Table -->
       <div id="filesContainer" class="space-y-6"></div>
 
-      <!-- Summary & Download All -->
       <div id="summary" class="hidden mt-10 text-center">
         <p class="text-2xl font-bold text-green-600 dark:text-green-400 mb-6">
           Total saved: <span id="totalSaved">0 MB</span>
         </p>
         <button id="downloadAll" class="px-10 py-5 bg-gradient-to-r from-teal-500 to-blue-600 text-white text-xl font-bold rounded-full hover:scale-105 transition shadow-lg">
-          <i class="fa-solid fa-download mr-2"></i> Download All as ZIP
+          <i class="fa-solid fa-file-zipper mr-2"></i> Download All as ZIP
         </button>
       </div>
     </div>
   </div>
 
   <script>
+    // --- Elements ---
     const dropZone = document.getElementById('dropZone');
     const fileInput = document.getElementById('fileInput');
     const qualitySlider = document.getElementById('quality');
@@ -92,17 +95,26 @@
     const totalSavedEl = document.getElementById('totalSaved');
     const downloadAllBtn = document.getElementById('downloadAll');
 
-    let files = [];
-    let totalSaved = 0;
+    // --- State ---
+    // Store file objects: { id, originalFile, compressedBlob, url, type, recompress: fn }
+    let fileRegistry = []; 
 
-    // Update quality display
+    // --- Event Listeners ---
+    
+    // Slider Change (Debounced slightly could be better, but direct is fine for small batches)
     qualitySlider.addEventListener('input', () => {
-      qualityValue.textContent = qualitySlider.value;
-      // Re-compress all already processed images
-      files.forEach(f => f.recompress && f.recompress());
+      const val = qualitySlider.value;
+      qualityValue.textContent = val;
+      
+      // Trigger recompression for all image files in registry
+      fileRegistry.forEach(item => {
+        if (item.type === 'image' && item.recompress) {
+           item.recompress(val / 100);
+        }
+      });
     });
 
-    // Drag & drop
+    // Drag & Drop
     ['dragover', 'dragenter'].forEach(e => dropZone.addEventListener(e, ev => ev.preventDefault()));
     dropZone.addEventListener('drop', e => {
       e.preventDefault();
@@ -111,82 +123,199 @@
     dropZone.addEventListener('click', () => fileInput.click());
     fileInput.addEventListener('change', () => handleFiles(fileInput.files));
 
+    // --- Core Logic ---
+
     function handleFiles(fileList) {
       [...fileList].forEach(file => {
         if (file.type.startsWith('image/') || file.type === 'application/pdf') {
-          processFile(file);
+          createFileEntry(file);
         }
       });
     }
 
-    function processFile(file) {
-      const id = Date.now() + Math.random();
+    function createFileEntry(file) {
+      const id = Date.now() + Math.random().toString(36).substr(2, 9);
+      
+      // UI Entry
       const row = document.createElement('div');
-      row.className = "bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-xl flex flex-col md:flex-row items-center justify-between gap-6";
+      row.className = "bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 animate-fade-in";
       row.innerHTML = `
-        <div class="flex-1 text-center md:text-left">
-          <p class="text-xl font-bold">${file.name}</p>
-          <p class="text-sm text-slate-600 dark:text-slate-400">Original: <span class="originalSize">-</span> → Compressed: <span class="compressedSize">-</span></p>
-          <div class="mt-3 bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
-            <div class="bg-gradient-to-r from-teal-500 to-blue-600 h-full transition-all duration-500" style="width:0%"></div>
+        <div class="flex-1 text-center md:text-left w-full">
+          <div class="flex items-center justify-center md:justify-start gap-3 mb-1">
+             <i class="${getFileIcon(file.type)} text-2xl text-slate-400"></i>
+             <p class="text-xl font-bold truncate max-w-xs" title="${file.name}">${file.name}</p>
+          </div>
+          <div class="flex justify-center md:justify-between text-sm text-slate-600 dark:text-slate-400 mb-2">
+            <span>${formatBytes(file.size)}</span>
+            <span class="status-text font-mono">Processing...</span>
+          </div>
+          <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-4 overflow-hidden">
+            <div class="progress-bar bg-gradient-to-r from-teal-500 to-blue-600 h-full" style="width:0%"></div>
           </div>
         </div>
-        <div class="flex gap-4">
-          <button class="viewBtn px-6 py-3 bg-gray-200 dark:bg-gray-700 rounded-full hover:bg-gray-300 dark:hover:bg-gray-600 transition">Preview</button>
-          <button class="downloadBtn px-6 py-3 bg-gradient-to-r from-teal-500 to-blue-600 text-white rounded-full hover:scale-105 transition">Download</button>
+        <div class="flex gap-3 w-full md:w-auto justify-center">
+          <button class="viewBtn hidden px-5 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition"><i class="fa-solid fa-eye"></i></button>
+          <button class="downloadBtn opacity-50 cursor-not-allowed px-5 py-2 bg-gradient-to-r from-teal-500 to-blue-600 text-white rounded-lg hover:shadow-lg transition flex items-center" disabled>
+            <i class="fa-solid fa-download mr-2"></i> Save
+          </button>
         </div>
       `;
 
       filesContainer.appendChild(row);
 
-      const originalSizeEl = row.querySelector('.originalSize');
-      const compressedSizeEl = row.querySelector('.compressedSize');
-      const progressBar = row.querySelector('.bg-gradient-to-r');
+      // Elements in Row
+      const statusText = row.querySelector('.status-text');
+      const progressBar = row.querySelector('.progress-bar');
       const downloadBtn = row.querySelector('.downloadBtn');
       const viewBtn = row.querySelector('.viewBtn');
 
-      originalSizeEl.textContent = formatBytes(file.size);
+      // Registry Object
+      const fileData = {
+        id,
+        originalFile: file,
+        compressedBlob: null,
+        url: null,
+        type: file.type === 'application/pdf' ? 'pdf' : 'image'
+      };
+      fileRegistry.push(fileData);
 
-      if (file.type === 'application/pdf') {
-        // Simple PDF size reduction via pdf-lib (removes metadata, recompresses images lightly)
-        compressPDF(file).then(compressedBlob => finish(compressedBlob));
-      } else {
-        // Image compression with Compressor.js
-        new Compressor(file, {
-          quality: qualitySlider.value / 100,
-          mimeType: file.type === 'image/webp' ? 'image/webp' : 'image/jpeg',
-          success: blob => finish(blob),
-          error: err => console.error(err)
+      // --- Image Compression Logic ---
+      if (fileData.type === 'image') {
+        
+        // Function to run compression
+        fileData.recompress = (qualityLevel) => {
+            statusText.textContent = `Compressing (${Math.round(qualityLevel*100)}%)...`;
+            
+            // Determine Output Type (Preserve transparency for PNG/WebP)
+            let mimeType = 'image/jpeg';
+            if (file.type === 'image/png') mimeType = 'image/png'; // Or 'image/webp' for better ratio
+            if (file.type === 'image/webp') mimeType = 'image/webp';
+
+            new Compressor(file, {
+                quality: qualityLevel,
+                mimeType: mimeType,
+                success(resultBlob) {
+                    updateUI(resultBlob);
+                },
+                error(err) {
+                    statusText.textContent = "Error";
+                    console.error(err);
+                }
+            });
+        };
+
+        // Initial Run
+        fileData.recompress(qualitySlider.value / 100);
+      } 
+      
+      // --- PDF Compression Logic ---
+      else if (fileData.type === 'pdf') {
+        // PDFs don't support slider-based re-compression easily in browser
+        // We perform a structural optimization
+        statusText.textContent = "Optimizing PDF...";
+        progressBar.style.width = "50%";
+        
+        optimizePDF(file).then(blob => {
+            updateUI(blob);
+        }).catch(err => {
+            statusText.textContent = "Failed";
+            console.error(err);
         });
       }
 
-      function finish(blob) {
-        const saved = file.size - blob.size;
-        totalSaved += saved;
-        totalSavedEl.textContent = formatBytes(totalSaved);
-        summary.classList.remove('hidden');
+      // --- Shared UI Updater ---
+      function updateUI(blob) {
+        fileData.compressedBlob = blob;
+        
+        // Release old URL to prevent memory leaks
+        if (fileData.url) URL.revokeObjectURL(fileData.url);
+        fileData.url = URL.createObjectURL(blob);
 
-        compressedSizeEl.textContent = formatBytes(blob.size) + ` (-${Math.round(saved/file.size*100)}%)`;
-        progressBar.style.width = `${(blob.size / file.size) * 100}%`;
+        // Calcs
+        const savedBytes = file.size - blob.size;
+        const percent = Math.max(0, Math.round((savedBytes / file.size) * 100));
+        
+        // Update Row UI
+        statusText.innerHTML = `<span class="text-green-600 font-bold">${formatBytes(blob.size)}</span> (-${percent}%)`;
+        progressBar.style.width = "100%";
+        
+        // Enable Buttons
+        downloadBtn.disabled = false;
+        downloadBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+        viewBtn.classList.remove('hidden');
 
-        const url = URL.createObjectURL(blob);
+        // Button Actions
+        viewBtn.onclick = () => window.open(fileData.url, '_blank');
         downloadBtn.onclick = () => {
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = file.name.replace(/\.[^.]+$/, '') + (file.type.startsWith('image/') ? '.jpg' : '.pdf');
-          a.click();
+            const a = document.createElement('a');
+            a.href = fileData.url;
+            // Keep extension or ensure correct one
+            const ext = fileData.type === 'pdf' ? '.pdf' : (blob.type === 'image/png' ? '.png' : '.jpg');
+            a.download = `compressed_${file.name.split('.')[0]}${ext}`;
+            a.click();
         };
-        viewBtn.onclick = () => window.open(url, '_blank');
 
-        files.push({ id, blob, url });
+        updateTotalSummary();
       }
+    }
 
-      async function compressPDF(pdfFile) {
-        const arrayBuffer = await pdfFile.arrayBuffer();
-        const pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
-        const pdfBytes = await pdfDoc.save({ useObjectStreams: true });
-        return new Blob([pdfBytes], { type: 'application/pdf' });
-      }
+    // --- Helper: PDF Optimization (Structural) ---
+    async function optimizePDF(file) {
+        try {
+            const arrayBuffer = await file.arrayBuffer();
+            // Load the PDF
+            const pdfDoc = await PDFLib.PDFDocument.load(arrayBuffer);
+            
+            // Save with object streams (compresses the structure)
+            // Note: This does not downsample images inside the PDF (complex client-side)
+            // But it removes unused objects and compacts the file stream.
+            const pdfBytes = await pdfDoc.save({ useObjectStreams: true });
+            
+            return new Blob([pdfBytes], { type: 'application/pdf' });
+        } catch (e) {
+            console.error("PDF Lib missing or error", e);
+            return file; // Return original if fail
+        }
+    }
+
+    // --- Helper: Update Total Summary ---
+    function updateTotalSummary() {
+        let totalOriginal = 0;
+        let totalCompressed = 0;
+
+        fileRegistry.forEach(f => {
+            if (f.compressedBlob) {
+                totalOriginal += f.originalFile.size;
+                totalCompressed += f.compressedBlob.size;
+            }
+        });
+
+        const saved = totalOriginal - totalCompressed;
+        totalSavedEl.textContent = formatBytes(saved);
+        if (fileRegistry.length > 0) summary.classList.remove('hidden');
+    }
+
+    // --- Helper: Download All ---
+    downloadAllBtn.addEventListener('click', async () => {
+        const { saveAs } = await import('https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js');
+        const JSZip = (await import('https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js')).default;
+        
+        const zip = new JSZip();
+        fileRegistry.forEach((f, index) => {
+            if (f.compressedBlob) {
+                const ext = f.compressedBlob.type === 'application/pdf' ? '.pdf' : (f.compressedBlob.type === 'image/png' ? '.png' : '.jpg');
+                zip.file(`compressed_${f.originalFile.name.split('.')[0]}${ext}`, f.compressedBlob);
+            }
+        });
+        
+        const content = await zip.generateAsync({ type: 'blob' });
+        saveAs(content, 'UtilityKit-Compressed.zip');
+    });
+
+    // --- Utilities ---
+    function getFileIcon(type) {
+        if (type === 'application/pdf') return 'fa-solid fa-file-pdf';
+        return 'fa-solid fa-file-image';
     }
 
     function formatBytes(bytes) {
@@ -196,19 +325,6 @@
       const i = Math.floor(Math.log(bytes) / Math.log(k));
       return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     }
-
-    // Download All as ZIP
-    downloadAllBtn.addEventListener('click', async () => {
-      const { saveAs } = await import('https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js');
-      const JSZip = (await import('https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js')).default;
-      const zip = new JSZip();
-      files.forEach(f => {
-        const ext = f.blob.type.startsWith('image/') ? '.jpg' : '.pdf';
-        zip.file(`compressed_${files.indexOf(f) + 1}${ext}`, f.blob);
-      });
-      const content = await zip.generateAsync({ type: 'blob' });
-      saveAs(content, 'UtilityKit-compressed-files.zip');
-    });
   </script>
 <script>
   document.addEventListener('DOMContentLoaded', () => {
