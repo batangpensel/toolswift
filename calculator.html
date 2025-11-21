@@ -13,36 +13,28 @@
     .history-scroll::-webkit-scrollbar-track { background: transparent; }
     .history-scroll::-webkit-scrollbar-thumb { background-color: #4b5563; border-radius: 20px; }
     
-    /* Animation for the live clock if used */
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
   </style>
 </head>
 <body class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 dark:from-slate-950 dark:to-slate-900 min-h-screen font-sans text-slate-800 dark:text-slate-200">
 
  <!-- Header -->
-<header class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-lg sticky top-0 z-50">
-  <div class="container mx-auto px-6 py-5 flex flex-wrap items-center justify-between">
-    <a href="index.html" class="flex items-center gap-3">
-      <h1 class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">UtilityKit</h1>
+ <header class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-lg sticky top-0 z-50">
+  <div class="container mx-auto px-6 h-16 flex items-center justify-between">
+    <a href="index.html" class="flex items-center gap-3 group">
+      <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white text-xl font-bold shadow-indigo-200 dark:shadow-none shadow-lg group-hover:scale-105 transition-transform">
+        <i class="fa-solid fa-calculator"></i>
+      </div>
+      <span class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400">
+        UtilityKit
+      </span>
     </a>
-    <nav class="flex flex-wrap gap-4 md:gap-6 text-lg">
-      <a href="pdf.html" class="nav-link hover:text-blue-600 dark:hover:text-blue-400 transition"><i class="fa-solid fa-file-pdf mr-1"></i>PDF</a>
-      <a href="image.html" class="nav-link hover:text-blue-600 dark:hover:text-blue-400 transition"><i class="fa-solid fa-image mr-1"></i>Image</a>
-      <a href="qr.html" class="nav-link hover:text-blue-600 dark:hover:text-blue-400 transition"><i class="fa-solid fa-qrcode mr-1"></i>QR</a>
-      <a href="ocr.html" class="nav-link hover:text-blue-600 dark:hover:text-blue-400 transition"><i class="fa-solid fa-eye mr-1"></i>OCR</a>
-      <a href="calculator.html" class="nav-link hover:text-blue-600 dark:hover:text-blue-400 transition"><i class="fa-solid fa-gauge-high mr-1"></i>Calculator</a>
-      <a href="password.html" class="nav-link hover:text-blue-600 dark:hover:text-blue-400 transition"><i class="fa-solid fa-key mr-1"></i>Password</a>
-      <a href="json.html" class="nav-link hover:text-blue-600 dark:hover:text-blue-400 transition"><i class="fa-solid fa-code mr-1"></i>JSON</a>
-      <a href="base64.html" class="nav-link hover:text-blue-600 dark:hover:text-blue-400 transition"><i class="fa-solid fa-lock mr-1"></i>Base64</a>
-      <a href="timestamp.html" class="nav-link hover:text-blue-600 dark:hover:text-blue-400 transition"><i class="fa-solid fa-clock mr-1"></i>Timestamp</a>
-      
-      <!-- === NEW TOOLS IN NAV === -->
-      <a href="compress.html" class="nav-link hover:text-blue-600 dark:hover:text-blue-400 transition"><i class="fa-solid fa-file-zipper mr-1"></i>Compressor</a>
-      <a href="markdown.html" class="nav-link hover:text-blue-600 dark:hover:text-blue-400 transition"><i class="fa-brands fa-markdown mr-1"></i>Markdown</a>
-      <a href="currency.html" class="nav-link hover:text-blue-600 dark:hover:text-blue-400 transition"><i class="fa-solid fa-dollar-sign mr-1"></i>Currency</a>
-    </nav>
+    
+    <a href="index.html" class="text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 transition-colors">
+      <i class="fa-solid fa-arrow-left mr-2"></i> Back to Tools
+    </a>
   </div>
-</header>
+ </header>
 
  <!-- Main Content -->
  <main class="container mx-auto px-4 py-12 max-w-6xl">
@@ -72,7 +64,7 @@
         </button>
     </div>
 
-    <!-- 1. Scientific Calculator (UPDATED WITH HISTORY & FEATURES) -->
+    <!-- 1. Scientific Calculator -->
     <div id="scientific" class="tab-content text-center">
         <h2 class="text-3xl font-bold mb-8">Scientific Calculator</h2>
         
@@ -135,7 +127,6 @@
                 </div>
                 <div id="history-list" class="flex-1 overflow-y-auto p-4 space-y-3 history-scroll text-left">
                     <div class="text-center text-slate-400 text-sm mt-10 italic" id="empty-history-msg">No history yet</div>
-                    <!-- History items will be injected here -->
                 </div>
             </div>
         </div>
@@ -333,11 +324,11 @@
     
     // Scientific Calc State
     let currentInput = '0';
-    let previousInput = '';
+    let previousInput = null; // Changed from '' to null for cleaner logic
     let operator = null;
-    let waitForSecondOperand = true;
-    let isDegrees = true; // Feature: Degree/Radian toggle
-    let calcHistory = []; // Feature: History array
+    let waitForSecondOperand = false;
+    let isDegrees = true; 
+    let calcHistory = []; 
     const display = document.getElementById('calc-display');
 
     // --- INITIALIZATION ---
@@ -393,8 +384,6 @@
     // --- CALCULATOR FUNCTIONS ---
 
     // 1. Scientific Calculator
-    
-    // Feature: Keyboard Support
     function handleKeyboardInput(e) {
         // Only trigger if Scientific tab is active
         const sciTab = document.getElementById('scientific');
@@ -413,8 +402,8 @@
         if (key === '/') handleOperator('/');
     }
 
-    // Feature: Backspace
     function deleteLastChar() {
+        if (waitForSecondOperand) return; 
         if (currentInput.length > 1) {
             currentInput = currentInput.slice(0, -1);
         } else {
@@ -423,52 +412,86 @@
         updateDisplay();
     }
 
-    // Feature: Toggle Deg/Rad
     function toggleDegRad() {
         isDegrees = !isDegrees;
         const btn = document.getElementById('deg-rad-btn');
         btn.textContent = isDegrees ? 'DEG' : 'RAD';
-        // Visual feedback
         btn.classList.add('bg-indigo-600', 'text-white');
         setTimeout(() => btn.classList.remove('bg-indigo-600', 'text-white'), 200);
     }
 
     function clearAll() {
-        currentInput = '0'; previousInput = ''; operator = null; waitForSecondOperand = true;
+        currentInput = '0'; previousInput = null; operator = null; waitForSecondOperand = false;
         updateDisplay();
     }
 
     function updateDisplay() { if(display) display.value = currentInput; }
 
     function inputDigit(digit) {
-        if (waitForSecondOperand) { currentInput = digit; waitForSecondOperand = false; }
-        else { currentInput = currentInput === '0' ? digit : currentInput + digit; }
+        if (waitForSecondOperand) {
+            currentInput = digit;
+            waitForSecondOperand = false;
+        } else {
+            currentInput = currentInput === '0' ? digit : currentInput + digit;
+        }
         updateDisplay();
     }
 
     function inputDecimal(dot) {
-        if (waitForSecondOperand) { currentInput = '0.'; waitForSecondOperand = false; }
-        else if (!currentInput.includes(dot)) { currentInput += dot; }
+        if (waitForSecondOperand) {
+            currentInput = '0.';
+            waitForSecondOperand = false;
+        } else if (!currentInput.includes(dot)) {
+            currentInput += dot;
+        }
         updateDisplay();
     }
 
-    function handleOperator(nextOp) {
+    // FIXED LOGIC: Correctly handles chaining, =, and new calculations
+    function handleOperator(nextOperator) {
         const inputValue = parseFloat(currentInput);
-        if (operator && waitForSecondOperand) { operator = nextOp; return; }
-        if (previousInput === '') { previousInput = inputValue; }
+
+        // If user just pressed an operator (5 + ), and clicks another ( * ), just swap them
+        if (operator && waitForSecondOperand) {
+            operator = nextOperator;
+            return;
+        }
+
+        // If this is the first operator (5 + )
+        if (previousInput === null) {
+            previousInput = inputValue;
+        } 
+        // If there is already an operator pending (5 + 3), calculate it now
         else if (operator) {
             const result = performCalculation[operator](previousInput, inputValue);
-            // Feature: Add to History
-            addToHistory(`${previousInput} ${operator} ${inputValue}`, result);
-            currentInput = String(result); previousInput = result;
+            
+            // Add to history BEFORE resetting for the new operator
+            addToHistory(previousInput, operator, inputValue, result);
+
+            currentInput = String(result);
+            previousInput = result;
         }
-        waitForSecondOperand = true; operator = nextOp; updateDisplay();
+
+        // Setup for the next step
+        waitForSecondOperand = true;
+        
+        // If user pressed '=', we are done with this chain.
+        if (nextOperator === '=') {
+            operator = null; // Clear operator so next number starts fresh
+            previousInput = null; // Clear previous so typing a number starts fresh
+            waitForSecondOperand = true; // Wait for new number
+        } else {
+            operator = nextOperator; // Continue chain
+        }
+        
+        updateDisplay();
     }
 
     const performCalculation = {
-        '/': (first, second) => first / second, '*': (first, second) => first * second,
-        '+': (first, second) => first + second, '-': (first, second) => first - second,
-        '=': (first, second) => second
+        '/': (first, second) => first / second, 
+        '*': (first, second) => first * second,
+        '+': (first, second) => first + second, 
+        '-': (first, second) => first - second
     };
 
     function calculateSpecial(type) {
@@ -477,12 +500,11 @@
         let expr = `${type}(${val})`;
 
         switch (type) {
-            case 'sqrt': result = Math.sqrt(val); break;
+            case 'sqrt': result = Math.sqrt(val); expr = `√${val}`; break;
             case 'pow2': result = val * val; expr = `${val}²`; break;
             case '1/x': result = 1 / val; expr = `1/${val}`; break;
             case 'pi': result = Math.PI; expr = 'π'; break;
             case 'log': result = Math.log10(val); break;
-            // Trig functions respecting Deg/Rad mode
             case 'sin': 
                 result = Math.sin(isDegrees ? val * Math.PI / 180 : val); 
                 expr = `sin(${val}${isDegrees ? '°' : 'rad'})`;
@@ -498,25 +520,38 @@
             case 'perc': result = val / 100; expr = `${val}%`; break;
         }
 
-        // Format result for display (Scientific Notation if too large/small)
-        let displayResult = result;
+        // Format
         if (Math.abs(result) < 0.000001 || Math.abs(result) > 1000000000) {
-             displayResult = result.toExponential(4);
+             result = result.toExponential(4);
+        } else {
+             // Avoid float errors like 0.1 + 0.2 = 0.300000004
+             result = parseFloat(result.toPrecision(12));
         }
 
-        currentInput = String(displayResult); 
+        // Special functions are self-contained, so we add to history immediately
+        addToHistorySpecial(expr, result);
+
+        currentInput = String(result); 
         waitForSecondOperand = true; 
         updateDisplay();
-        addToHistory(expr, displayResult);
     }
 
-    // Feature: History Management
-    function addToHistory(expr, res) {
-        // Prevent adding duplicate equals press
-        if(calcHistory.length > 0 && calcHistory[0].expr === expr) return;
+    // History Logic
+    function addToHistory(prev, op, curr, res) {
+        const expr = `${prev} ${op} ${curr}`;
+        _pushHistory(expr, res);
+    }
+    
+    function addToHistorySpecial(expr, res) {
+        _pushHistory(expr, res);
+    }
 
+    function _pushHistory(expr, res) {
+        // Avoid duplicate entries if user spams keys
+        if (calcHistory.length > 0 && calcHistory[0].expr === expr) return;
+        
         calcHistory.unshift({ expr: expr, res: res });
-        if (calcHistory.length > 20) calcHistory.pop(); // Keep last 20
+        if (calcHistory.length > 20) calcHistory.pop();
         renderHistory();
     }
 
@@ -525,15 +560,17 @@
         const emptyMsg = document.getElementById('empty-history-msg');
         
         if (calcHistory.length === 0) {
-            emptyMsg.style.display = 'block';
+            if(emptyMsg) emptyMsg.style.display = 'block';
             list.innerHTML = '';
-            list.appendChild(emptyMsg);
+            if(emptyMsg) list.appendChild(emptyMsg);
             return;
         }
         
-        emptyMsg.style.display = 'none';
-        list.innerHTML = calcHistory.map((item, index) => `
-            <div onclick="loadHistory(${item.res})" class="p-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl hover:bg-indigo-50 dark:hover:bg-slate-700 cursor-pointer transition-colors group">
+        if(emptyMsg) emptyMsg.style.display = 'none';
+        
+        // Safe rebuild
+        list.innerHTML = calcHistory.map((item) => `
+            <div onclick="loadHistory('${item.res}')" class="p-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl hover:bg-indigo-50 dark:hover:bg-slate-700 cursor-pointer transition-colors group mb-2">
                 <div class="text-xs text-slate-400 font-mono mb-1">${item.expr} =</div>
                 <div class="text-lg font-bold text-slate-700 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400">${item.res}</div>
             </div>
@@ -547,10 +584,9 @@
 
     function loadHistory(val) {
         currentInput = String(val);
-        waitForSecondOperand = true; // allow typing new number immediately replaces
+        waitForSecondOperand = true;
         updateDisplay();
     }
-
 
     // 2. Percentage Calculator
     function calcPercentage() {
@@ -692,19 +728,5 @@
         document.getElementById('unit-res').textContent = res + " " + to.toUpperCase();
     }
  </script>
-  <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const currentPage = location.pathname.split('/').pop() || 'index.html';
-
-    document.querySelectorAll('.nav-link').forEach(link => {
-      if (link.getAttribute('href') === currentPage) {
-        link.classList.add('text-indigo-600', 'font-bold');
-        link.classList.remove('text-slate-700', 'dark:text-slate-300', 'hover:text-indigo-600');
-      } else {
-        link.classList.add('text-slate-700', 'dark:text-slate-300', 'hover:text-indigo-600');
-      }
-    });
-  });
-</script>
 </body>
 </html>
