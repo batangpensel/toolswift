@@ -58,16 +58,18 @@
 </div>
 
         <!-- FROM -->
-        <div class="rounded-2xl p-6 bg-slate-50 dark:bg-slate-700 mb-6 border border-slate-200 dark:border-slate-600">
+       <div class="rounded-2xl p-6 bg-slate-50 dark:bg-slate-700 mb-6 border border-slate-200 dark:border-slate-600">
           <label class="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-3">I have</label>
-          <div class="flex flex-col md:flex-row gap-4 items-end">
-            <div class="relative flex-1 md:flex-initial">
-              <input type="text" id="search-from" placeholder="Search currency..." class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900 outline-none">
-              <select id="currency-from" size="8" class="absolute top-full left-0 w-full mt-1 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl shadow-xl hidden z-10 max-h-64 overflow-y-auto"></select>
+          <div class="flex flex-col md:flex-row gap-4 items-center">
+            <div class="relative w-full md:w-48 shrink-0">
+              <input type="text" id="search-from" placeholder="Search..." class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900 outline-none font-semibold">
+              <select id="currency-from" size="8" class="absolute top-full left-0 w-full mt-1 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl shadow-xl hidden z-50 max-h-64 overflow-y-auto"></select>
             </div>
-            <input type="text" id="amount-from" value="1.00" class="w-full md:w-64 text-5xl font-bold text-right bg-transparent focus:outline-none" placeholder="0.00">
+            <div class="relative flex-1 w-full">
+              <input type="text" id="amount-from" value="1.00" class="w-full text-4xl md:text-5xl font-bold text-center bg-transparent focus:outline-none text-slate-800 dark:text-white" placeholder="0.00">
+            </div>
           </div>
-          <p id="rate-display-from" class="text-sm text-slate-500 dark:text-slate-400 mt-3 text-right"></p>
+          <p id="rate-display-from" class="text-sm text-slate-500 dark:text-slate-400 mt-3 text-center md:text-right"></p>
         </div>
 
         <div class="flex justify-center my-8 gap-6">
@@ -79,25 +81,25 @@
           </button>
         </div>
 
-        <!-- TO -->
         <div class="rounded-2xl p-6 bg-slate-50 dark:bg-slate-700 border border-slate-200 dark:border-slate-600">
           <label class="block text-sm font-medium text-slate-600 dark:text-slate-300 mb-3">I want</label>
-          <div class="flex flex-col md:flex-row gap-4 items-end">
-            <div class="relative flex-1 md:flex-initial">
-              <input type="text" id="search-to" placeholder="Search currency..." class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900 outline-none">
-              <select id="currency-to" size="8" class="absolute top-full left-0 w-full mt-1 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl shadow-xl hidden z-10 max-h-64 overflow-y-auto"></select>
+          <div class="flex flex-col md:flex-row gap-4 items-center">
+            <div class="relative w-full md:w-48 shrink-0">
+              <input type="text" id="search-to" placeholder="Search..." class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-100 dark:focus:ring-indigo-900 outline-none font-semibold">
+              <select id="currency-to" size="8" class="absolute top-full left-0 w-full mt-1 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl shadow-xl hidden z-50 max-h-64 overflow-y-auto"></select>
             </div>
-            <div class="relative w-full md:w-64">
-              <input type="text" id="amount-to" readonly class="w-full text-5xl font-bold text-right bg-transparent pr-12 cursor-pointer" placeholder="0.00">
-              <button id="copy-btn" class="absolute right-2 top-1/2 -translate-y-1/2 text-indigo-600 opacity-0 hover:opacity-100 transition">
-                <i class="fa-regular fa-copy text-3xl"></i>
+            <div class="relative flex-1 w-full">
+              <input type="text" id="amount-to" readonly class="w-full text-4xl md:text-5xl font-bold text-center bg-transparent pr-12 cursor-pointer text-slate-800 dark:text-white text-ellipsis overflow-hidden" placeholder="0.00">
+              
+              <button id="copy-btn" class="absolute right-0 top-1/2 -translate-y-1/2 p-2 text-indigo-600 opacity-50 hover:opacity-100 transition">
+                <i class="fa-regular fa-copy text-2xl"></i>
               </button>
-              <span class="copy-feedback absolute right-2 top-1/2 -translate-y-1/2 text-green-500 font-medium">Copied!</span>
+              <span class="copy-feedback absolute right-10 top-1/2 -translate-y-1/2 text-green-500 font-medium text-sm pointer-events-none">Copied!</span>
             </div>
           </div>
-          <p id="rate-display-to" class="text-sm text-slate-500 dark:text-slate-400 mt-3 text-right"></p>
+          <p id="rate-display-to" class="text-sm text-slate-500 dark:text-slate-400 mt-3 text-center md:text-right"></p>
         </div>
-
+        
         <!-- Status + Chart -->
         <div class="mt-10 text-center">
           <p id="status-message" class="text-sm font-medium text-slate-600 dark:text-slate-400">Fetching latest rates...</p>
@@ -121,14 +123,32 @@
 <script>
     // --- 1. DATA DEFINITIONS ---
     const FIAT_CURRENCIES = {
+      // Major
       "USD": "United States Dollar", "EUR": "Euro", "GBP": "British Pound", "JPY": "Japanese Yen", 
-      "AUD": "Australian Dollar", "CAD": "Canadian Dollar", "CHF": "Swiss Franc", "CNY": "Chinese Yuan", 
-      "INR": "Indian Rupee", "SGD": "Singapore Dollar", "HKD": "Hong Kong Dollar", "NZD": "New Zealand Dollar", 
-      "KRW": "South Korean Won", "MXN": "Mexican Peso", "BRL": "Brazilian Real", "ZAR": "South African Rand", 
-      "TRY": "Turkish Lira", "RUB": "Russian Ruble", "PLN": "Polish Zloty", "THB": "Thai Baht",
-      "IDR": "Indonesian Rupiah", "MYR": "Malaysian Ringgit", "PHP": "Philippine Peso", "VND": "Vietnamese Dong", 
-      "AED": "UAE Dirham", "SAR": "Saudi Riyal", "ILS": "Israeli Shekel", "NOK": "Norwegian Krone", 
-      "SEK": "Swedish Krona", "DKK": "Danish Krone"
+      "CNY": "Chinese Yuan", "INR": "Indian Rupee", "AUD": "Australian Dollar", "CAD": "Canadian Dollar", 
+      "CHF": "Swiss Franc", "HKD": "Hong Kong Dollar", "SGD": "Singapore Dollar",
+      
+      // Europe
+      "SEK": "Swedish Krona", "NOK": "Norwegian Krone", "DKK": "Danish Krone", "PLN": "Polish Zloty",
+      "CZK": "Czech Koruna", "HUF": "Hungarian Forint", "RON": "Romanian Leu", "BGN": "Bulgarian Lev",
+      "ISK": "Icelandic Krona", "UAH": "Ukrainian Hryvnia", "RUB": "Russian Ruble", "TRY": "Turkish Lira",
+
+      // Americas
+      "BRL": "Brazilian Real", "MXN": "Mexican Peso", "ARS": "Argentine Peso", "COP": "Colombian Peso",
+      "CLP": "Chilean Peso", "PEN": "Peruvian Sol", "UYU": "Uruguayan Peso", "CRC": "Costa Rican Colón",
+      "DOP": "Dominican Peso", "GTQ": "Guatemalan Quetzal",
+
+      // Asia & Pacific
+      "KRW": "South Korean Won", "IDR": "Indonesian Rupiah", "MYR": "Malaysian Ringgit", "PHP": "Philippine Peso",
+      "THB": "Thai Baht", "VND": "Vietnamese Dong", "NZD": "New Zealand Dollar", "TWD": "New Taiwan Dollar",
+      "PKR": "Pakistani Rupee", "BDT": "Bangladeshi Taka", "LKR": "Sri Lankan Rupee", "NPR": "Nepalese Rupee",
+      "KZT": "Kazakhstani Tenge", "UZS": "Uzbekistani Som",
+
+      // Middle East & Africa
+      "AED": "UAE Dirham", "SAR": "Saudi Riyal", "ILS": "Israeli Shekel", "QAR": "Qatari Riyal",
+      "KWD": "Kuwaiti Dinar", "BHD": "Bahraini Dinar", "OMR": "Omani Rial", "JOD": "Jordanian Dinar",
+      "ZAR": "South African Rand", "EGP": "Egyptian Pound", "NGN": "Nigerian Naira", "KES": "Kenyan Shilling",
+      "GHS": "Ghanaian Cedi", "MAD": "Moroccan Dirham", "DZD": "Algerian Dinar", "TND": "Tunisian Dinar"
     };
 
     const CRYPTO_CURRENCIES = {
