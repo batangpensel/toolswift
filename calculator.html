@@ -142,24 +142,88 @@
       </div>
 
       <div id="age" class="tab-content hidden text-center">
-        <h2 class="text-3xl font-bold mb-8">Age Calculator</h2>
-        <div class="max-w-md mx-auto">
-          <input type="date" id="birthdate" class="w-full p-5 text-2xl text-center rounded-2xl input-field bg-gray-100 dark:bg-slate-700">
-          <p class="mt-10 text-5xl font-black text-indigo-600 dark:text-indigo-400" id="age-result">Select your birthday</p>
-          <p class="mt-4 text-xl text-slate-600 dark:text-slate-400">Exact age in years, months, and days</p>
+  <h2 class="text-3xl font-bold mb-8 text-slate-800 dark:text-slate-200">Age Calculator</h2>
+  
+  <div class="max-w-xl mx-auto bg-gray-50 dark:bg-slate-900 p-6 rounded-2xl shadow-sm">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+      <div>
+        <label class="block text-sm font-semibold text-slate-500 mb-2">Date of Birth / From</label>
+        <input type="date" id="age-from" class="w-full p-4 text-lg text-center rounded-xl input-field bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700" onchange="calculateAge()">
+      </div>
+      <div>
+        <label class="block text-sm font-semibold text-slate-500 mb-2">Calculate To / Until</label>
+        <input type="date" id="age-to" class="w-full p-4 text-lg text-center rounded-xl input-field bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700" onchange="calculateAge()">
+      </div>
+    </div>
+
+    <div class="p-6 bg-indigo-50 dark:bg-slate-800 rounded-xl border border-indigo-100 dark:border-slate-700">
+      <p class="text-lg text-slate-500 dark:text-slate-400 uppercase tracking-wide text-xs font-bold mb-2">Exact Age</p>
+      <p class="text-4xl md:text-5xl font-black text-indigo-600 dark:text-indigo-400" id="age-result">--</p>
+    </div>
+  </div>
+</div>
+
+     <div id="bmi" class="tab-content hidden text-center">
+  <h2 class="text-3xl font-bold mb-8 text-slate-800 dark:text-slate-200">BMI Calculator</h2>
+  
+  <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+    <div class="space-y-6">
+      <div class="bg-gray-50 dark:bg-slate-900 p-6 rounded-2xl">
+        <label class="block text-left text-sm font-bold text-slate-500 mb-2 ml-1">Height</label>
+        <div class="relative">
+          <input type="number" id="bmi-height" placeholder="e.g. 175" class="w-full p-4 pl-4 pr-16 text-xl rounded-xl input-field" oninput="calcBMI()">
+          <span class="absolute right-6 top-4 text-slate-400 font-bold">cm</span>
         </div>
       </div>
 
-      <div id="bmi" class="tab-content hidden text-center">
-        <h2 class="text-3xl font-bold mb-8">BMI Calculator</h2>
-        <div class="max-w-md mx-auto space-y-6">
-          <input type="number" id="bmi-height" placeholder="Height (cm)" class="w-full p-5 text-xl rounded-2xl input-field">
-          <input type="number" id="bmi-weight" placeholder="Weight (kg)" class="w-full p-5 text-xl rounded-2xl input-field">
-          <button onclick="calcBMI()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-5 rounded-2xl text-xl font-bold">Calculate BMI</button>
-          <p class="text-4xl font-bold text-indigo-600 dark:text-indigo-400" id="bmi-res"></p>
-          <p class="text-2xl" id="bmi-category"></p>
+      <div class="bg-gray-50 dark:bg-slate-900 p-6 rounded-2xl">
+        <label class="block text-left text-sm font-bold text-slate-500 mb-2 ml-1">Weight</label>
+        <div class="relative">
+          <input type="number" id="bmi-weight" placeholder="e.g. 70" class="w-full p-4 pl-4 pr-16 text-xl rounded-xl input-field" oninput="calcBMI()">
+          <span class="absolute right-6 top-4 text-slate-400 font-bold">kg</span>
         </div>
       </div>
+
+      <div class="p-6 bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-indigo-50 dark:border-slate-700">
+        <p class="text-sm text-slate-500 uppercase font-bold mb-2">Your BMI</p>
+        <p class="text-5xl font-black text-indigo-600 dark:text-indigo-400 mb-2" id="bmi-res">--</p>
+        <p class="text-xl font-medium text-slate-700 dark:text-slate-300" id="bmi-category">Enter details</p>
+      </div>
+    </div>
+
+    <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-gray-100 dark:border-slate-700 overflow-hidden">
+      <div class="bg-slate-100 dark:bg-slate-900 p-4 border-b dark:border-slate-700">
+        <h3 class="font-bold text-lg text-slate-700 dark:text-slate-300">BMI Categories</h3>
+      </div>
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="text-xs uppercase text-slate-500 border-b dark:border-slate-700">
+            <th class="p-4">Category</th>
+            <th class="p-4 text-right">Range</th>
+          </tr>
+        </thead>
+        <tbody class="text-sm">
+          <tr class="border-b dark:border-slate-700" id="row-under">
+            <td class="p-4 font-medium text-blue-500">Underweight</td>
+            <td class="p-4 text-right text-slate-600 dark:text-slate-400">&lt; 18.5</td>
+          </tr>
+          <tr class="border-b dark:border-slate-700 bg-green-50/50 dark:bg-green-900/10" id="row-normal">
+            <td class="p-4 font-medium text-green-600">Normal Weight</td>
+            <td class="p-4 text-right text-slate-600 dark:text-slate-400">18.5 – 24.9</td>
+          </tr>
+          <tr class="border-b dark:border-slate-700" id="row-over">
+            <td class="p-4 font-medium text-orange-500">Overweight</td>
+            <td class="p-4 text-right text-slate-600 dark:text-slate-400">25 – 29.9</td>
+          </tr>
+          <tr id="row-obese">
+            <td class="p-4 font-medium text-red-500">Obesity</td>
+            <td class="p-4 text-right text-slate-600 dark:text-slate-400">≥ 30</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
 
       <div id="loan" class="tab-content hidden text-center">
         <h2 class="text-3xl font-bold mb-8">Loan / Mortgage Calculator</h2>
@@ -326,51 +390,114 @@
     }
 
 
-    // --- Age Calculator (Fixed Logic) ---
-    document.getElementById('birthdate').addEventListener('change', () => {
-      let birthStr = document.getElementById('birthdate').value;
-      if(!birthStr) return;
-      
-      let birth = new Date(birthStr);
-      let today = new Date();
-      
-      if(birth > today) {
-        document.getElementById('age-result').textContent = "Not born yet?";
+    // --- NEW Age Calculator Logic (2 Dates) ---
+    // Set default "To" date to today on load
+    document.getElementById('age-to').valueAsDate = new Date();
+
+    function calculateAge() {
+      const fromStr = document.getElementById('age-from').value;
+      const toStr = document.getElementById('age-to').value;
+
+      if (!fromStr || !toStr) return;
+
+      const fromDate = new Date(fromStr);
+      const toDate = new Date(toStr);
+
+      // Check if dates are valid
+      if (fromDate > toDate) {
+        document.getElementById('age-result').innerHTML = "<span class='text-red-500 text-2xl'>'From' date must be before 'To' date</span>";
         return;
       }
 
-      let y = today.getFullYear() - birth.getFullYear();
-      let m = today.getMonth() - birth.getMonth();
-      let d = today.getDate() - birth.getDate();
+      let years = toDate.getFullYear() - fromDate.getFullYear();
+      let months = toDate.getMonth() - fromDate.getMonth();
+      let days = toDate.getDate() - fromDate.getDate();
 
       // Adjust for negative days (borrow from previous month)
-      if (d < 0) {
-        m--;
-        // Get days in previous month
-        let prevMonth = new Date(today.getFullYear(), today.getMonth(), 0);
-        d += prevMonth.getDate();
+      if (days < 0) {
+        months--;
+        // Get number of days in the previous month
+        // (Date(year, month, 0) gives the last day of the previous month)
+        let prevMonthLastDay = new Date(toDate.getFullYear(), toDate.getMonth(), 0).getDate();
+        days += prevMonthLastDay;
       }
+
       // Adjust for negative months (borrow from previous year)
-      if (m < 0) {
-        y--;
-        m += 12;
+      if (months < 0) {
+        years--;
+        months += 12;
       }
 
-      document.getElementById('age-result').textContent = `${y} years, ${m} months, ${d} days`;
-    });
+      document.getElementById('age-result').innerHTML = 
+        `${years}<span class="text-xl font-normal text-slate-400">y</span> ` + 
+        `${months}<span class="text-xl font-normal text-slate-400">m</span> ` + 
+        `${days}<span class="text-xl font-normal text-slate-400">d</span>`;
+    }
 
 
-    // --- BMI Calculator ---
+    // --- NEW BMI Calculator Logic (Smart & Fixed) ---
     function calcBMI() {
-      let h = parseFloat(document.getElementById('bmi-height').value);
+      let hInput = parseFloat(document.getElementById('bmi-height').value);
       let w = parseFloat(document.getElementById('bmi-weight').value);
       
-      if(!h || !w || h <= 0 || w <= 0) {
-        document.getElementById('bmi-res').textContent = "Invalid input";
-        document.getElementById('bmi-category').textContent = "";
+      // Reset UI if empty
+      if (!hInput || !w) {
+        document.getElementById('bmi-res').textContent = "--";
+        document.getElementById('bmi-category').textContent = "Enter details";
+        resetTableHighlight();
         return;
       }
 
+      // Smart Unit Detection:
+      // If user enters "1.75" (meters), we treat it as meters.
+      // If user enters "175" (cm), we convert to meters.
+      let h_meters = (hInput < 3.0) ? hInput : hInput / 100;
+
+      // Calculation
+      let bmi = (w / (h_meters * h_meters)).toFixed(1);
+
+      // Display Result
+      document.getElementById('bmi-res').textContent = bmi;
+      
+      // Determine Category
+      let cat = "";
+      let colorClass = "";
+      let rowId = "";
+
+      resetTableHighlight(); // Clear previous highlights
+
+      if (bmi < 18.5) {
+        cat = "Underweight";
+        colorClass = "text-blue-500";
+        rowId = "row-under";
+      } else if (bmi >= 18.5 && bmi <= 24.9) {
+        cat = "Normal Weight";
+        colorClass = "text-green-600";
+        rowId = "row-normal";
+      } else if (bmi >= 25 && bmi <= 29.9) {
+        cat = "Overweight";
+        colorClass = "text-orange-500";
+        rowId = "row-over";
+      } else {
+        cat = "Obesity";
+        colorClass = "text-red-500";
+        rowId = "row-obese";
+      }
+
+      document.getElementById('bmi-category').className = "text-xl font-bold " + colorClass;
+      document.getElementById('bmi-category').textContent = cat;
+
+      // Highlight the table row
+      if(rowId) {
+        document.getElementById(rowId).classList.add('bg-indigo-100', 'dark:bg-slate-700');
+      }
+    }
+
+    function resetTableHighlight() {
+      ['row-under', 'row-normal', 'row-over', 'row-obese'].forEach(id => {
+        document.getElementById(id).classList.remove('bg-indigo-100', 'dark:bg-slate-700');
+      });
+    }
       // Convert cm to meters
       let h_m = h / 100;
       let bmi = (w / (h_m * h_m)).toFixed(1);
