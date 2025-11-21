@@ -14,6 +14,10 @@
     .article-link {
       @apply block p-3 rounded-xl transition-colors text-slate-700 dark:text-slate-300 border-l-4 border-transparent hover:bg-slate-100 dark:hover:bg-slate-800;
     }
+    /* Style for the bolded title in the nav link */
+    .article-link .title-text {
+        @apply font-bold;
+    }
     .article-content h2 {
       @apply text-3xl font-bold mt-8 mb-4 border-b pb-2 border-slate-200 dark:border-slate-700;
     }
@@ -63,15 +67,31 @@
         <nav class="space-y-2" id="article-nav">
           <a href="#client-side-utility" class="article-link active" data-article="client-side-utility">
             <span class="text-sm font-light text-slate-500 dark:text-slate-400 block">Tech Philosophy</span>
-            Why Client-Side Processing is the Future
+            <span class="title-text">Why Client-Side Processing is the Future</span>
+          </a>
+          <a href="#password-entropy" class="article-link" data-article="password-entropy">
+            <span class="text-sm font-light text-slate-500 dark:text-slate-400 block">Security Deep Dive</span>
+            <span class="title-text">Password Entropy: How Strong is Your Password?</span>
           </a>
           <a href="#webp-jpeg-guide" class="article-link" data-article="webp-jpeg-guide">
             <span class="text-sm font-light text-slate-500 dark:text-slate-400 block">Image Formats</span>
-            WebP vs. JPEG: Choosing the Right Format
+            <span class="title-text">WebP vs. JPEG: Choosing the Right Format</span>
+          </a>
+          <a href="#timestamps-explained" class="article-link" data-article="timestamps-explained">
+            <span class="text-sm font-light text-slate-500 dark:text-slate-400 block">Coding Basics</span>
+            <span class="title-text">Unix Timestamps Explained: The Universal Language of Time</span>
           </a>
           <a href="#currency-costs" class="article-link" data-article="currency-costs">
             <span class="text-sm font-light text-slate-500 dark:text-slate-400 block">Data Privacy</span>
-            The Hidden Costs of Free Currency Converters
+            <span class="title-text">The Hidden Costs of Free Currency Converters</span>
+          </a>
+          <a href="#lossless-lossy-compression" class="article-link" data-article="lossless-lossy-compression">
+            <span class="text-sm font-light text-slate-500 dark:text-slate-400 block">Compression Science</span>
+            <span class="title-text">Lossless vs. Lossy: The Two Ways to Shrink a File</span>
+          </a>
+          <a href="#raster-vector" class="article-link" data-article="raster-vector">
+            <span class="text-sm font-light text-slate-500 dark:text-slate-400 block">Graphics Basics</span>
+            <span class="title-text">Raster vs. Vector: When to use Pixels or Paths</span>
           </a>
         </nav>
       </div>
@@ -82,157 +102,324 @@
       
       <!-- Article 1: Client-Side Processing -->
       <article class="bg-white dark:bg-slate-800 rounded-3xl p-8 sm:p-12 shadow-2xl article-content" id="client-side-utility">
-        <h1 class="text-5xl font-extrabold mb-8 text-slate-900 dark:text-white">Why Client-Side Processing is the Future of Utility (And Why It Matters to You)</h1>
+        <h1 class="text-5xl font-extrabold mb-8 text-slate-900 dark:text-white">Why Client-Side Processing is the Future of Utility</h1>
 
-        <p>In today's digital world, online tools are everywhere—from image converters to password generators. But have you ever stopped to think about where your data goes when you use them? The fundamental difference between traditional tools and modern utilities like those on UtilityKit lies in one technical concept: **Client-Side Processing**.</p>
+        <p>Every time you use a tool online—like a password generator or an image converter—your data goes somewhere. With most tools, your files are sent to a distant computer (the server) for the work to be done. This is risky for privacy.</p>
 
-        <p>This shift is crucial. It changes how your files are handled, offering significant advantages in privacy, speed, and security.</p>
+        <p>The tools on UtilityKit use **Client-Side Processing**. This is a major difference. It means the work is done entirely on your computer, inside your web browser. **Your data never leaves your device.**</p>
 
         <h2 id="what-is-csp">What is Client-Side Processing?</h2>
 
-        <p>When you use a typical online tool, your web browser (the client) sends your file or data to the tool’s remote computer (the server) for processing. The server does the work and sends the result back to you.</p>
-
-        <p>**Client-Side Processing**, however, means the heavy lifting is done entirely within your web browser, using its own computational power. **Your data never leaves your device.** The server is only used to deliver the initial tool code (HTML, CSS, JavaScript) to your browser. Once the tool loads, it's self-contained.</p>
+        <p>Think of it simply:</p>
         
         <figure class="my-8 text-center">
             
-            <figcaption class="text-sm text-slate-500 dark:text-slate-400 mt-2">Diagram illustrating the flow of data for Server-Side (upload/process/download) versus Client-Side (process/download).</figcaption>
+            <figcaption class="text-sm text-slate-500 dark:text-slate-400 mt-2">Diagram showing that Client-Side means data stays with you, Server-Side means data is sent away.</figcaption>
         </figure>
 
-        <h3 id="how-data-stays-local">How Your Data Stays Local</h3>
-
-        <p>The magic behind this is modern web technology, specifically JavaScript APIs. For instance, when you compress an image on UtilityKit, the JavaScript code running in your browser uses APIs like <code>FileReader</code> to access the file data locally and <code>Canvas</code> or dedicated compression libraries to perform the conversion or compression right on your machine. Your file is only written back to your device when you click **"Download."**</p>
-
-        <h2 id="privacy-advantage">1. The Ultimate Privacy Advantage</h2>
-
-        <p>The single biggest reason to prioritize client-side tools is privacy. In a world of increasing data breaches and surveillance, control over your information is paramount.</p>
-
-        <p>When a tool processes files on its server, the server owner temporarily possesses a copy of your data—be it a sensitive JSON file, a personal photograph, or a private document. Even if the server owner promises to delete it, that file has still been transmitted and stored somewhere.</p>
-
-        <p>With client-side processing, this risk is eliminated entirely:</p>
-
         <ul>
-            <li>**No Transmission:** Your files are never uploaded over the internet.</li>
-            <li>**No Storage:** Your data is never stored on UtilityKit's servers or any third-party cloud.</li>
-            <li>**Zero Logs:** There are no server logs to track what files you processed or when you processed them, because the server wasn't involved in the transaction.</li>
+            <li>**Server-Side (Traditional):** You send file $\rightarrow$ Server processes file $\rightarrow$ Server sends results back.</li>
+            <li>**Client-Side (UtilityKit):** You open tool $\rightarrow$ Your browser processes file $\rightarrow$ You download results.</li>
         </ul>
 
-        <p>Your privacy is guaranteed by the browser itself.</p>
+        <p>The server is only used once: to send the tool's code (HTML/JavaScript) to your browser. After that, your device does all the work itself.</p>
 
-        <h2 id="speed-efficiency">2. Unmatched Speed and Efficiency</h2>
+        <h2 id="privacy-advantage">Reason 1: Total Privacy and Security</h2>
 
-        <p>Beyond privacy, client-side tools offer a tangible advantage in performance, especially for tasks involving large files or bulk processing.</p>
+        <p>Privacy is the biggest advantage. When a tool uses a server, the owner temporarily has a copy of your personal data or files. Even if they promise to delete it, the data was still transferred over the internet.</p>
 
-        <p>Traditional server-side processing requires four steps:</p>
+        <p>Client-side processing completely eliminates this risk:</p>
 
+        <ul>
+            <li>**No Uploads:** Your files are never sent over the internet to us.</li>
+            <li>**No Storage:** Your data is never saved on UtilityKit's servers or any external cloud.</li>
+            <li>**Zero Logs:** There is no record of what files you processed because our server wasn't involved in the work.</li>
+        </ul>
+
+        <p>Your data is protected by your own browser, not by our policy.</p>
+
+        <h2 id="speed-efficiency">Reason 2: Lightning-Fast Speed</h2>
+
+        <p>For large files, client-side tools are much faster because they cut out two slow, mandatory steps of the internet:</p>
+
+        <h3 id="server-side-steps">Traditional (Server-Side) Steps:</h3>
         <ol>
-            <li>**Upload:** Sending the file from your computer to the server.</li>
-            <li>**Server Process:** The server runs the operation.</li>
-            <li>**Download:** Sending the processed file back to your computer.</li>
-            <li>**Local Save:** Saving the result.</li>
+            <li>**Slow Upload:** Sending your file (could be huge) from your computer to the server.</li>
+            <li>**Slow Download:** Waiting for the processed file to be sent back to you.</li>
         </ol>
 
-        <p>Client-side processing skips the most time-consuming steps—the upload and download phases. The process simplifies to:</p>
-
+        <h3 id="client-side-steps">Client-Side Steps:</h3>
         <ol>
-            <li>**Local Process:** Your browser runs the operation instantly.</li>
-            <li>**Local Save:** Saving the result.</li>
+            <li>**Instant Processing:** Your fast modern device processes the file instantly.</li>
+            <li>**Local Save:** The file is saved directly back to your device.</li>
         </ol>
 
-        <p>For users on slower internet connections or those handling gigabytes of data (like bulk image conversions), the time saved by eliminating upload/download latency is massive.</p>
+        <p>For anyone with slow internet, or for people who handle large files (like high-res images or PDFs), skipping the upload and download saves a huge amount of time.</p>
 
         <h2 id="future-private-fast">The Future is Private and Fast</h2>
 
-        <p>Client-side utilities are the next evolution of online tools. They represent a fundamental shift toward respecting user privacy and leveraging the power already present in modern devices.</p>
-
-        <p>By choosing client-side tools, you are not just getting a fast service; you are making a conscious choice to keep your data secure, local, and entirely in your own hands. UtilityKit is committed to this standard, ensuring every tool you use upholds the highest levels of speed and privacy.</p>
+        <p>Choosing client-side tools is a choice to keep your data local, secure, and entirely in your own hands. UtilityKit is committed to this standard, ensuring every tool you use gives you both speed and privacy.</p>
 
       </article>
 
-      <!-- Article 2: WebP vs. JPEG -->
-      <article id="webp-jpeg-guide" class="article-content bg-white dark:bg-slate-800 rounded-3xl p-8 sm:p-12 shadow-2xl mt-8 hidden">
-        <h1 class="text-5xl font-extrabold mb-8 text-slate-900 dark:text-white">WebP vs. JPEG: Choosing the Right Format for Speed and Quality</h1>
+      <!-- Article 2: Password Entropy -->
+      <article id="password-entropy" class="article-content bg-white dark:bg-slate-800 rounded-3xl p-8 sm:p-12 shadow-2xl mt-8 hidden">
+        <h1 class="text-5xl font-extrabold mb-8 text-slate-900 dark:text-white">Password Entropy: How Strong is Your Password?</h1>
         
-        <p>The format you choose for your website's images is one of the single biggest factors affecting page load speed and user experience. While JPEG has been the long-standing champion, newer formats like WebP have fundamentally changed the game. Understanding these differences is key to optimizing your digital presence.</p>
+        <p>Do you know how long it would take a hacker to guess your password? This isn't just about length; it's about **Entropy**, which is the mathematical way to measure a password's strength and how hard it is to crack.</p>
 
-        <h2 id="the-classic-jpeg">The Classic: JPEG (.jpg or .jpeg)</h2>
+        <h2 id="what-is-entropy">Understanding Password Strength</h2>
         
-        <p>JPEG (Joint Photographic Experts Group) has been the standard for decades, prized for its ability to compress complex, full-color photographs efficiently. However, it relies on **lossy compression**, which means some original image data is permanently discarded to achieve a smaller file size.</p>
-
-        <ul>
-            <li>**Best For:** Complex, real-world photographs and images with smooth color gradients.</li>
-            <li>**Limitations:** Does not support transparency (Alpha channel). File sizes are often significantly larger than modern formats.</li>
-        </ul>
-
-        <h2 id="the-modern-standard-webp">The Modern Standard: WebP (.webp)</h2>
+        <p>Entropy is measured in **bits**. A higher bit number means a stronger password. The calculation is based on two main things:</p>
         
-        <p>WebP, developed by Google, is a next-generation image format designed specifically for the web. It offers superior compression for both lossy and lossless formats, resulting in files that are typically 25-35% smaller than comparable JPEGs or PNGs.</p>
-
-        <ul>
-            <li>**Key Advantages:** Supports both **lossy and lossless** compression, supports **transparency** (like PNG), and supports **animation** (like GIF).</li>
-            <li>**Adoption:** Widely supported across all modern browsers (Chrome, Firefox, Edge, Safari).</li>
-        </ul>
-
-        <h2 id="when-to-use-which">When to Use Which Format</h2>
-        
-        <p>The choice often comes down to balancing compatibility, file size, and the specific image content.</p>
-
         <figure class="my-8 text-center">
             
-            <figcaption class="text-sm text-slate-500 dark:text-slate-400 mt-2">WebP offers significantly better compression efficiency compared to both JPEG and PNG.</figcaption>
+            <figcaption class="text-sm text-slate-500 dark:text-slate-400 mt-2">Diagram showing how the number of characters and character types (charset) combine to determine password entropy.</figcaption>
         </figure>
 
-        <h3 id="use-webp">Use WebP for Almost Everything</h3>
-        <p>For modern web projects, WebP should be your default choice:</p>
-        <p class="text-green-600 dark:text-green-400 font-semibold mt-2">**Example Use Cases:** All site logos, product images, graphics with transparency, and main hero images.</p>
+        <ol>
+            <li>**The Length (L):** How many characters your password has.</li>
+            <li>**The Character Set Size (R):** How many different types of characters you use (numbers, lowercase, uppercase, symbols).</li>
+        </ol>
 
-        <h3 id="use-jpeg">Keep JPEG for Legacy or Compatibility</h3>
-        <p>You may only need to revert to JPEG if you must support very old browsers or systems that have not updated to support WebP.</p>
-        <p class="text-red-600 dark:text-red-400 font-semibold mt-2">**Example Use Cases:** Documents or email templates where image format support is unpredictable.</p>
+        <h3 id="the-charset-rule">The Character Set Rule (R)</h3>
+        <p>Using more types of characters quickly increases the complexity of the password, making it much harder to guess:</p>
+        <ul>
+            <li>**Numbers Only (0-9):** Character set size (R) is 10.</li>
+            <li>**Lowercase Letters + Numbers (a-z, 0-9):** Character set size (R) is $26 + 10 = 36$.</li>
+            <li>**All Four Types (A-Z, a-z, 0-9, Symbols):** Character set size (R) is about $26 + 26 + 10 + 32 = 94$.</li>
+        </ul>
+
+        <h2 id="best-practices">How to Create an Unbreakable Password</h2>
+
+        <p>The best way to increase your password's strength is to focus on **length**. Entropy increases very quickly as you add more characters.</p>
+
+        <ul>
+            <li>**Aim for 16 Characters:** An 8-character password using all four types might be cracked in hours. A 16-character password using the same complexity might take thousands of years.</li>
+            <li>**Use a Password Manager:** Don't try to remember long, complex passwords. Use a secure manager to store and generate them for you.</li>
+            <li>**Use Symbols and Numbers:** Always mix in symbols and numbers to increase your character set size (R).</li>
+            <li>**Never Reuse:** Use a unique password for every single account you have.</li>
+        </ul>
         
-        <h2 id="webp-in-utilitykit">Optimizing with UtilityKit</h2>
-        <p>Our client-side Image Toolkit allows you to quickly convert your entire image library to WebP without uploading your files to a server. This gives you both the performance boost of WebP and the privacy assurance of client-side processing.</p>
-
+        <p>UtilityKit's Password Generator uses these principles to create random, high-entropy passwords, ensuring your online accounts are as safe as possible.</p>
       </article>
 
-      <!-- Article 3: Currency Converters -->
+      <!-- Article 3: WebP vs. JPEG -->
+      <article id="webp-jpeg-guide" class="article-content bg-white dark:bg-slate-800 rounded-3xl p-8 sm:p-12 shadow-2xl mt-8 hidden">
+        <h1 class="text-5xl font-extrabold mb-8 text-slate-900 dark:text-white">WebP vs. JPEG: Choosing the Right Image Format</h1>
+        
+        <p>The image format you choose directly impacts how fast your website loads. When pages load slowly, people leave. While JPEG has been the most common choice for years, a newer format called WebP is much better for the modern web.</p>
+
+        <h2 id="the-classic-jpeg">JPEG: The Older Format</h2>
+        
+        <p>JPEG is great for detailed, colorful photos. The problem is that it uses **lossy compression**. This means when you make the file smaller, it permanently throws away some image data to shrink the size. This can hurt quality, and the final file size is still often too big.</p>
+
+        <ul>
+            <li>**Best For:** Complex, real-world photographs.</li>
+            <li>**The Downsides:** Large file sizes and does not support transparency (clear backgrounds).</li>
+        </ul>
+
+        <h2 id="the-modern-standard-webp">WebP: The New Standard</h2>
+        
+        <p>WebP was created by Google to fix the problems with JPEG. It is the best modern format designed specifically to load fast on the internet. It can make files $25\%$ to $35\%$ smaller than an identical JPEG or PNG image.</p>
+
+        <ul>
+            <li>**Key Advantages:**
+                <ul>
+                    <li>**Smaller Size:** Reduces file size dramatically without losing much quality.</li>
+                    <li>**Transparency:** Supports clear backgrounds (like PNG).</li>
+                    <li>**Wide Support:** Works in all modern web browsers (Chrome, Firefox, Edge, Safari).</li>
+                </ul>
+            </li>
+        </ul>
+
+        <h2 id="when-to-use-which">Which Format Should You Use?</h2>
+        
+        <p>For maximum speed and quality, the choice is simple:</p>
+
+        <h3 id="use-webp">Use WebP for Almost Everything</h3>
+        <p class="text-green-600 dark:text-green-400 font-semibold mt-2">**Use Cases:** All website logos, product photos, graphics, and background images.</p>
+
+        <h3 id="use-jpeg">Keep JPEG for Very Old Systems</h3>
+        <p>Only use JPEG if you absolutely must support very old computers or software that can't handle WebP.</p>
+        <p class="text-red-600 dark:text-red-400 font-semibold mt-2">**Use Cases:** Documents or older email systems where image format support is unpredictable.</p>
+        
+        <h2 id="webp-in-utilitykit">Optimizing with UtilityKit</h2>
+        <p>UtilityKit's Image Toolkit lets you convert all your existing images to WebP right in your browser. This gives you the speed benefit of WebP without ever uploading your files to a server, keeping your workflow private and fast.</p>
+
+      </article>
+      
+      <!-- Article 4: Unix Timestamps -->
+      <article id="timestamps-explained" class="article-content bg-white dark:bg-slate-800 rounded-3xl p-8 sm:p-12 shadow-2xl mt-8 hidden">
+        <h1 class="text-5xl font-extrabold mb-8 text-slate-900 dark:text-white">Unix Timestamps Explained: The Universal Language of Time</h1>
+        
+        <p>If you've ever looked at log files, database entries, or code, you've probably seen a Unix timestamp. It's a simple, long number like <code>1672531200</code>. It looks like nonsense, but it's actually the most precise and universal way computers measure time.</p>
+
+        <h2 id="what-is-a-unix-timestamp">What is This Number?</h2>
+        
+        <p>A Unix timestamp is simply the total number of seconds that have passed since a specific starting point called the **Epoch**. Everything is counted from that one moment:</p>
+        
+        <ul>
+            <li>**The Epoch:** January 1, 1970, at 00:00:00 Coordinated Universal Time (UTC).</li>
+            <li>**The Count:** Every second since that time is added up and stored as the timestamp number.</li>
+        </ul>
+
+        <p>For example, the number <code>1672531200</code> means exactly $1,672,531,200$ seconds have passed since the Epoch, which translates to January 1, 2023, 00:00:00 UTC.</p>
+
+        <h2 id="why-do-computers-use-it">Why Computers Love Timestamps</h2>
+        
+        <p>Why use a long number instead of a simple date like "Dec 31, 2022"? Timestamps solve the massive problem of time zones and daylight savings.</p>
+
+        <h3 id="no-time-zone-problems">No Time Zone Problems</h3>
+        <p>If you use a traditional date format, "10:00 AM on Monday" is different in London, New York, and Sydney. The Unix timestamp always refers to the same universal second, no matter where you are in the world. When your computer converts it back to local time, it applies your time zone correctly.</p>
+
+        <h3 id="easy-to-sort-and-compare">Easy to Sort and Compare</h3>
+        <p>Since the timestamp is a simple counting number, it's very easy for databases and code to sort and compare. A bigger number always means a later time. Trying to sort a list of dates written as strings ("January," "February," etc.) is much harder.</p>
+
+        <h2 id="the-year-2038-problem">The Year 2038 Problem</h2>
+        
+        <p>You may hear about the "Year 2038 Problem." This is the point when the 32-bit timestamp number will become too large to store, causing older systems to break. This will happen on January 19, 2038. Luckily, most modern systems use a 64-bit number, which delays the next potential problem for billions of years!</p>
+        
+        <p>UtilityKit's Timestamp tool helps you easily convert these long numbers to human-readable dates and back again, ensuring you always know exactly when an event happened.</p>
+      </article>
+
+      <!-- Article 5: Currency Converters -->
       <article id="currency-costs" class="article-content bg-white dark:bg-slate-800 rounded-3xl p-8 sm:p-12 shadow-2xl mt-8 hidden">
         <h1 class="text-5xl font-extrabold mb-8 text-slate-900 dark:text-white">The Hidden Costs of Free Currency Converters</h1>
         
-        <p>In a globalized economy, quick access to currency conversion is essential. While many tools offer "free" services, the price you pay isn't in money, but in **data accuracy** and **timeliness**. Understanding the source and speed of the exchange rate data is critical, especially for business or investment decisions.</p>
+        <p>We all need fast currency conversion, but many "free" online tools have hidden costs that aren't money-related. These costs are paid in two ways: **bad data** and **delayed information**.</p>
+
+        <p>If you use a bad rate for a business transaction, you could lose money. Here's what you need to watch out for.</p>
 
         <h2 id="the-cost-of-free-data">The "Cost" of Free Data: Latency</h2>
         
-        <p>Currency exchange rates are volatile and change minute by minute. A "free" converter often operates on a model where the data is either delayed or aggregated.</p>
+        <p>Currency exchange rates are always changing, minute by minute. A free converter often uses delayed data. This delay is called **Latency**.</p>
 
-        <h3 id="what-is-latency">What is Data Latency?</h3>
-        
-        <p>Latency is the delay between when a currency rate changes on the global market and when that change is reflected in the tool you are using. Most free converters rely on:**</p>
+        <h3 id="what-is-latency">Why Latency Happens in Free Tools:</h3>
         
         <ul>
-            <li>**End-of-Day Aggregation:** Rates are updated only once per day, based on the closing market price. This is useless for transactions happening during peak trading hours.</li>
-            <li>**Arbitrary Delays:** The data provider may only release updates every 15, 30, or 60 minutes to non-paying users, selling "real-time" access to large financial institutions.</li>
+            <li>**End-of-Day Data:** The tool only updates rates once per day, based on the market closing price. This is completely inaccurate for real-time trading.</li>
+            <li>**Artificial Delays:** The data provider might only release rates every 15 or 30 minutes to free users, saving the truly "live" data for their paid customers (large banks).</li>
         </ul>
 
-        <p>If you use a delayed rate for a large e-commerce transaction or international invoice, the actual rate applied by the bank or payment processor will differ, leading to unexpected costs or losses.</p>
+        <p>If you use a delayed rate for a big international payment, the bank's actual rate will be different, which can lead to unexpected losses for you or your business.</p>
 
-        <h2 id="data-source-matters">Why the Data Source Matters</h2>
+        <h2 id="data-source-matters">Data Source: Where Do the Rates Come From?</h2>
         
-        <p>Not all "live" rates are created equal. The most accurate rates come directly from reliable financial data APIs that pull from major stock exchanges and interbank quotes. Tools that scrape or rely on peer-to-peer data can be wildly inaccurate.</p>
+        <p>Always question the source. The best, most accurate rates come from trusted financial data providers who pull from major stock exchanges. Free tools that rely on "scraping" or unreliable sources will often give you wrong numbers.</p>
 
-        <p>When using any currency converter, always check their data source and update frequency. A lack of transparency here is a major red flag.</p>
+        <p class="text-indigo-600 dark:text-indigo-400 font-semibold mt-4">If a tool doesn't clearly show when the rate was last updated, be careful! That lack of transparency is a risk.</p>
 
-        <h2 id="utilitykit-approach">UtilityKit's Approach to Currency Data</h2>
+        <h2 id="utilitykit-approach">How UtilityKit Handles Currency Data</h2>
         
-        <p>Because accurate currency conversion requires external, real-time data, this is the one tool on UtilityKit that relies on a secure, server-side data call (not client-side processing). However, we prioritize a few key factors:</p>
+        <p>Since currency rates must be pulled from the market, our Currency Converter is the only tool that needs a secure server call. We ensure accuracy by:</p>
         
-        <ol>
-            <li>**Rate Credibility:** We partner with high-quality, widely-trusted financial data providers to ensure the rates are as close to live market data as possible.</li>
-            <li>**Transparency:** We display the time the data was last updated, allowing you to gauge the rate's freshness before making any critical decision.</li>
-        </ol>
+        <ul>
+            <li>**Using High-Quality Sources:** We partner with well-known financial APIs for reliable rates.</li>
+            <li>**Showing Update Time:** We always show you the exact time the rate was last updated.</li>
+        </ul>
         
-        <p class="text-indigo-600 dark:text-indigo-400 font-semibold mt-4">For mission-critical financial transactions, always confirm the final rate directly with your bank or payment institution. Use online converters as reliable estimates, not final guarantees.</p>
+        <p>Remember: Always use online converters as reliable estimates. For important business deals, confirm the final rate directly with your bank or payment institution.</p>
 
+      </article>
+
+      <!-- Article 6: Lossless vs. Lossy (New Article) -->
+      <article id="lossless-lossy-compression" class="article-content bg-white dark:bg-slate-800 rounded-3xl p-8 sm:p-12 shadow-2xl mt-8 hidden">
+        <h1 class="text-5xl font-extrabold mb-8 text-slate-900 dark:text-white">Lossless vs. Lossy: The Two Ways to Shrink a File</h1>
+        
+        <p>When you use a compression tool to make a file smaller, the process falls into one of two categories: **lossless** or **lossy**. The choice determines whether you keep perfect quality or sacrifice it for size.</p>
+
+        <h2 id="lossless-compression">Lossless Compression (Perfect Quality)</h2>
+
+        <p>Lossless compression works like a perfect packing service. It finds redundant information in the file and replaces it with a shorter code, but without ever throwing away a single piece of original data.</p>
+        
+        <figure class="my-8 text-center">
+            
+            <figcaption class="text-sm text-slate-500 dark:text-slate-400 mt-2">Diagram showing a file being compressed and then perfectly restored, illustrating the concept of lossless data preservation.</figcaption>
+        </figure>
+
+        <p>When you decompress the file, it is an exact, bit-for-bit copy of the original. There is zero quality loss, but the size reduction is limited.</p>
+
+        <h3 id="lossless-formats">Common Lossless Formats:</h3>
+        <ul>
+            <li>**ZIP & GZIP:** Used for compressing documents and software packages.</li>
+            <li>**PNG:** Used for images, especially graphics and logos with sharp edges.</li>
+            <li>**FLAC:** Used for high-quality audio.</li>
+        </ul>
+
+        <h2 id="lossy-compression">Lossy Compression (Smaller Size)</h2>
+
+        <p>Lossy compression permanently removes data that the human eye or ear is least likely to notice. This allows for much smaller file sizes, but the quality is irreversibly reduced.</p>
+
+        <figure class="my-8 text-center">
+            
+            <figcaption class="text-sm text-slate-500 dark:text-slate-400 mt-2">Diagram showing a file being compressed with some data permanently discarded, illustrating the lossy compression trade-off.</figcaption>
+        </figure>
+
+        <p>This method is essential for the internet because it lets us transfer large photos and videos quickly. The key is finding the balance between size reduction and acceptable quality.</p>
+
+        <h3 id="lossy-formats">Common Lossy Formats:</h3>
+        <ul>
+            <li>**JPEG:** Used for photographs. You set a quality level (e.g., 80%) to determine how much data is discarded.</li>
+            <li>**MP3:** Used for music. It throws away inaudible frequencies to achieve huge size reductions.</li>
+            <li>**MPEG/H.264:** Used for video.</li>
+        </ul>
+        
+        <h2 id="utilitykit-choice">The UtilityKit Compression Philosophy</h2>
+        <p>UtilityKit's compression tools give you the control to choose. For documents (like PDFs), we primarily aim for efficient **lossless** size reduction. For images, we allow you to fine-tune the **lossy** quality settings to achieve the perfect balance of small file size and high visual clarity.</p>
+      </article>
+
+      <!-- Article 7: Raster vs. Vector (New Article) -->
+      <article id="raster-vector" class="article-content bg-white dark:bg-slate-800 rounded-3xl p-8 sm:p-12 shadow-2xl mt-8 hidden">
+        <h1 class="text-5xl font-extrabold mb-8 text-slate-900 dark:text-white">Raster vs. Vector: When to use Pixels or Paths</h1>
+        
+        <p>Every digital image is either a **raster** or a **vector** file. Understanding the difference is crucial for anyone who works with graphics, logos, or web design, as it determines how big you can make an image before it breaks.</p>
+
+        <h2 id="raster-graphics-pixels">Raster Graphics (The Pixel Map)</h2>
+
+        <p>Raster graphics are built on a fixed grid of tiny squares called **pixels**. Every pixel is assigned a color, and the image is essentially a map of all those colors.</p>
+        
+        <figure class="my-8 text-center">
+            
+            <figcaption class="text-sm text-slate-500 dark:text-slate-400 mt-2">Magnified view showing a raster image's edge composed of distinct, colored pixels, illustrating resolution dependency.</figcaption>
+        </figure>
+
+        <h3 id="raster-pros-cons">Pros and Cons:</h3>
+        <ul>
+            <li>**Pros:** Can handle extreme detail, complex shading, and realistic photographs.</li>
+            <li>**Cons:** They are **resolution-dependent**. If you try to scale a raster image up too much, the pixels become visible, and the image looks blurry or "pixelated."</li>
+        </ul>
+
+        <h3 id="raster-formats">Common Raster Formats:</h3>
+        <ul>
+            <li>JPEG, PNG, GIF, TIFF, BMP.</li>
+        </ul>
+
+        <h2 id="vector-graphics-math">Vector Graphics (The Mathematical Path)</h2>
+
+        <p>Vector graphics are not made of pixels. They are made of mathematical equations—lines, curves, and shapes defined by points. Instead of storing a color for every dot, the file stores instructions: "Draw a red circle with a radius of 50 units."</p>
+
+        <figure class="my-8 text-center">
+            [Image of Vector Graphics Scaling Example]
+            <figcaption class="text-sm text-slate-500 dark:text-slate-400 mt-2">Diagram showing a vector image (like a logo) being scaled from small to very large without any loss of sharpness or quality.</figcaption>
+        </figure>
+
+        <h3 id="vector-pros-cons">Pros and Cons:</h3>
+        <ul>
+            <li>**Pros:** They are **resolution-independent**. You can scale a vector image to the size of a billboard or shrink it down to a favicon, and it will remain perfectly sharp.</li>
+            <li>**Cons:** Cannot easily display complex photographic detail or gradients.</li>
+        </ul>
+
+        <h3 id="vector-formats">Common Vector Formats:</h3>
+        <ul>
+            <li>SVG (Scalable Vector Graphics), AI (Adobe Illustrator), EPS.</li>
+        </ul>
+        
+        <h2 id="when-to-choose">When to Choose Which</h2>
+        
+        <p>The rule of thumb is:</p>
+        <p class="text-green-600 dark:text-green-400 font-semibold mt-2">**Vector:** Use for logos, icons, text, and anything that needs to be scaled (SVG is the vector standard for the web).</p>
+        <p class="text-red-600 dark:text-red-400 font-semibold mt-2">**Raster:** Use for photographs, complex artwork, and anything captured by a camera (JPEG and WebP are the standards).</p>
       </article>
 
     </main>
@@ -280,10 +467,15 @@
     // Article Navigation Logic
     document.addEventListener('DOMContentLoaded', () => {
       const articleNav = document.getElementById('article-nav');
+      // Updated articles list to include all 7 articles
       const articles = {
         'client-side-utility': document.getElementById('client-side-utility'),
+        'password-entropy': document.getElementById('password-entropy'),
         'webp-jpeg-guide': document.getElementById('webp-jpeg-guide'),
+        'timestamps-explained': document.getElementById('timestamps-explained'),
         'currency-costs': document.getElementById('currency-costs'),
+        'lossless-lossy-compression': document.getElementById('lossless-lossy-compression'),
+        'raster-vector': document.getElementById('raster-vector'),
       };
       
       const updateContentVisibility = (hash) => {
