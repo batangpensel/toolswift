@@ -19,68 +19,7 @@
   "featureList": "Base64 Encoder, Base64 Decoder"
 }
 </script>
-  <!-- BEGIN: AdSense Privacy & Consent (MANDATORY for GDPR/CCPA) -->
-
-  <!-- 1. Google CMP (Funding Choices) Script -->
-  <!-- This script loads the consent dialogue. Replace 'ca-pub-0000000000000000' with your Publisher ID -->
-  <script async src="https://fundingchoicesmessages.google.com/i/pub-2884780611077861?hl=en"></script>
-  <script>
-    (function(){
-      var w=window;
-      if(w.CmpApi)return;
-      w.CmpApi=function(c,l,a,i){w.gmc_p_f=w.gmc_p_f||[];w.gmc_p_f.push([c,l,a,i]);};
-      w.CmpApi('setUiCallback', function(e){
-        if(e.type === 'SHOW') document.documentElement.classList.add('overflow-hidden');
-        if(e.type === 'HIDE') document.documentElement.classList.remove('overflow-hidden');
-      });
-    })();
-  </script>
-
-  <!-- 2. CCPA Privacy Configuration Script (__uspapi) -->
-  <script>
-    (function(){
-      function signalGoogleIframe() {
-        if (!window.frames['__uspapi_iframe']) {
-          var iframe = document.createElement('iframe');
-          iframe.setAttribute('style', 'display:none;');
-          iframe.setAttribute('id', '__uspapi_iframe');
-          iframe.setAttribute('name', '__uspapi_iframe');
-          document.body.appendChild(iframe);
-        }
-      }
-      if(typeof window.__uspapi === 'undefined') {
-        window.__uspapi = function() {
-          var args = arguments;
-          if (typeof window.__uspapi.stub === 'undefined') {
-            window.__uspapi.stub = [];
-          }
-          window.__uspapi.stub.push(args);
-        }
-      }
-      var ccpaCall = ['getUSPData', 1, function(data, success) {
-        if (success) {
-          if (data && data.hasOwnProperty('uspString')) {
-            window.__uspapi('setCfg', 1, {
-              uspString: data.uspString,
-              shouldEnforceSettings: false
-            });
-          }
-        }
-      }];
-      window.addEventListener('message', function(e) {
-        if (e.data && e.data.__cmpCall) {
-          e.data.__cmpCall(ccpaCall);
-        }
-      }, false);
-      signalGoogleIframe();
-    })();
-  </script>
-
-  <!-- 3. Google AdSense Auto Ads Script -->
-  <!-- IMPORTANT: Replace 'ca-pub-0000000000000000' with your Publisher ID -->
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=pub-2884780611077861" crossorigin="anonymous"></script>
-
-  <!-- END: AdSense Privacy & Consent -->
+ 
   <!-- Adsense Start -->
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2884780611077861"
      crossorigin="anonymous"></script>
