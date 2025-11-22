@@ -19,438 +19,441 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <style>
-    .article-link.active {
-      @apply bg-indigo-100 dark:bg-slate-700 font-semibold text-indigo-700 dark:text-indigo-300 border-indigo-500;
+    /* Scroll Progress Bar */
+    #progress-bar {
+      width: 0%;
+      height: 4px;
+      background: linear-gradient(to right, #4f46e5, #9333ea);
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 100;
+      transition: width 0.1s;
     }
+
+    /* Sidebar Links */
     .article-link {
-      @apply block p-3 rounded-xl transition-colors text-slate-700 dark:text-slate-300 border-l-4 border-transparent hover:bg-slate-100 dark:hover:bg-slate-800;
+      transition: all 0.3s ease;
     }
-    /* Style for the bolded title in the nav link */
-    .article-link .title-text {
-        @apply font-bold;
+    .article-link:hover {
+      transform: translateX(4px);
+    }
+    .article-link.active {
+      @apply bg-indigo-50 dark:bg-slate-800/80 border-l-4 border-indigo-600;
+    }
+    .article-link.active .title-text {
+      @apply text-indigo-700 dark:text-indigo-400;
+    }
+    .article-link.active .meta-text {
+      @apply text-indigo-500 dark:text-indigo-500;
+    }
+
+    /* Typography & Content Styling */
+    .article-content h1 {
+      @apply text-4xl md:text-5xl font-black mb-6 text-slate-900 dark:text-white tracking-tight leading-tight;
     }
     .article-content h2 {
-      @apply text-3xl font-bold mt-8 mb-4 border-b pb-2 border-slate-200 dark:border-slate-700;
+      @apply text-2xl md:text-3xl font-bold mt-12 mb-6 text-slate-800 dark:text-slate-100 relative inline-block;
     }
+    /* Decorative underline for H2 */
+    .article-content h2::after {
+        content: '';
+        display: block;
+        width: 40px;
+        height: 4px;
+        background: #6366f1; /* Indigo-500 */
+        margin-top: 8px;
+        border-radius: 2px;
+    }
+
     .article-content h3 {
-      @apply text-2xl font-semibold mt-6 mb-3 text-indigo-600 dark:text-indigo-400;
+      @apply text-xl md:text-2xl font-semibold mt-8 mb-4 text-indigo-600 dark:text-indigo-400;
     }
-    .article-content p, .article-content ul, .article-content ol {
-      @apply mb-4 leading-relaxed text-lg text-slate-700 dark:text-slate-300;
+    
+    /* Body Text - Optimized for Reading */
+    .article-content p {
+      @apply mb-6 text-lg leading-8 text-slate-600 dark:text-slate-300 font-normal;
     }
-    .article-content ul, .article-content ol {
-      @apply list-disc list-inside ml-4;
+    
+    /* Lists */
+    .article-content ul {
+      @apply list-none mb-8 space-y-3;
     }
+    .article-content ul li {
+      @apply relative pl-8 text-lg text-slate-600 dark:text-slate-300 leading-8;
+    }
+    .article-content ul li::before {
+      content: '➔';
+      @apply absolute left-0 text-indigo-500 font-bold;
+    }
+
     .article-content ol {
-        @apply list-decimal;
+      @apply list-decimal list-outside ml-6 mb-8 space-y-3 text-lg text-slate-600 dark:text-slate-300 leading-8 marker:text-indigo-600 marker:font-bold;
     }
+
+    /* Code Blocks */
     .article-content code {
-      @apply bg-slate-200 dark:bg-slate-800 text-sm p-1 rounded-md;
+      @apply bg-slate-100 dark:bg-slate-700 text-pink-600 dark:text-pink-400 px-2 py-1 rounded font-mono text-sm border border-slate-200 dark:border-slate-600;
+    }
+
+    /* Key Takeaway Box */
+    .takeaway-box {
+      @apply bg-indigo-50 dark:bg-slate-800/50 border-l-4 border-indigo-500 p-6 my-8 rounded-r-xl;
+    }
+    .takeaway-box h4 {
+      @apply text-indigo-700 dark:text-indigo-300 font-bold uppercase text-xs tracking-wider mb-2;
+    }
+    .takeaway-box p {
+      @apply mb-0 text-slate-700 dark:text-slate-200 italic;
     }
   </style>
 </head>
-<body class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 dark:from-slate-950 dark:to-slate-900 min-h-screen">
+<body class="bg-slate-50 dark:bg-slate-950 min-h-screen flex flex-col">
 
-  <!-- Header (Copied from your index.html) -->
-  <header class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-lg sticky top-0 z-50">
+  <!-- Scroll Progress Bar -->
+  <div id="progress-bar"></div>
+
+  <!-- Header -->
+  <header class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-sm sticky top-0 z-50 border-b border-slate-200 dark:border-slate-800">
     <div class="container mx-auto px-6 py-4 max-w-7xl flex justify-between items-center">
-      <a href="index.html" class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600">
-        UtilityKit
+      <a href="index.html" class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 tracking-tighter">
+        UtilityKit<span class="text-slate-400 font-light text-lg ml-2 hidden sm:inline">/ Insights</span>
       </a>
-      <nav class="space-x-4 flex items-center">
-        <a href="index.html" class="nav-link text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 p-2 rounded-lg transition-colors">Tools</a>
-        <a href="articles.html" class="nav-link text-slate-700 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 p-2 rounded-lg transition-colors">Articles</a>
+      <nav class="space-x-2 flex items-center">
+        <a href="index.html" class="nav-link text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 px-3 py-2 rounded-lg transition-colors">Tools</a>
+        <a href="articles.html" class="nav-link text-sm font-medium bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300 px-3 py-2 rounded-lg transition-colors">Articles</a>
         <!-- Dark Mode Toggle -->
-        <button id="theme-toggle" class="p-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:ring-2 ring-indigo-500 transition-all">
-          <i class="fa-solid fa-moon text-lg" id="theme-icon"></i>
+        <button id="theme-toggle" class="ml-2 p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 transition-all">
+          <i class="fa-solid fa-moon" id="theme-icon"></i>
         </button>
       </nav>
     </div>
   </header>
 
-  <!-- Main Content Layout -->
-  <div class="container mx-auto px-6 py-12 max-w-7xl grid grid-cols-1 lg:grid-cols-4 gap-12">
+  <!-- Main Layout -->
+  <div class="container mx-auto px-4 sm:px-6 py-12 max-w-7xl flex-grow">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
 
-    <!-- Sidebar Navigation (Col 1) -->
-    <aside class="lg:col-span-1">
-      <div class="sticky top-24 p-6 bg-white dark:bg-slate-900 rounded-3xl shadow-xl">
-        <h2 class="text-2xl font-bold mb-6 text-indigo-700 dark:text-indigo-300">Articles</h2>
-        <nav class="space-y-2" id="article-nav">
-          <a href="#client-side-utility" class="article-link active" data-article="client-side-utility">
-            <span class="text-sm font-light text-slate-500 dark:text-slate-400 block">Tech Philosophy</span>
-            <span class="title-text">Why Client-Side Processing is the Future</span>
-          </a>
-          <a href="#password-entropy" class="article-link" data-article="password-entropy">
-            <span class="text-sm font-light text-slate-500 dark:text-slate-400 block">Security Deep Dive</span>
-            <span class="title-text">Password Entropy: How Strong is Your Password?</span>
-          </a>
-          <a href="#webp-jpeg-guide" class="article-link" data-article="webp-jpeg-guide">
-            <span class="text-sm font-light text-slate-500 dark:text-slate-400 block">Image Formats</span>
-            <span class="title-text">WebP vs. JPEG: Choosing the Right Format</span>
-          </a>
-          <a href="#timestamps-explained" class="article-link" data-article="timestamps-explained">
-            <span class="text-sm font-light text-slate-500 dark:text-slate-400 block">Coding Basics</span>
-            <span class="title-text">Unix Timestamps Explained: The Universal Language of Time</span>
-          </a>
-          <a href="#currency-costs" class="article-link" data-article="currency-costs">
-            <span class="text-sm font-light text-slate-500 dark:text-slate-400 block">Data Privacy</span>
-            <span class="title-text">The Hidden Costs of Free Currency Converters</span>
-          </a>
-          <a href="#lossless-lossy-compression" class="article-link" data-article="lossless-lossy-compression">
-            <span class="text-sm font-light text-slate-500 dark:text-slate-400 block">Compression Science</span>
-            <span class="title-text">Lossless vs. Lossy: The Two Ways to Shrink a File</span>
-          </a>
-          <a href="#raster-vector" class="article-link" data-article="raster-vector">
-            <span class="text-sm font-light text-slate-500 dark:text-slate-400 block">Graphics Basics</span>
-            <span class="title-text">Raster vs. Vector: When to use Pixels or Paths</span>
-          </a>
-        </nav>
-      </div>
-    </aside>
-
-    <!-- Article Content (Col 2-4) -->
-    <main class="lg:col-span-3">
-      
-      <!-- Article 1: Client-Side Processing -->
-      <article class="bg-white dark:bg-slate-800 rounded-3xl p-8 sm:p-12 shadow-2xl article-content" id="client-side-utility">
-        <h1 class="text-5xl font-extrabold mb-8 text-slate-900 dark:text-white">Why Client-Side Processing is the Future of Utility</h1>
-
-        <p>Every time you use a tool online—like a password generator or an image converter—your data goes somewhere. With most tools, your files are sent to a distant computer (the server) for the work to be done. This is risky for privacy.</p>
-
-        <p>The tools on UtilityKit use **Client-Side Processing**. This is a major difference. It means the work is done entirely on your computer, inside your web browser. **Your data never leaves your device.**</p>
-
-        <h2 id="what-is-csp">What is Client-Side Processing?</h2>
-
-        <p>Think of it simply:</p>
-        
-        <figure class="my-8 text-center">
+      <!-- Left Sidebar (Navigation) -->
+      <aside class="lg:col-span-3 lg:sticky lg:top-24 self-start">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-800 overflow-hidden">
+          <div class="p-5 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
+            <h2 class="text-xs font-bold uppercase tracking-widest text-slate-500">Table of Contents</h2>
+          </div>
+          <nav class="p-2 space-y-1" id="article-nav">
+            <!-- Nav Items generated here -->
+            <a href="#client-side-utility" class="article-link block p-3 rounded-lg group active" data-article="client-side-utility">
+              <span class="meta-text text-xs font-semibold text-slate-400 uppercase mb-1 block transition-colors">Tech Philosophy</span>
+              <span class="title-text text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors leading-snug">Why Client-Side Processing is the Future</span>
+            </a>
             
-            <figcaption class="text-sm text-slate-500 dark:text-slate-400 mt-2">Diagram showing that Client-Side means data stays with you, Server-Side means data is sent away.</figcaption>
-        </figure>
+            <a href="#password-entropy" class="article-link block p-3 rounded-lg group" data-article="password-entropy">
+              <span class="meta-text text-xs font-semibold text-slate-400 uppercase mb-1 block transition-colors">Security</span>
+              <span class="title-text text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors leading-snug">Password Entropy: How Strong is Your Password?</span>
+            </a>
 
-        <ul>
-            <li>**Server-Side (Traditional):** You send file $\rightarrow$ Server processes file $\rightarrow$ Server sends results back.</li>
-            <li>**Client-Side (UtilityKit):** You open tool $\rightarrow$ Your browser processes file $\rightarrow$ You download results.</li>
-        </ul>
+            <a href="#webp-jpeg-guide" class="article-link block p-3 rounded-lg group" data-article="webp-jpeg-guide">
+              <span class="meta-text text-xs font-semibold text-slate-400 uppercase mb-1 block transition-colors">Optimization</span>
+              <span class="title-text text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors leading-snug">WebP vs. JPEG: Choosing the Right Format</span>
+            </a>
 
-        <p>The server is only used once: to send the tool's code (HTML/JavaScript) to your browser. After that, your device does all the work itself.</p>
+            <a href="#timestamps-explained" class="article-link block p-3 rounded-lg group" data-article="timestamps-explained">
+              <span class="meta-text text-xs font-semibold text-slate-400 uppercase mb-1 block transition-colors">Coding Basics</span>
+              <span class="title-text text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors leading-snug">Unix Timestamps Explained</span>
+            </a>
 
-        <h2 id="privacy-advantage">Reason 1: Total Privacy and Security</h2>
+            <a href="#currency-costs" class="article-link block p-3 rounded-lg group" data-article="currency-costs">
+              <span class="meta-text text-xs font-semibold text-slate-400 uppercase mb-1 block transition-colors">Finance Data</span>
+              <span class="title-text text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors leading-snug">The Hidden Costs of Free Converters</span>
+            </a>
 
-        <p>Privacy is the biggest advantage. When a tool uses a server, the owner temporarily has a copy of your personal data or files. Even if they promise to delete it, the data was still transferred over the internet.</p>
+            <a href="#lossless-lossy-compression" class="article-link block p-3 rounded-lg group" data-article="lossless-lossy-compression">
+                <span class="meta-text text-xs font-semibold text-slate-400 uppercase mb-1 block transition-colors">Compression</span>
+                <span class="title-text text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors leading-snug">Lossless vs. Lossy Compression</span>
+              </a>
+  
+            <a href="#raster-vector" class="article-link block p-3 rounded-lg group" data-article="raster-vector">
+              <span class="meta-text text-xs font-semibold text-slate-400 uppercase mb-1 block transition-colors">Graphics</span>
+              <span class="title-text text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors leading-snug">Raster vs. Vector Graphics</span>
+            </a>
+          </nav>
+        </div>
+      </aside>
 
-        <p>Client-side processing completely eliminates this risk:</p>
-
-        <ul>
-            <li>**No Uploads:** Your files are never sent over the internet to us.</li>
-            <li>**No Storage:** Your data is never saved on UtilityKit's servers or any external cloud.</li>
-            <li>**Zero Logs:** There is no record of what files you processed because our server wasn't involved in the work.</li>
-        </ul>
-
-        <p>Your data is protected by your own browser, not by our policy.</p>
-
-        <h2 id="speed-efficiency">Reason 2: Lightning-Fast Speed</h2>
-
-        <p>For large files, client-side tools are much faster because they cut out two slow, mandatory steps of the internet:</p>
-
-        <h3 id="server-side-steps">Traditional (Server-Side) Steps:</h3>
-        <ol>
-            <li>**Slow Upload:** Sending your file (could be huge) from your computer to the server.</li>
-            <li>**Slow Download:** Waiting for the processed file to be sent back to you.</li>
-        </ol>
-
-        <h3 id="client-side-steps">Client-Side Steps:</h3>
-        <ol>
-            <li>**Instant Processing:** Your fast modern device processes the file instantly.</li>
-            <li>**Local Save:** The file is saved directly back to your device.</li>
-        </ol>
-
-        <p>For anyone with slow internet, or for people who handle large files (like high-res images or PDFs), skipping the upload and download saves a huge amount of time.</p>
-
-        <h2 id="future-private-fast">The Future is Private and Fast</h2>
-
-        <p>Choosing client-side tools is a choice to keep your data local, secure, and entirely in your own hands. UtilityKit is committed to this standard, ensuring every tool you use gives you both speed and privacy.</p>
-
-      </article>
-
-      <!-- Article 2: Password Entropy -->
-      <article id="password-entropy" class="article-content bg-white dark:bg-slate-800 rounded-3xl p-8 sm:p-12 shadow-2xl mt-8 hidden">
-        <h1 class="text-5xl font-extrabold mb-8 text-slate-900 dark:text-white">Password Entropy: How Strong is Your Password?</h1>
+      <!-- Center Content (The Article) -->
+      <main class="lg:col-span-9">
         
-        <p>Do you know how long it would take a hacker to guess your password? This isn't just about length; it's about **Entropy**, which is the mathematical way to measure a password's strength and how hard it is to crack.</p>
+        <!-- Article 1 -->
+        <article id="client-side-utility" class="article-content bg-white dark:bg-slate-900 rounded-3xl p-8 md:p-12 shadow-xl border border-slate-100 dark:border-slate-800">
+            <!-- Meta Header -->
+            <div class="flex items-center gap-4 mb-8 text-sm">
+                <span class="bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300 px-3 py-1 rounded-full font-bold">Tech Philosophy</span>
+                <span class="text-slate-400"><i class="fa-regular fa-clock mr-1"></i> 3 min read</span>
+            </div>
 
-        <h2 id="what-is-entropy">Understanding Password Strength</h2>
-        
-        <p>Entropy is measured in **bits**. A higher bit number means a stronger password. The calculation is based on two main things:</p>
-        
-        <figure class="my-8 text-center">
+            <h1>Why Client-Side Processing is the Future of Utility</h1>
             
-            <figcaption class="text-sm text-slate-500 dark:text-slate-400 mt-2">Diagram showing how the number of characters and character types (charset) combine to determine password entropy.</figcaption>
-        </figure>
+            <p class="text-xl text-slate-500 dark:text-slate-400 font-light leading-relaxed mb-10 border-b border-slate-100 dark:border-slate-800 pb-10">
+                Every time you use a tool online—like a password generator or an image converter—your data goes somewhere. With UtilityKit, we're changing that paradigm.
+            </p>
 
-        <ol>
-            <li>**The Length (L):** How many characters your password has.</li>
-            <li>**The Character Set Size (R):** How many different types of characters you use (numbers, lowercase, uppercase, symbols).</li>
-        </ol>
+            <p>Most online tools send your files to a distant computer (the server) for the work to be done. This is risky for privacy. The tools on UtilityKit use <strong>Client-Side Processing</strong>. This is a major difference. It means the work is done entirely on your computer, inside your web browser.</p>
 
-        <h3 id="the-charset-rule">The Character Set Rule (R)</h3>
-        <p>Using more types of characters quickly increases the complexity of the password, making it much harder to guess:</p>
-        <ul>
-            <li>**Numbers Only (0-9):** Character set size (R) is 10.</li>
-            <li>**Lowercase Letters + Numbers (a-z, 0-9):** Character set size (R) is $26 + 10 = 36$.</li>
-            <li>**All Four Types (A-Z, a-z, 0-9, Symbols):** Character set size (R) is about $26 + 26 + 10 + 32 = 94$.</li>
-        </ul>
+            <div class="takeaway-box">
+                <h4>Key Takeaway</h4>
+                <p>Client-Side processing guarantees that your data never leaves your device. It eliminates upload times and ensures zero risk of data leaks.</p>
+            </div>
 
-        <h2 id="best-practices">How to Create an Unbreakable Password</h2>
-
-        <p>The best way to increase your password's strength is to focus on **length**. Entropy increases very quickly as you add more characters.</p>
-
-        <ul>
-            <li>**Aim for 16 Characters:** An 8-character password using all four types might be cracked in hours. A 16-character password using the same complexity might take thousands of years.</li>
-            <li>**Use a Password Manager:** Don't try to remember long, complex passwords. Use a secure manager to store and generate them for you.</li>
-            <li>**Use Symbols and Numbers:** Always mix in symbols and numbers to increase your character set size (R).</li>
-            <li>**Never Reuse:** Use a unique password for every single account you have.</li>
-        </ul>
-        
-        <p>UtilityKit's Password Generator uses these principles to create random, high-entropy passwords, ensuring your online accounts are as safe as possible.</p>
-      </article>
-
-      <!-- Article 3: WebP vs. JPEG -->
-      <article id="webp-jpeg-guide" class="article-content bg-white dark:bg-slate-800 rounded-3xl p-8 sm:p-12 shadow-2xl mt-8 hidden">
-        <h1 class="text-5xl font-extrabold mb-8 text-slate-900 dark:text-white">WebP vs. JPEG: Choosing the Right Image Format</h1>
-        
-        <p>The image format you choose directly impacts how fast your website loads. When pages load slowly, people leave. While JPEG has been the most common choice for years, a newer format called WebP is much better for the modern web.</p>
-
-        <h2 id="the-classic-jpeg">JPEG: The Older Format</h2>
-        
-        <p>JPEG is great for detailed, colorful photos. The problem is that it uses **lossy compression**. This means when you make the file smaller, it permanently throws away some image data to shrink the size. This can hurt quality, and the final file size is still often too big.</p>
-
-        <ul>
-            <li>**Best For:** Complex, real-world photographs.</li>
-            <li>**The Downsides:** Large file sizes and does not support transparency (clear backgrounds).</li>
-        </ul>
-
-        <h2 id="the-modern-standard-webp">WebP: The New Standard</h2>
-        
-        <p>WebP was created by Google to fix the problems with JPEG. It is the best modern format designed specifically to load fast on the internet. It can make files $25\%$ to $35\%$ smaller than an identical JPEG or PNG image.</p>
-
-        <ul>
-            <li>**Key Advantages:**
-                <ul>
-                    <li>**Smaller Size:** Reduces file size dramatically without losing much quality.</li>
-                    <li>**Transparency:** Supports clear backgrounds (like PNG).</li>
-                    <li>**Wide Support:** Works in all modern web browsers (Chrome, Firefox, Edge, Safari).</li>
-                </ul>
-            </li>
-        </ul>
-
-        <h2 id="when-to-use-which">Which Format Should You Use?</h2>
-        
-        <p>For maximum speed and quality, the choice is simple:</p>
-
-        <h3 id="use-webp">Use WebP for Almost Everything</h3>
-        <p class="text-green-600 dark:text-green-400 font-semibold mt-2">**Use Cases:** All website logos, product photos, graphics, and background images.</p>
-
-        <h3 id="use-jpeg">Keep JPEG for Very Old Systems</h3>
-        <p>Only use JPEG if you absolutely must support very old computers or software that can't handle WebP.</p>
-        <p class="text-red-600 dark:text-red-400 font-semibold mt-2">**Use Cases:** Documents or older email systems where image format support is unpredictable.</p>
-        
-        <h2 id="webp-in-utilitykit">Optimizing with UtilityKit</h2>
-        <p>UtilityKit's Image Toolkit lets you convert all your existing images to WebP right in your browser. This gives you the speed benefit of WebP without ever uploading your files to a server, keeping your workflow private and fast.</p>
-
-      </article>
-      
-      <!-- Article 4: Unix Timestamps -->
-      <article id="timestamps-explained" class="article-content bg-white dark:bg-slate-800 rounded-3xl p-8 sm:p-12 shadow-2xl mt-8 hidden">
-        <h1 class="text-5xl font-extrabold mb-8 text-slate-900 dark:text-white">Unix Timestamps Explained: The Universal Language of Time</h1>
-        
-        <p>If you've ever looked at log files, database entries, or code, you've probably seen a Unix timestamp. It's a simple, long number like <code>1672531200</code>. It looks like nonsense, but it's actually the most precise and universal way computers measure time.</p>
-
-        <h2 id="what-is-a-unix-timestamp">What is This Number?</h2>
-        
-        <p>A Unix timestamp is simply the total number of seconds that have passed since a specific starting point called the **Epoch**. Everything is counted from that one moment:</p>
-        
-        <ul>
-            <li>**The Epoch:** January 1, 1970, at 00:00:00 Coordinated Universal Time (UTC).</li>
-            <li>**The Count:** Every second since that time is added up and stored as the timestamp number.</li>
-        </ul>
-
-        <p>For example, the number <code>1672531200</code> means exactly $1,672,531,200$ seconds have passed since the Epoch, which translates to January 1, 2023, 00:00:00 UTC.</p>
-
-        <h2 id="why-do-computers-use-it">Why Computers Love Timestamps</h2>
-        
-        <p>Why use a long number instead of a simple date like "Dec 31, 2022"? Timestamps solve the massive problem of time zones and daylight savings.</p>
-
-        <h3 id="no-time-zone-problems">No Time Zone Problems</h3>
-        <p>If you use a traditional date format, "10:00 AM on Monday" is different in London, New York, and Sydney. The Unix timestamp always refers to the same universal second, no matter where you are in the world. When your computer converts it back to local time, it applies your time zone correctly.</p>
-
-        <h3 id="easy-to-sort-and-compare">Easy to Sort and Compare</h3>
-        <p>Since the timestamp is a simple counting number, it's very easy for databases and code to sort and compare. A bigger number always means a later time. Trying to sort a list of dates written as strings ("January," "February," etc.) is much harder.</p>
-
-        <h2 id="the-year-2038-problem">The Year 2038 Problem</h2>
-        
-        <p>You may hear about the "Year 2038 Problem." This is the point when the 32-bit timestamp number will become too large to store, causing older systems to break. This will happen on January 19, 2038. Luckily, most modern systems use a 64-bit number, which delays the next potential problem for billions of years!</p>
-        
-        <p>UtilityKit's Timestamp tool helps you easily convert these long numbers to human-readable dates and back again, ensuring you always know exactly when an event happened.</p>
-      </article>
-
-      <!-- Article 5: Currency Converters -->
-      <article id="currency-costs" class="article-content bg-white dark:bg-slate-800 rounded-3xl p-8 sm:p-12 shadow-2xl mt-8 hidden">
-        <h1 class="text-5xl font-extrabold mb-8 text-slate-900 dark:text-white">The Hidden Costs of Free Currency Converters</h1>
-        
-        <p>We all need fast currency conversion, but many "free" online tools have hidden costs that aren't money-related. These costs are paid in two ways: **bad data** and **delayed information**.</p>
-
-        <p>If you use a bad rate for a business transaction, you could lose money. Here's what you need to watch out for.</p>
-
-        <h2 id="the-cost-of-free-data">The "Cost" of Free Data: Latency</h2>
-        
-        <p>Currency exchange rates are always changing, minute by minute. A free converter often uses delayed data. This delay is called **Latency**.</p>
-
-        <h3 id="what-is-latency">Why Latency Happens in Free Tools:</h3>
-        
-        <ul>
-            <li>**End-of-Day Data:** The tool only updates rates once per day, based on the market closing price. This is completely inaccurate for real-time trading.</li>
-            <li>**Artificial Delays:** The data provider might only release rates every 15 or 30 minutes to free users, saving the truly "live" data for their paid customers (large banks).</li>
-        </ul>
-
-        <p>If you use a delayed rate for a big international payment, the bank's actual rate will be different, which can lead to unexpected losses for you or your business.</p>
-
-        <h2 id="data-source-matters">Data Source: Where Do the Rates Come From?</h2>
-        
-        <p>Always question the source. The best, most accurate rates come from trusted financial data providers who pull from major stock exchanges. Free tools that rely on "scraping" or unreliable sources will often give you wrong numbers.</p>
-
-        <p class="text-indigo-600 dark:text-indigo-400 font-semibold mt-4">If a tool doesn't clearly show when the rate was last updated, be careful! That lack of transparency is a risk.</p>
-
-        <h2 id="utilitykit-approach">How UtilityKit Handles Currency Data</h2>
-        
-        <p>Since currency rates must be pulled from the market, our Currency Converter is the only tool that needs a secure server call. We ensure accuracy by:</p>
-        
-        <ul>
-            <li>**Using High-Quality Sources:** We partner with well-known financial APIs for reliable rates.</li>
-            <li>**Showing Update Time:** We always show you the exact time the rate was last updated.</li>
-        </ul>
-        
-        <p>Remember: Always use online converters as reliable estimates. For important business deals, confirm the final rate directly with your bank or payment institution.</p>
-
-      </article>
-
-      <!-- Article 6: Lossless vs. Lossy (New Article) -->
-      <article id="lossless-lossy-compression" class="article-content bg-white dark:bg-slate-800 rounded-3xl p-8 sm:p-12 shadow-2xl mt-8 hidden">
-        <h1 class="text-5xl font-extrabold mb-8 text-slate-900 dark:text-white">Lossless vs. Lossy: The Two Ways to Shrink a File</h1>
-        
-        <p>When you use a compression tool to make a file smaller, the process falls into one of two categories: **lossless** or **lossy**. The choice determines whether you keep perfect quality or sacrifice it for size.</p>
-
-        <h2 id="lossless-compression">Lossless Compression (Perfect Quality)</h2>
-
-        <p>Lossless compression works like a perfect packing service. It finds redundant information in the file and replaces it with a shorter code, but without ever throwing away a single piece of original data.</p>
-        
-        <figure class="my-8 text-center">
+            <h2>What is Client-Side Processing?</h2>
+            <p>Think of it simply: The server is only used once to send the tool's code (HTML/JavaScript) to your browser. After that, your device does all the work itself.</p>
             
-            <figcaption class="text-sm text-slate-500 dark:text-slate-400 mt-2">Diagram showing a file being compressed and then perfectly restored, illustrating the concept of lossless data preservation.</figcaption>
-        </figure>
+            <ul>
+                <li><strong>Server-Side (Traditional):</strong> You send file &rarr; Server processes file &rarr; Server sends results back.</li>
+                <li><strong>Client-Side (UtilityKit):</strong> You open tool &rarr; Your browser processes file &rarr; You download results.</li>
+            </ul>
 
-        <p>When you decompress the file, it is an exact, bit-for-bit copy of the original. There is zero quality loss, but the size reduction is limited.</p>
+            <h2>Reason 1: Total Privacy</h2>
+            <p>Privacy is the biggest advantage. When a tool uses a server, the owner temporarily has a copy of your personal data or files. Client-side processing completely eliminates this risk:</p>
 
-        <h3 id="lossless-formats">Common Lossless Formats:</h3>
-        <ul>
-            <li>**ZIP & GZIP:** Used for compressing documents and software packages.</li>
-            <li>**PNG:** Used for images, especially graphics and logos with sharp edges.</li>
-            <li>**FLAC:** Used for high-quality audio.</li>
-        </ul>
+            <ul>
+                <li><strong>No Uploads:</strong> Your files are never sent over the internet.</li>
+                <li><strong>No Storage:</strong> Your data is never saved on external clouds.</li>
+                <li><strong>Zero Logs:</strong> There is no record of your activity.</li>
+            </ul>
 
-        <h2 id="lossy-compression">Lossy Compression (Smaller Size)</h2>
+            <h2>Reason 2: Lightning Speed</h2>
+            <p>For large files, client-side tools are much faster because they cut out the "Upload" and "Download" steps. Your modern device processor is powerful enough to handle complex tasks instantly.</p>
 
-        <p>Lossy compression permanently removes data that the human eye or ear is least likely to notice. This allows for much smaller file sizes, but the quality is irreversibly reduced.</p>
+            <!-- Call to Action Footer -->
+            <div class="mt-16 p-8 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 text-center">
+                <h3 class="!mt-0 !mb-2 !text-lg">Experience it yourself</h3>
+                <p class="!text-sm !mb-4">Try our PDF tools to see how fast local processing can be.</p>
+                <a href="pdf.html" class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-lg hover:shadow-indigo-500/30">
+                    Launch PDF Tools <i class="fa-solid fa-arrow-right ml-2"></i>
+                </a>
+            </div>
+        </article>
 
-        <figure class="my-8 text-center">
+        <!-- Article 2 -->
+        <article id="password-entropy" class="article-content bg-white dark:bg-slate-900 rounded-3xl p-8 md:p-12 shadow-xl border border-slate-100 dark:border-slate-800 hidden">
+            <div class="flex items-center gap-4 mb-8 text-sm">
+                <span class="bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-300 px-3 py-1 rounded-full font-bold">Security</span>
+                <span class="text-slate-400"><i class="fa-regular fa-clock mr-1"></i> 4 min read</span>
+            </div>
+
+            <h1>Password Entropy: How Strong is Your Password?</h1>
             
-            <figcaption class="text-sm text-slate-500 dark:text-slate-400 mt-2">Diagram showing a file being compressed with some data permanently discarded, illustrating the lossy compression trade-off.</figcaption>
-        </figure>
+            <p>Do you know how long it would take a hacker to guess your password? This isn't just about length; it's about <strong>Entropy</strong>, which is the mathematical way to measure a password's randomness.</p>
 
-        <p>This method is essential for the internet because it lets us transfer large photos and videos quickly. The key is finding the balance between size reduction and acceptable quality.</p>
+            <h2>Understanding Password Strength</h2>
+            <p>Entropy is measured in <strong>bits</strong>. A higher bit number means a stronger password. The calculation is based on two main things:</p>
 
-        <h3 id="lossy-formats">Common Lossy Formats:</h3>
-        <ul>
-            <li>**JPEG:** Used for photographs. You set a quality level (e.g., 80%) to determine how much data is discarded.</li>
-            <li>**MP3:** Used for music. It throws away inaudible frequencies to achieve huge size reductions.</li>
-            <li>**MPEG/H.264:** Used for video.</li>
-        </ul>
-        
-        <h2 id="utilitykit-choice">The UtilityKit Compression Philosophy</h2>
-        <p>UtilityKit's compression tools give you the control to choose. For documents (like PDFs), we primarily aim for efficient **lossless** size reduction. For images, we allow you to fine-tune the **lossy** quality settings to achieve the perfect balance of small file size and high visual clarity.</p>
-      </article>
+            <ol>
+                <li><strong>The Length (L):</strong> How many characters your password has.</li>
+                <li><strong>The Character Set Size (R):</strong> How many different types of characters you use (numbers, lowercase, uppercase, symbols).</li>
+            </ol>
 
-      <!-- Article 7: Raster vs. Vector (New Article) -->
-      <article id="raster-vector" class="article-content bg-white dark:bg-slate-800 rounded-3xl p-8 sm:p-12 shadow-2xl mt-8 hidden">
-        <h1 class="text-5xl font-extrabold mb-8 text-slate-900 dark:text-white">Raster vs. Vector: When to use Pixels or Paths</h1>
-        
-        <p>Every digital image is either a **raster** or a **vector** file. Understanding the difference is crucial for anyone who works with graphics, logos, or web design, as it determines how big you can make an image before it breaks.</p>
+            <div class="takeaway-box">
+                <h4>The Golden Rule</h4>
+                <p>Length beats complexity. A 16-character password made of random letters is often stronger than an 8-character password with symbols.</p>
+            </div>
 
-        <h2 id="raster-graphics-pixels">Raster Graphics (The Pixel Map)</h2>
+            <h2>The Character Set Math</h2>
+            <p>Using more types of characters quickly increases the complexity of the password, making it much harder to guess:</p>
+            <ul>
+                <li><strong>Numbers Only:</strong> 10 possibilities per character.</li>
+                <li><strong>Alphanumeric:</strong> 36 possibilities per character.</li>
+                <li><strong>Full ASCII:</strong> 94 possibilities per character.</li>
+            </ul>
 
-        <p>Raster graphics are built on a fixed grid of tiny squares called **pixels**. Every pixel is assigned a color, and the image is essentially a map of all those colors.</p>
-        
-        <figure class="my-8 text-center">
+            <h2>Best Practices</h2>
+            <ul>
+                <li><strong>Aim for 16+ Characters:</strong> This makes brute-force attacks mathematically impossible with current technology.</li>
+                <li><strong>Use a Password Manager:</strong> Don't rely on your brain. Machines are better at randomness.</li>
+                <li><strong>Never Reuse:</strong> A leak on one site shouldn't compromise your bank.</li>
+            </ul>
+
+             <!-- Call to Action Footer -->
+             <div class="mt-16 p-8 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 text-center">
+                <h3 class="!mt-0 !mb-2 !text-lg">Secure your accounts</h3>
+                <p class="!text-sm !mb-4">Generate a high-entropy password instantly.</p>
+                <a href="password.html" class="inline-block bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-lg hover:shadow-green-500/30">
+                    Open Password Generator <i class="fa-solid fa-key ml-2"></i>
+                </a>
+            </div>
+        </article>
+
+        <!-- Article 3 -->
+        <article id="webp-jpeg-guide" class="article-content bg-white dark:bg-slate-900 rounded-3xl p-8 md:p-12 shadow-xl border border-slate-100 dark:border-slate-800 hidden">
+            <div class="flex items-center gap-4 mb-8 text-sm">
+                <span class="bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-300 px-3 py-1 rounded-full font-bold">Optimization</span>
+                <span class="text-slate-400"><i class="fa-regular fa-clock mr-1"></i> 3 min read</span>
+            </div>
+
+            <h1>WebP vs. JPEG: Choosing the Right Image Format</h1>
             
-            <figcaption class="text-sm text-slate-500 dark:text-slate-400 mt-2">Magnified view showing a raster image's edge composed of distinct, colored pixels, illustrating resolution dependency.</figcaption>
-        </figure>
+            <p>The image format you choose directly impacts how fast your website loads. While JPEG has been the king for decades, a newer challenger called WebP is taking over the web.</p>
 
-        <h3 id="raster-pros-cons">Pros and Cons:</h3>
-        <ul>
-            <li>**Pros:** Can handle extreme detail, complex shading, and realistic photographs.</li>
-            <li>**Cons:** They are **resolution-dependent**. If you try to scale a raster image up too much, the pixels become visible, and the image looks blurry or "pixelated."</li>
-        </ul>
+            <h2>JPEG: The Old Standard</h2>
+            <p>JPEG is great for photographs, but it uses outdated compression algorithms. It often results in larger file sizes and does not support transparency (clear backgrounds), which limits design flexibility.</p>
 
-        <h3 id="raster-formats">Common Raster Formats:</h3>
-        <ul>
-            <li>JPEG, PNG, GIF, TIFF, BMP.</li>
-        </ul>
+            <h2>WebP: The Modern Champion</h2>
+            <p>WebP was created by Google specifically for the web. It uses predictive coding to compress images more efficiently.</p>
 
-        <h2 id="vector-graphics-math">Vector Graphics (The Mathematical Path)</h2>
+            <ul>
+                <li><strong>Smaller Size:</strong> Typically 25-35% smaller than JPEGs of the same quality.</li>
+                <li><strong>Transparency:</strong> Supports alpha channels (like PNG) but with much smaller file sizes.</li>
+                <li><strong>Versatility:</strong> Can be both lossy (like JPEG) and lossless (like PNG).</li>
+            </ul>
 
-        <p>Vector graphics are not made of pixels. They are made of mathematical equations—lines, curves, and shapes defined by points. Instead of storing a color for every dot, the file stores instructions: "Draw a red circle with a radius of 50 units."</p>
+            <div class="takeaway-box">
+                <h4>Recommendation</h4>
+                <p>Use WebP for everything on the web. Only use JPEG if you need to support extremely old software (e.g., older than 2015).</p>
+            </div>
 
-        <figure class="my-8 text-center">
-            [Image of Vector Graphics Scaling Example]
-            <figcaption class="text-sm text-slate-500 dark:text-slate-400 mt-2">Diagram showing a vector image (like a logo) being scaled from small to very large without any loss of sharpness or quality.</figcaption>
-        </figure>
+            <!-- Call to Action Footer -->
+            <div class="mt-16 p-8 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 text-center">
+                <h3 class="!mt-0 !mb-2 !text-lg">Optimize your site</h3>
+                <p class="!text-sm !mb-4">Convert PNGs and JPEGs to WebP instantly.</p>
+                <a href="image.html" class="inline-block bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-lg hover:shadow-pink-500/30">
+                    Open Image Converter <i class="fa-solid fa-image ml-2"></i>
+                </a>
+            </div>
+        </article>
 
-        <h3 id="vector-pros-cons">Pros and Cons:</h3>
-        <ul>
-            <li>**Pros:** They are **resolution-independent**. You can scale a vector image to the size of a billboard or shrink it down to a favicon, and it will remain perfectly sharp.</li>
-            <li>**Cons:** Cannot easily display complex photographic detail or gradients.</li>
-        </ul>
+        <!-- Article 4 -->
+        <article id="timestamps-explained" class="article-content bg-white dark:bg-slate-900 rounded-3xl p-8 md:p-12 shadow-xl border border-slate-100 dark:border-slate-800 hidden">
+             <div class="flex items-center gap-4 mb-8 text-sm">
+                <span class="bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 px-3 py-1 rounded-full font-bold">Coding Basics</span>
+                <span class="text-slate-400"><i class="fa-regular fa-clock mr-1"></i> 2 min read</span>
+            </div>
+            <h1>Unix Timestamps Explained</h1>
+            <p>If you've ever looked at database entries, you've likely seen a number like <code>1672531200</code>. This is a Unix Timestamp, the heartbeat of modern computing timekeeping.</p>
 
-        <h3 id="vector-formats">Common Vector Formats:</h3>
-        <ul>
-            <li>SVG (Scalable Vector Graphics), AI (Adobe Illustrator), EPS.</li>
-        </ul>
-        
-        <h2 id="when-to-choose">When to Choose Which</h2>
-        
-        <p>The rule of thumb is:</p>
-        <p class="text-green-600 dark:text-green-400 font-semibold mt-2">**Vector:** Use for logos, icons, text, and anything that needs to be scaled (SVG is the vector standard for the web).</p>
-        <p class="text-red-600 dark:text-red-400 font-semibold mt-2">**Raster:** Use for photographs, complex artwork, and anything captured by a camera (JPEG and WebP are the standards).</p>
-      </article>
+            <h2>What is the Epoch?</h2>
+            <p>Computers need a simple way to count time. Instead of dealing with complicated things like "Leap Years," "Time Zones," and "Daylight Savings," they just count <strong>seconds</strong>.</p>
+            <p>They start counting from <strong>January 1, 1970, at 00:00:00 UTC</strong>. This moment is called "The Epoch." A timestamp is simply the number of seconds that have ticked by since that moment.</p>
 
-    </main>
+            <h2>Why use it?</h2>
+            <ul>
+                <li><strong>Universal:</strong> It is the same number everywhere in the world. 1672531200 is the same moment in Tokyo as it is in New York.</li>
+                <li><strong>Math-Friendly:</strong> Calculating the difference between two dates is as easy as simple subtraction.</li>
+            </ul>
+
+            <!-- Call to Action Footer -->
+            <div class="mt-16 p-8 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 text-center">
+                <h3 class="!mt-0 !mb-2 !text-lg">Debug your dates</h3>
+                <p class="!text-sm !mb-4">Convert timestamps to human dates effortlessly.</p>
+                <a href="timestamp.html" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-lg hover:shadow-blue-500/30">
+                    Open Timestamp Tool <i class="fa-solid fa-clock ml-2"></i>
+                </a>
+            </div>
+        </article>
+
+         <!-- Article 5 -->
+         <article id="currency-costs" class="article-content bg-white dark:bg-slate-900 rounded-3xl p-8 md:p-12 shadow-xl border border-slate-100 dark:border-slate-800 hidden">
+            <div class="flex items-center gap-4 mb-8 text-sm">
+               <span class="bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-300 px-3 py-1 rounded-full font-bold">Finance Data</span>
+               <span class="text-slate-400"><i class="fa-regular fa-clock mr-1"></i> 3 min read</span>
+           </div>
+           <h1>The Hidden Costs of Free Currency Converters</h1>
+           <p>We all need fast currency conversion, but many "free" online tools operate on delayed data. In the financial world, old data is wrong data.</p>
+
+           <h2>The Latency Trap</h2>
+           <p>Currency markets move every millisecond. Free tools often cache their data for hours or even a full day (using "End of Day" rates). If you are planning a large transaction based on yesterday's rate, you could lose significant money due to market volatility.</p>
+
+           <div class="takeaway-box">
+               <h4>Transparency Matters</h4>
+               <p>If a tool doesn't explicitly tell you <em>when</em> the rate was last updated, assume it is old. Always verify major transactions with your bank.</p>
+           </div>
+
+           <h2>Our Approach</h2>
+           <p>UtilityKit connects to live financial APIs. While we still recommend verifying with your payment provider, we ensure our data reflects current market mid-market rates, not yesterday's news.</p>
+
+           <!-- Call to Action Footer -->
+           <div class="mt-16 p-8 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 text-center">
+               <h3 class="!mt-0 !mb-2 !text-lg">Check live rates</h3>
+               <p class="!text-sm !mb-4">Get real-time exchange rates now.</p>
+               <a href="currency.html" class="inline-block bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-lg hover:shadow-yellow-500/30">
+                   Open Currency Converter <i class="fa-solid fa-coins ml-2"></i>
+               </a>
+           </div>
+       </article>
+
+       <!-- Article 6 -->
+       <article id="lossless-lossy-compression" class="article-content bg-white dark:bg-slate-900 rounded-3xl p-8 md:p-12 shadow-xl border border-slate-100 dark:border-slate-800 hidden">
+            <div class="flex items-center gap-4 mb-8 text-sm">
+                <span class="bg-teal-100 dark:bg-teal-900/30 text-teal-600 dark:text-teal-300 px-3 py-1 rounded-full font-bold">Compression</span>
+                <span class="text-slate-400"><i class="fa-regular fa-clock mr-1"></i> 4 min read</span>
+            </div>
+            <h1>Lossless vs. Lossy: The Two Ways to Shrink a File</h1>
+            <p>Compression is the art of making things smaller. But not all compression is created equal. You must choose between perfect accuracy (Lossless) and maximum size reduction (Lossy).</p>
+
+            <h2>Lossless: The Perfect Copy</h2>
+                        <p>Lossless compression works like a really efficient packer. It finds patterns in the data (like "RRRRR") and rewrites them shorter ("5R"). When you unpack it, you get the <strong>exact</strong> original back.</p>
+            <ul>
+                <li><strong>Best for:</strong> Text documents, software code, financial data, PNG logos.</li>
+                <li><strong>Downside:</strong> File size reduction is usually only 30-50%.</li>
+            </ul>
+
+            <h2>Lossy: The Smart Compromise</h2>
+                        <p>Lossy compression is smarter but destructive. It looks at an image or audio file and asks, "What can the human eye NOT see?" It deletes that data permanently.</p>
+            <ul>
+                <li><strong>Best for:</strong> Photos (JPEG), Music (MP3), Videos (MP4).</li>
+                <li><strong>Upside:</strong> Massive size reduction (often 90% smaller).</li>
+            </ul>
+
+            <!-- Call to Action Footer -->
+            <div class="mt-16 p-8 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 text-center">
+                <h3 class="!mt-0 !mb-2 !text-lg">Shrink your files</h3>
+                <p class="!text-sm !mb-4">Try both lossy and lossless compression safely.</p>
+                <a href="compress.html" class="inline-block bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-lg hover:shadow-teal-500/30">
+                    Open File Compressor <i class="fa-solid fa-file-zipper ml-2"></i>
+                </a>
+            </div>
+        </article>
+
+        <!-- Article 7 -->
+        <article id="raster-vector" class="article-content bg-white dark:bg-slate-900 rounded-3xl p-8 md:p-12 shadow-xl border border-slate-100 dark:border-slate-800 hidden">
+             <div class="flex items-center gap-4 mb-8 text-sm">
+                <span class="bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-300 px-3 py-1 rounded-full font-bold">Graphics</span>
+                <span class="text-slate-400"><i class="fa-regular fa-clock mr-1"></i> 3 min read</span>
+            </div>
+            <h1>Raster vs. Vector: When to use Pixels or Paths</h1>
+            <p>If you've ever zoomed in on a logo and saw it get blurry, you were looking at a Raster image. If it stayed sharp forever, it was a Vector.</p>
+
+            <h2>Raster: The Map of Pixels</h2>
+                        <p>Raster images (JPEG, PNG) are a grid of colored dots. They are great for photos because they can capture infinite detail. However, they are resolution-dependent. You cannot make them bigger without losing quality.</p>
+
+            <h2>Vector: The Math of Shapes</h2>
+            <p>Vector images (SVG, AI) are instructions. Instead of dots, the file says "Draw a circle here." Because it's math, you can scale it to the size of a building, and the edges will remain razor-sharp.</p>
+
+            <div class="takeaway-box">
+                <h4>Design Rule</h4>
+                <p>Use Vectors (SVG) for logos, icons, and text. Use Rasters (WebP/JPEG) for photographs.</p>
+            </div>
+        </article>
+
+      </main>
+    </div>
   </div>
 
-  <!-- Footer (Copied from your index.html) -->
-  <footer class="text-center py-10 border-t border-slate-200 dark:border-slate-800 mt-16">
+  <!-- Footer -->
+  <footer class="text-center py-10 border-t border-slate-200 dark:border-slate-800 mt-12 bg-white dark:bg-slate-900">
     <div class="container mx-auto px-6">
-      <p class="text-slate-600 dark:text-slate-400 mb-2">UtilityKit is a collection of 100% free, client-side tools designed for privacy and speed.</p>
-      <p class="text-sm text-slate-500 dark:text-slate-500">Built with <i class="fa-solid fa-heart text-red-500 mx-1"></i> and powered by modern web APIs.</p>
+      <p class="text-slate-600 dark:text-slate-400 mb-2 font-medium">UtilityKit is a collection of 100% free, client-side tools.</p>
       <div class="flex justify-center space-x-4 mt-4">
-        <a href="articles.html" class="text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors text-sm">Articles</a>
-        <span class="text-slate-400 dark:text-slate-600">|</span>
-        <a href="privacy_policy.html" class="text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors text-sm">Privacy Policy</a>
+        <a href="articles.html" class="text-sm text-slate-500 hover:text-indigo-600 transition-colors">Articles</a>
+        <span class="text-slate-300">|</span>
+        <a href="privacy_policy.html" class="text-sm text-slate-500 hover:text-indigo-600 transition-colors">Privacy Policy</a>
       </div>
     </div>
   </footer>
 
   <script>
-    // Theme toggle logic (copied from your existing files)
+    // --- Logic for Theme, Nav, and Progress Bar ---
+
+    // 1. Theme Toggle
     const themeToggle = document.getElementById('theme-toggle');
     const themeIcon = document.getElementById('theme-icon');
     const isDark = () => localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
@@ -466,19 +469,23 @@
         themeIcon.classList.add('fa-moon');
       }
     };
-
     themeToggle.addEventListener('click', () => {
       localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'light' : 'dark');
       applyTheme();
     });
-
-    // Run on load
     applyTheme();
 
-    // Article Navigation Logic
+    // 2. Scroll Progress Bar Logic
+    window.onscroll = function() {
+        let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+        let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        let scrolled = (winScroll / height) * 100;
+        document.getElementById("progress-bar").style.width = scrolled + "%";
+    };
+
+    // 3. Article Navigation Logic
     document.addEventListener('DOMContentLoaded', () => {
       const articleNav = document.getElementById('article-nav');
-      // Updated articles list to include all 7 articles
       const articles = {
         'client-side-utility': document.getElementById('client-side-utility'),
         'password-entropy': document.getElementById('password-entropy'),
@@ -492,60 +499,44 @@
       const updateContentVisibility = (hash) => {
         const articleId = hash.substring(1) || 'client-side-utility';
         
-        // Hide all articles
-        Object.values(articles).forEach(article => article.classList.add('hidden'));
+        // Hide all
+        Object.values(articles).forEach(el => { if(el) el.classList.add('hidden'); });
 
-        // Show the current article
+        // Show current & Scroll to top
         if (articles[articleId]) {
           articles[articleId].classList.remove('hidden');
+          window.scrollTo(0,0); 
         }
 
-        // Update active class in sidebar
+        // Update Sidebar Active State
         document.querySelectorAll('.article-link').forEach(link => {
-          link.classList.remove('active');
-          if (link.getAttribute('href') === hash) {
+          link.classList.remove('active', 'bg-indigo-50', 'dark:bg-slate-800/80', 'border-l-4', 'border-indigo-600');
+          // Reset internal text colors
+          link.querySelector('.title-text').classList.remove('text-indigo-700', 'dark:text-indigo-400');
+          link.querySelector('.title-text').classList.add('text-slate-700', 'dark:text-slate-300');
+
+          if (link.getAttribute('href') === '#' + articleId) {
             link.classList.add('active');
-          } else if (!hash && link.getAttribute('href') === '#client-side-utility') {
-            link.classList.add('active');
+            // Apply active text colors
+            link.querySelector('.title-text').classList.remove('text-slate-700', 'dark:text-slate-300');
+            link.querySelector('.title-text').classList.add('text-indigo-700', 'dark:text-indigo-400');
           }
         });
       };
 
-      // Handle initial load and hash changes
       updateContentVisibility(window.location.hash);
       window.addEventListener('hashchange', () => updateContentVisibility(window.location.hash));
 
-      // Use event delegation for smooth scrolling and updating state
       articleNav.addEventListener('click', (e) => {
-          if (e.target.closest('.article-link')) {
+          const link = e.target.closest('.article-link');
+          if (link) {
               e.preventDefault();
-              const link = e.target.closest('.article-link');
               const targetId = link.getAttribute('href');
-              
-              // Change the URL hash
               window.history.pushState(null, '', targetId);
-              
-              // Trigger the visibility update
               updateContentVisibility(targetId);
-              
-              // Manually scroll to top of the article content (main element)
-              document.querySelector('main').scrollIntoView({ behavior: 'smooth' });
           }
-      });
-
-      // Ensure the correct nav link is active in the main header
-      document.querySelectorAll('.nav-link').forEach(link => {
-        const href = link.getAttribute('href');
-        if (href === 'articles.html' || href === location.pathname.split('/').pop()) {
-          link.classList.add('text-indigo-600', 'font-bold');
-          link.classList.remove('text-slate-700', 'dark:text-slate-300');
-        } else {
-          link.classList.remove('text-indigo-600', 'font-bold');
-          link.classList.add('text-slate-700', 'dark:text-slate-300');
-        }
       });
     });
   </script>
 </body>
 </html>
-
