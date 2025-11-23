@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UtilityKit Articles — Privacy, Speed & Web Tech</title>
+  <meta name="description" content="In-depth articles explaining the technology and philosophy behind UtilityKit's private, client-side tools.">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "UtilityKit Articles & Guides",
+  "description": "Tutorials and guides on web optimization, image formats, and using UtilityKit tools.",
+  "url": "https://utilitykit.xyz/articles.html"
+}
+</script>
+  
+  
+  <!-- Adsense Start -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2884780611077861"
+     crossorigin="anonymous"></script>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+</head>
+<body class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 dark:from-slate-950 dark:to-slate-900 min-h-screen">
+<!-- Adsense End -->
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    /* Scroll Progress Bar */
+    #progress-bar {
+      width: 0%;
+      height: 4px;
+      background: linear-gradient(to right, #4f46e5, #9333ea);
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 100;
+      transition: width 0.1s;
+    }
+
+    /* Sidebar Links */
+    .article-link {
+      transition: all 0.3s ease;
+    }
+    .article-link:hover {
+      transform: translateX(4px);
+    }
+    .article-link.active {
+      @apply bg-indigo-50 dark:bg-slate-800/80 border-l-4 border-indigo-600;
+    }
+    .article-link.active .title-text {
+      @apply text-indigo-700 dark:text-indigo-400;
+    }
+    .article-link.active .meta-text {
+      @apply text-indigo-500 dark:text-indigo-500;
+    }
+
+    /* Typography & Content Styling */
+    .article-content h1 {
+      @apply text-4xl md:text-5xl font-black mb-6 text-slate-900 dark:text-white tracking-tight leading-tight;
+    }
+    .article-content h2 {
+      @apply text-2xl md:text-3xl font-bold mt-12 mb-6 text-slate-800 dark:text-slate-100 relative inline-block;
+    }
+    /* Decorative underline for H2 */
+    .article-content h2::after {
+        content: '';
+        display: block;
+        width: 40px;
+        height: 4px;
+        background: #6366f1; /* Indigo-500 */
+        margin-top: 8px;
+        border-radius: 2px;
+    }
+
+    .article-content h3 {
+      @apply text-xl md:text-2xl font-semibold mt-8 mb-4 text-indigo-600 dark:text-indigo-400;
+    }
+    
+    /* Body Text - Optimized for Reading */
+    .article-content p {
+      @apply mb-6 text-lg leading-8 text-slate-600 dark:text-slate-300 font-normal;
+    }
+    
+    /* Lists */
+    .article-content ul {
+      @apply list-none mb-8 space-y-3;
+    }
+    .article-content ul li {
+      @apply relative pl-8 text-lg text-slate-600 dark:text-slate-300 leading-8;
+    }
+    .article-content ul li::before {
+      content: '➔';
+      @apply absolute left-0 text-indigo-500 font-bold;
+    }
+
+    .article-content ol {
+      @apply list-decimal list-outside ml-6 mb-8 space-y-3 text-lg text-slate-600 dark:text-slate-300 leading-8 marker:text-indigo-600 marker:font-bold;
+    }
+
+    /* Code Blocks */
+    .article-content code {
+      @apply bg-slate-100 dark:bg-slate-700 text-pink-600 dark:text-pink-400 px-2 py-1 rounded font-mono text-sm border border-slate-200 dark:border-slate-600;
+    }
+
+    /* Key Takeaway Box */
+    .takeaway-box {
+      @apply bg-indigo-50 dark:bg-slate-800/50 border-l-4 border-indigo-500 p-6 my-8 rounded-r-xl;
+    }
+    .takeaway-box h4 {
+      @apply text-indigo-700 dark:text-indigo-300 font-bold uppercase text-xs tracking-wider mb-2;
+    }
+    .takeaway-box p {
+      @apply mb-0 text-slate-700 dark:text-slate-200 italic;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 min-h-screen flex flex-col">
+
+  <!-- Scroll Progress Bar -->
+  <div id="progress-bar"></div>
+
+  <!-- Header -->
+  <header class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-sm sticky top-0 z-50 border-b border-slate-200 dark:border-slate-800">
+    <div class="container mx-auto px-6 py-4 max-w-7xl flex justify-between items-center">
+      <a href="index.html" class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 tracking-tighter">
+        UtilityKit<span class="text-slate-400 font-light text-lg ml-2 hidden sm:inline">/ Insights</span>
+      </a>
+      <nav class="space-x-2 flex items-center">
+        <a href="index.html" class="nav-link text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 px-3 py-2 rounded-lg transition-colors">Tools</a>
+        <a href="articles.html" class="nav-link text-sm font-medium bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300 px-3 py-2 rounded-lg transition-colors">Articles</a>
+        <!-- Dark Mode Toggle -->
+        <button id="theme-toggle" class="ml-2 p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-500 transition-all">
+          <i class="fa-solid fa-moon" id="theme-icon"></i>
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Layout -->
+  <div class="container mx-auto px-4 sm:px-6 py-12 max-w-7xl flex-grow">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+
+      <!-- Left Sidebar (Navigation) -->
+      <aside class="lg:col-span-3 lg:sticky lg:top-24 self-start">
+        <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-800 overflow-hidden">
+          <div class="p-5 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50">
+            <h2 class="text-xs font-bold uppercase tracking-widest text-slate-500">Table of Contents</h2>
+          </div>
+          <nav class="p-2 space-y-1" id="article-nav">
+            <!-- New Articles -->
+            <a href="#calculator-utility" class="article-link block p-3 rounded-lg group" data-article="calculator-utility">
+                <span class="meta-text text-xs font-semibold text-slate-400 uppercase mb-1 block transition-colors">Efficiency</span>
+                <span class="title-text text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors leading-snug">The Ultimate Utility of a Digital Calculator</span>
+            </a>
+            <a href="#qr-code-basics" class="article-link block p-3 rounded-lg group" data-article="qr-code-basics">
+                <span class="meta-text text-xs font-semibold text-slate-400 uppercase mb-1 block transition-colors">Data Transfer</span>
+                <span class="title-text text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors leading-snug">QR Codes: More Than Just Scannable Links</span>
+            </a>
+            <a href="#ocr-explained" class="article-link block p-3 rounded-lg group" data-article="ocr-explained">
+                <span class="meta-text text-xs font-semibold text-slate-400 uppercase mb-1 block transition-colors">Productivity</span>
+                <span class="title-text text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors leading-snug">Unlocking Text in Images: How OCR Works</span>
+            </a>
+            <a href="#base64-encoding" class="article-link block p-3 rounded-lg group" data-article="base64-encoding">
+                <span class="meta-text text-xs font-semibold text-slate-400 uppercase mb-1 block transition-colors">Coding Basics</span>
+                <span class="title-text text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors leading-snug">Base64: The Universal Language for Data</span>
+            </a>
+            <a href="#json-for-developers" class="article-link block p-3 rounded-lg group" data-article="json-for-developers">
+                <span class="meta-text text-xs font-semibold text-slate-400 uppercase mb-1 block transition-colors">Development</span>
+                <span class="title-text text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors leading-snug">Why JSON Tools are Essential for APIs</span>
+            </a>
+            
+            <!-- Existing Articles -->
+            <div class="border-t border-slate-100 dark:border-slate-800 my-2 pt-2"></div>
+            <a href="#client-side-utility" class="article-link block p-3 rounded-lg group active" data-article="client-side-utility">
+              <span class="meta-text text-xs font-semibold text-slate-400 uppercase mb-1 block transition-colors">Tech Philosophy</span>
+              <span class="title-text text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors leading-snug">Why Client-Side Processing is the Future</span>
+            </a>
+            <a href="#password-entropy" class="article-link block p-3 rounded-lg group" data-article="password-entropy">
+              <span class="meta-text text-xs font-semibold text-slate-400 uppercase mb-1 block transition-colors">Security</span>
+              <span class="title-text text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors leading-snug">Password Entropy: How Strong is Your Password?</span>
+            </a>
+            <a href="#webp-jpeg-guide" class="article-link block p-3 rounded-lg group" data-article="webp-jpeg-guide">
+              <span class="meta-text text-xs font-semibold text-slate-400 uppercase mb-1 block transition-colors">Optimization</span>
+              <span class="title-text text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors leading-snug">WebP vs. JPEG: Choosing the Right Format</span>
+            </a>
+            <a href="#timestamps-explained" class="article-link block p-3 rounded-lg group" data-article="timestamps-explained">
+              <span class="meta-text text-xs font-semibold text-slate-400 uppercase mb-1 block transition-colors">Coding Basics</span>
+              <span class="title-text text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors leading-snug">Unix Timestamps Explained</span>
+            </a>
+            <a href="#currency-costs" class="article-link block p-3 rounded-lg group" data-article="currency-costs">
+              <span class="meta-text text-xs font-semibold text-slate-400 uppercase mb-1 block transition-colors">Finance Data</span>
+              <span class="title-text text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors leading-snug">The Hidden Costs of Free Converters</span>
+            </a>
+            <a href="#lossless-lossy-compression" class="article-link block p-3 rounded-lg group" data-article="lossless-lossy-compression">
+                <span class="meta-text text-xs font-semibold text-slate-400 uppercase mb-1 block transition-colors">Compression</span>
+                <span class="title-text text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors leading-snug">Lossless vs. Lossy Compression</span>
+            </a>
+            <a href="#raster-vector" class="article-link block p-3 rounded-lg group" data-article="raster-vector">
+              <span class="meta-text text-xs font-semibold text-slate-400 uppercase mb-1 block transition-colors">Graphics</span>
+              <span class="title-text text-sm font-medium text-slate-700 dark:text-slate-300 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors leading-snug">Raster vs. Vector Graphics</span>
+            </a>
+          </nav>
+        </div>
+      </aside>
+
+      <!-- Center Content (The Article) -->
+      <main class="lg:col-span-9">
+        
+        <!-- === NEW ARTICLE 1: CALCULATOR UTILITY === -->
+        <article id="calculator-utility" class="article-content bg-white dark:bg-slate-900 rounded-3xl p-8 md:p-12 shadow-xl border border-slate-100 dark:border-slate-800 hidden">
+            <div class="flex items-center gap-4 mb-8 text-sm">
+                <span class="bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-300 px-3 py-1 rounded-full font-bold">Efficiency</span>
+                <span class="text-slate-400"><i class="fa-regular fa-clock mr-1"></i> 3 min read</span>
+            </div>
+            <h2>The Ultimate Utility of a Digital Calculator</h2>
+            
+            <p class="text-xl text-slate-500 dark:text-slate-400 font-light leading-relaxed mb-10 border-b border-slate-100 dark:border-slate-800 pb-10">
+                A simple calculator can handle basic math, but a true utility calculator is a suite of tools for real-world complexity, from finance to fitness.
+            </p>
+
+            <h2>Beyond the Four Functions</h2>
+            <p>Modern online calculators must go beyond simple addition and subtraction. They are necessary for daily tasks that involve specific algorithms. UtilityKit's calculator integrates several essential functions:</p>
+
+            <ul>
+                <li><strong>BMI Calculation:</strong> Quickly assess health metrics.</li>
+                <li><strong>Loan & Tip Calculations:</strong> Handle complex financial divisions with ease.</li>
+                <li><strong>Scientific Functions:</strong> Sine, Cosine, and advanced logic for technical work.</li>
+            </ul>
+
+            <div class="takeaway-box">
+                <h4>Why Use an Advanced Online Calculator?</h4>
+                <p>An integrated calculator prevents context switching. You don't need separate tools for BMI, a loan estimate, and a unit conversion; they are all immediately available in one tab.</p>
+            </div>
+
+            <h2>Privacy and Trust in Calculation</h2>
+            <p>While a calculator doesn't deal with sensitive documents, the calculations you perform can still be private (e.g., business expenses, personal loan scenarios). Our calculator, like all UtilityKit tools, operates **client-side**. The numbers you enter and the results you see never leave your browser, ensuring your financial and personal data remains yours.</p>
+
+            <!-- Call to Action Footer -->
+            <div class="mt-16 p-8 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 text-center">
+                <h3 class="!mt-0 !mb-2 !text-lg">Crunch the numbers</h3>
+                <p class="!text-sm !mb-4">Access all advanced calculation modes instantly.</p>
+                <a href="calculator.html" class="inline-block bg-violet-600 hover:bg-violet-700 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-lg hover:shadow-violet-500/30">
+                    Launch Advanced Calculator <i class="fa-solid fa-calculator ml-2"></i>
+                </a>
+            </div>
+        </article>
+        
+        <!-- === NEW ARTICLE 2: QR CODES === -->
+        <article id="qr-code-basics" class="article-content bg-white dark:bg-slate-900 rounded-3xl p-8 md:p-12 shadow-xl border border-slate-100 dark:border-slate-800 hidden">
+            <div class="flex items-center gap-4 mb-8 text-sm">
+                <span class="bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-300 px-3 py-1 rounded-full font-bold">Data Transfer</span>
+                <span class="text-slate-400"><i class="fa-regular fa-clock mr-1"></i> 2 min read</span>
+            </div>
+            <h2>QR Codes: More Than Just Scannable Links</h2>
+            
+            <p class="text-xl text-slate-500 dark:text-slate-400 font-light leading-relaxed mb-10 border-b border-slate-100 dark:border-slate-800 pb-10">
+                The Quick Response (QR) code is a 2D barcode capable of holding far more data than its linear predecessor, making it ideal for everything from marketing to seamless digital sharing.
+            </p>
+
+            <h2>Encoding Complex Data</h2>
+            <p>While the most common use of a QR code is encoding a website URL, its true power lies in transmitting structured data for specific purposes:</p>
+            <ul>
+                <li><strong>WiFi Credentials:</strong> Encode the network name and password to allow devices to connect instantly upon scanning.</li>
+                <li><strong>Contact Information (vCard):</strong> Share your full contact card, allowing someone to save your details in their phonebook with a single scan.</li>
+                <li><strong>Plain Text:</strong> Store short messages, serial numbers, or small snippets of code offline.</li>
+            </ul>
+            
+
+            <div class="takeaway-box">
+                <h4>Error Correction: The QR Advantage</h4>
+                <p>QR codes include built-in error correction (up to 30%). This means they can still be scanned and read even if they are partially damaged, dirty, or covered by a logo.</p>
+            </div>
+
+            <h2>Client-Side Generation for Security</h2>
+            <p>When you generate a QR code for sensitive data (like your WiFi password), you must ensure the process is private. By running the generator in your browser, the data you encode never leaves your device, preventing potential interception or logging by a third-party server.</p>
+
+            <!-- Call to Action Footer -->
+            <div class="mt-16 p-8 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 text-center">
+                <h3 class="!mt-0 !mb-2 !text-lg">Generate your QR code</h3>
+                <p class="!text-sm !mb-4">Create secure, scannable codes for any data type.</p>
+                <a href="qr.html" class="inline-block bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-lg hover:shadow-red-500/30">
+                    Open QR Generator <i class="fa-solid fa-qrcode ml-2"></i>
+                </a>
+            </div>
+        </article>
+
+        <!-- === NEW ARTICLE 3: OCR === -->
+        <article id="ocr-explained" class="article-content bg-white dark:bg-slate-900 rounded-3xl p-8 md:p-12 shadow-xl border border-slate-100 dark:border-slate-800 hidden">
+            <div class="flex items-center gap-4 mb-8 text-sm">
+                <span class="bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-300 px-3 py-1 rounded-full font-bold">Productivity</span>
+                <span class="text-slate-400"><i class="fa-regular fa-clock mr-1"></i> 3 min read</span>
+            </div>
+            <h2>Unlocking Text in Images: How OCR Works</h2>
+            
+            <p class="text-xl text-slate-500 dark:text-slate-400 font-light leading-relaxed mb-10 border-b border-slate-100 dark:border-slate-800 pb-10">
+                Optical Character Recognition (OCR) is the process of converting typed, handwritten, or printed text into machine-encoded text, making non-editable images fully searchable and copyable.
+            </p>
+
+            <h2>The OCR Process</h2>
+            <p>OCR is not a single-step process but a pipeline involving multiple stages to reliably interpret visual data into text data:</p>
+            <ol>
+                <li><strong>Image Pre-processing:</strong> Cleaning the image (de-skewing, noise removal, binarization) to make the text lines clearer.</li>
+                <li><strong>Layout Analysis:</strong> Identifying columns, paragraphs, and blocks of text to maintain the original structure.</li>
+                <li><strong>Character Recognition:</strong> A machine learning model identifies individual characters (letters, numbers, symbols) based on shape.</li>
+                <li><strong>Post-processing:</strong> Using language models and dictionaries to correct errors (e.g., correcting '1' to 'l' or 'i' based on context).</li>
+            </ol>
+            
+
+            <div class="takeaway-box">
+                <h4>The Privacy Advantage</h4>
+                <p>OCR tools often process highly sensitive images (passports, invoices, medical reports). Running OCR client-side is paramount, guaranteeing that your documents are not uploaded to a remote server for processing.</p>
+            </div>
+
+            <h2>Client-Side OCR: Instant and Secure</h2>
+            <p>Using powerful JavaScript libraries like Tesseract.js, modern browsers can now perform high-accuracy OCR directly on your device. This means you get instantaneous text extraction without the delay or security risk of file transfers.</p>
+
+            <!-- Call to Action Footer -->
+            <div class="mt-16 p-8 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 text-center">
+                <h3 class="!mt-0 !mb-2 !text-lg">Go paperless</h3>
+                <p class="!text-sm !mb-4">Extract text from images or PDFs securely now.</p>
+                <a href="ocr.html" class="inline-block bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-lg hover:shadow-amber-500/30">
+                    Launch OCR Tool <i class="fa-solid fa-file-invoice ml-2"></i>
+                </a>
+            </div>
+        </article>
+
+        <!-- === NEW ARTICLE 4: BASE64 === -->
+        <article id="base64-encoding" class="article-content bg-white dark:bg-slate-900 rounded-3xl p-8 md:p-12 shadow-xl border border-slate-100 dark:border-slate-800 hidden">
+            <div class="flex items-center gap-4 mb-8 text-sm">
+                <span class="bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600 dark:text-cyan-300 px-3 py-1 rounded-full font-bold">Coding Basics</span>
+                <span class="text-slate-400"><i class="fa-regular fa-clock mr-1"></i> 2 min read</span>
+            </div>
+            <h2>Base64: The Universal Language for Data</h2>
+            
+            <p class="text-xl text-slate-500 dark:text-slate-400 font-light leading-relaxed mb-10 border-b border-slate-100 dark:border-slate-800 pb-10">
+                Base64 is not an encryption method. It is a simple encoding scheme that translates any binary data—like an image or a PDF—into a sequence of printable ASCII characters.
+            </p>
+
+            <h2>Why Encoding is Necessary</h2>
+            <p>The internet relies heavily on text-based protocols (like email and JSON). Binary data (like images) contains non-printable, non-ASCII characters that can be misinterpreted or corrupted when sent through these protocols. Base64 solves this by converting the binary data into a safe, reliable text format.</p>
+            
+            <p>The process works by taking three 8-bit bytes of binary data (24 bits total) and representing them as four 6-bit Base64 characters, which can be safely printed.</p>
+
+            <div class="takeaway-box">
+                <h4>Base64 in Practice</h4>
+                <p>Base64 is essential for two main tasks: embedding images directly into CSS/HTML files (`data:image/png;base64...`), and securely sending file attachments in older email systems.</p>
+            </div>
+
+            <h2>Using the Encoder/Decoder</h2>
+            <p>Because Base64 deals directly with raw data, using a client-side tool is critical. Encoding sensitive files or text locally ensures that no raw data is ever transmitted, protecting intellectual property and private communications.</p>
+
+            <!-- Call to Action Footer -->
+            <div class="mt-16 p-8 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 text-center">
+                <h3 class="!mt-0 !mb-2 !text-lg">Translate your data</h3>
+                <p class="!text-sm !mb-4">Encode and decode text, images, and files instantly.</p>
+                <a href="base64.html" class="inline-block bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-lg hover:shadow-cyan-500/30">
+                    Launch Base64 Tool <i class="fa-solid fa-code ml-2"></i>
+                </a>
+            </div>
+        </article>
+
+        <!-- === NEW ARTICLE 5: JSON DEVTOOLS === -->
+        <article id="json-for-developers" class="article-content bg-white dark:bg-slate-900 rounded-3xl p-8 md:p-12 shadow-xl border border-slate-100 dark:border-slate-800 hidden">
+            <div class="flex items-center gap-4 mb-8 text-sm">
+                <span class="bg-fuchsia-100 dark:bg-fuchsia-900/30 text-fuchsia-600 dark:text-fuchsia-300 px-3 py-1 rounded-full font-bold">Development</span>
+                <span class="text-slate-400"><i class="fa-regular fa-clock mr-1"></i> 4 min read</span>
+            </div>
+            <h2>Why JSON Tools are Essential for API Development</h2>
+            
+            <p class="text-xl text-slate-500 dark:text-slate-400 font-light leading-relaxed mb-10 border-b border-slate-100 dark:border-slate-800 pb-10">
+                JSON (JavaScript Object Notation) is the format of choice for modern web APIs. Tools that allow developers to format, validate, and compare JSON are indispensable for efficient debugging.
+            </p>
+
+            <h2>The Three Pillars of JSON Utility</h2>
+            <p>A comprehensive JSON utility kit speeds up API development and debugging dramatically:</p>
+            <ol>
+                <li><strong>Formatter / Prettifier:</strong> Raw JSON from an API is often minified (all on one line) to save bandwidth. Formatting it with proper indentation makes it readable for human inspection.</li>
+                <li><strong>Validator:</strong> Checks the structure for common errors (like missing commas or misplaced brackets). This is the fastest way to confirm your API call or payload is syntactically correct.</li>
+                <li><strong>Minifier:</strong> Does the reverse of the formatter—it removes all unnecessary whitespace to create the smallest file size possible for production.</li>
+            </ol>
+
+            <div class="takeaway-box">
+                <h4>Advanced Feature: Diff Checking</h4>
+                <p>When debugging an API, comparing two JSON payloads (e.g., the old response vs. the new response) is critical. A built-in diff checker instantly highlights the structural changes, saving hours of manual comparison.</p>
+            </div>
+
+            <h2>Security for Debugging</h2>
+            <p>API responses often contain proprietary or sensitive customer data (even in testing). When using a JSON formatter, it's vital that this data is not sent to a server. Client-side JSON tools keep all API payloads local, ensuring your debugging process is completely private.</p>
+
+            <!-- Call to Action Footer -->
+            <div class="mt-16 p-8 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 text-center">
+                <h3 class="!mt-0 !mb-2 !text-lg">Debug faster</h3>
+                <p class="!text-sm !mb-4">Validate and format your JSON code instantly.</p>
+                <a href="json.html" class="inline-block bg-fuchsia-600 hover:bg-fuchsia-700 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-lg hover:shadow-fuchsia-500/30">
+                    Launch JSON DevTools <i class="fa-solid fa-gears ml-2"></i>
+                </a>
+            </div>
+        </article>
+
+
+        <!-- === EXISTING ARTICLES (KEEP THESE BELOW) === -->
+
+        <!-- Article 1: Client-Side Utility (Existing content starts here) -->
+        <article id="client-side-utility" class="article-content bg-white dark:bg-slate-900 rounded-3xl p-8 md:p-12 shadow-xl border border-slate-100 dark:border-slate-800 hidden">
+            <!-- Meta Header -->
+            <div class="flex items-center gap-4 mb-8 text-sm">
+                <span class="bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300 px-3 py-1 rounded-full font-bold">Tech Philosophy</span>
+                <span class="text-slate-400"><i class="fa-regular fa-clock mr-1"></i> 3 min read</span>
+            </div>
+
+            <h2>Why Client-Side Processing is the Future of Utility</h2>
+            
+            <p class="text-xl text-slate-500 dark:text-slate-400 font-light leading-relaxed mb-10 border-b border-slate-100 dark:border-slate-800 pb-10">
+                Every time you use a tool online—like a password generator or an image converter—your data goes somewhere. With UtilityKit, we're changing that paradigm.
+            </p>
+
+            <p>Most online tools send your files to a distant computer (the server) for the work to be done. This is risky for privacy. The tools on UtilityKit use <strong>Client-Side Processing</strong>. This is a major difference. It means the work is done entirely on your computer, inside your web browser.</p>
+
+            <div class="takeaway-box">
+                <h4>Key Takeaway</h4>
+                <p>Client-Side processing guarantees that your data never leaves your device. It eliminates upload times and ensures zero risk of data leaks.</p>
+            </div>
+
+            <h2>What is Client-Side Processing?</h2>
+            <p>Think of it simply: The server is only used once to send the tool's code (HTML/JavaScript) to your browser. After that, your device does all the work itself.</p>
+            
+            <ul>
+                <li><strong>Server-Side (Traditional):</strong> You send file &rarr; Server processes file &rarr; Server sends results back.</li>
+                <li><strong>Client-Side (UtilityKit):</strong> You open tool &rarr; Your browser processes file &rarr; You download results.</li>
+            </ul>
+
+            <h2>Reason 1: Total Privacy</h2>
+            <p>Privacy is the biggest advantage. When a tool uses a server, the owner temporarily has a copy of your personal data or files. Client-side processing completely eliminates this risk:</p>
+
+            <ul>
+                <li><strong>No Uploads:</strong> Your files are never sent over the internet.</li>
+                <li><strong>No Storage:</strong> Your data is never saved on external clouds.</li>
+                <li><strong>Zero Logs:</strong> There is no record of your activity.</li>
+            </ul>
+
+            <h2>Reason 2: Lightning Speed</h2>
+            <p>For large files, client-side tools are much faster because they cut out the "Upload" and "Download" steps. Your modern device processor is powerful enough to handle complex tasks instantly.</p>
+
+            <!-- Call to Action Footer -->
+            <div class="mt-16 p-8 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 text-center">
+                <h3 class="!mt-0 !mb-2 !text-lg">Experience it yourself</h3>
+                <p class="!text-sm !mb-4">Try our PDF tools to see how fast local processing can be.</p>
+                <a href="pdf.html" class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-lg hover:shadow-indigo-500/30">
+                    Launch PDF Tools <i class="fa-solid fa-arrow-right ml-2"></i>
+                </a>
+            </div>
+        </article>
+
+        <!-- Article 2: Password Entropy (Existing content) -->
+        <article id="password-entropy" class="article-content bg-white dark:bg-slate-900 rounded-3xl p-8 md:p-12 shadow-xl border border-slate-100 dark:border-slate-800 hidden">
+            <div class="flex items-center gap-4 mb-8 text-sm">
+                <span class="bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-300 px-3 py-1 rounded-full font-bold">Security</span>
+                <span class="text-slate-400"><i class="fa-regular fa-clock mr-1"></i> 4 min read</span>
+            </div>
+
+            <h2>Password Entropy: How Strong is Your Password?</h2>
+            
+            <p>Do you know how long it would take a hacker to guess your password? This isn't just about length; it's about <strong>Entropy</strong>, which is the mathematical way to measure a password's randomness.</p>
+
+            <h2>Understanding Password Strength</h2>
+            <p>Entropy is measured in <strong>bits</strong>. A higher bit number means a stronger password. The calculation is based on two main things:</p>
+
+            <ol>
+                <li><strong>The Length (L):</strong> How many characters your password has.</li>
+                <li><strong>The Character Set Size (R):</strong> How many different types of characters you use (numbers, lowercase, uppercase, symbols).</li>
+            </ol>
+
+            <div class="takeaway-box">
+                <h4>The Golden Rule</h4>
+                <p>Length beats complexity. A 16-character password made of random letters is often stronger than an 8-character password with symbols.</p>
+            </div>
+
+            <h2>The Character Set Math</h2>
+            <p>Using more types of characters quickly increases the complexity of the password, making it much harder to guess:</p>
+            <ul>
+                <li><strong>Numbers Only:</strong> 10 possibilities per character.</li>
+                <li><strong>Alphanumeric:</strong> 36 possibilities per character.</li>
+                <li><strong>Full ASCII:</strong> 94 possibilities per character.</li>
+            </ul>
+
+            <h2>Best Practices</h2>
+            <ul>
+                <li><strong>Aim for 16+ Characters:</strong> This makes brute-force attacks mathematically impossible with current technology.</li>
+                <li><strong>Use a Password Manager:</strong> Don't rely on your brain. Machines are better at randomness.</li>
+                <li><strong>Never Reuse:</strong> A leak on one site shouldn't compromise your bank.</li>
+            </ul>
+
+             <!-- Call to Action Footer -->
+             <div class="mt-16 p-8 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 text-center">
+                <h3 class="!mt-0 !mb-2 !text-lg">Secure your accounts</h3>
+                <p class="!text-sm !mb-4">Generate a high-entropy password instantly.</p>
+                <a href="password.html" class="inline-block bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-lg hover:shadow-green-500/30">
+                    Open Password Generator <i class="fa-solid fa-key ml-2"></i>
+                </a>
+            </div>
+        </article>
+
+        <!-- Article 3: WebP vs. JPEG (Existing content) -->
+        <article id="webp-jpeg-guide" class="article-content bg-white dark:bg-slate-900 rounded-3xl p-8 md:p-12 shadow-xl border border-slate-100 dark:border-slate-800 hidden">
+            <div class="flex items-center gap-4 mb-8 text-sm">
+                <span class="bg-pink-100 dark:bg-pink-900/30 text-pink-600 dark:text-pink-300 px-3 py-1 rounded-full font-bold">Optimization</span>
+                <span class="text-slate-400"><i class="fa-regular fa-clock mr-1"></i> 3 min read</span>
+            </div>
+
+            <h2>WebP vs. JPEG: Choosing the Right Image Format</h2>
+            
+            <p>The image format you choose directly impacts how fast your website loads. While JPEG has been the king for decades, a newer challenger called WebP is taking over the web.</p>
+
+            <h2>JPEG: The Old Standard</h2>
+            <p>JPEG is great for photographs, but it uses outdated compression algorithms. It often results in larger file sizes and does not support transparency (clear backgrounds), which limits design flexibility.</p>
+
+            <h2>WebP: The Modern Champion</h2>
+            <p>WebP was created by Google specifically for the web. It uses predictive coding to compress images more efficiently.</p>
+
+            <ul>
+                <li><strong>Smaller Size:</strong> Typically 25-35% smaller than JPEGs of the same quality.</li>
+                <li><strong>Transparency:</strong> Supports alpha channels (like PNG) but with much smaller file sizes.</li>
+                <li><strong>Versatility:</strong> Can be both lossy (like JPEG) and lossless (like PNG).</li>
+            </ul>
+
+            <div class="takeaway-box">
+                <h4>Recommendation</h4>
+                <p>Use WebP for everything on the web. Only use JPEG if you need to support extremely old software (e.g., older than 2015).</p>
+            </div>
+
+            <!-- Call to Action Footer -->
+            <div class="mt-16 p-8 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 text-center">
+                <h3 class="!mt-0 !mb-2 !text-lg">Optimize your site</h3>
+                <p class="!text-sm !mb-4">Convert PNGs and JPEGs to WebP instantly.</p>
+                <a href="image.html" class="inline-block bg-pink-600 hover:bg-pink-700 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-lg hover:shadow-pink-500/30">
+                    Open Image Converter <i class="fa-solid fa-image ml-2"></i>
+                </a>
+            </div>
+        </article>
+
+        <!-- Article 4: Unix Timestamps (Existing content) -->
+        <article id="timestamps-explained" class="article-content bg-white dark:bg-slate-900 rounded-3xl p-8 md:p-12 shadow-xl border border-slate-100 dark:border-slate-800 hidden">
+             <div class="flex items-center gap-4 mb-8 text-sm">
+                <span class="bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-300 px-3 py-1 rounded-full font-bold">Coding Basics</span>
+                <span class="text-slate-400"><i class="fa-regular fa-clock mr-1"></i> 2 min read</span>
+            </div>
+            <h2>Unix Timestamps Explained</h2>
+            <p>If you've ever looked at database entries, you've likely seen a number like <code>1672531200</code>. This is a Unix Timestamp, the heartbeat of modern computing timekeeping.</p>
+
+            <h2>What is the Epoch?</h2>
+            <p>Computers need a simple way to count time. Instead of dealing with complicated things like "Leap Years," "Time Zones," and "Daylight Savings," they just count <strong>seconds</strong>.</p>
+            <p>They start counting from <strong>January 1, 1970, at 00:00:00 UTC</strong>. This moment is called "The Epoch." A timestamp is simply the number of seconds that have ticked by since that moment.</p>
+
+            <h2>Why use it?</h2>
+            <ul>
+                <li><strong>Universal:</strong> It is the same number everywhere in the world. 1672531200 is the same moment in Tokyo as it is in New York.</li>
+                <li><strong>Math-Friendly:</strong> Calculating the difference between two dates is as easy as simple subtraction.</li>
+            </ul>
+
+            <!-- Call to Action Footer -->
+            <div class="mt-16 p-8 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 text-center">
+                <h3 class="!mt-0 !mb-2 !text-lg">Debug your dates</h3>
+                <p class="!text-sm !mb-4">Convert timestamps to human dates effortlessly.</p>
+                <a href="timestamp.html" class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-lg hover:shadow-blue-500/30">
+                    Open Timestamp Tool <i class="fa-solid fa-clock ml-2"></i>
+                </a>
+            </div>
+        </article>
+
+         <!-- Article 5: Currency Costs (Existing content) -->
+         <article id="currency-costs" class="article-content bg-white dark:bg-slate-900 rounded-3xl p-8 md:p-12 shadow-xl border border-slate-100 dark:border-slate-800 hidden">
+            <div class="flex items-center gap-4 mb-8 text-sm">
+               <span class="bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600 dark:text-yellow-300 px-3 py-1 rounded-full font-bold">Finance Data</span>
+               <span class="text-slate-400"><i class="fa-regular fa-clock mr-1"></i> 3 min read</span>
+           </div>
+           <h2>The Hidden Costs of Free Currency Converters</h2>
+           <p>We all need fast currency conversion, but many "free" online tools operate on delayed data. In the financial world, old data is wrong data.</p>
+
+           <h2>The Latency Trap</h2>
+           <p>Currency markets move every millisecond. Free tools often cache their data for hours or even a full day (using "End of Day" rates). If you are planning a large transaction based on yesterday's rate, you could lose significant money due to market volatility.</p>
+
+           <div class="takeaway-box">
+               <h4>Transparency Matters</h4>
+               <p>If a tool doesn't explicitly tell you <em>when</em> the rate was last updated, assume it is old. Always verify major transactions with your bank.</p>
+           </div>
+
+           <h2>Our Approach</h2>
+           <p>UtilityKit connects to live financial APIs. While we still recommend verifying with your payment provider, we ensure our data reflects current market mid-market rates, not yesterday's news.</p>
+
+           <!-- Call to Action Footer -->
+           <div class="mt-16 p-8 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 text-center">
+               <h3 class="!mt-0 !mb-2 !text-lg">Check live rates</h3>
+               <p class="!text-sm !mb-4">Get real-time exchange rates now.</p>
+               <a href="currency.html" class="inline-block bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-lg hover:shadow-yellow-500/30">
+                   Open Currency Converter <i class="fa-solid fa-coins ml-2"></i>
+               </a>
+           </div>
+       </article>
+
+       <!-- Article 6: Lossless vs. Lossy (Existing content) -->
+       <article id="lossless-lossy-compression" class="article-content bg-white dark:bg-slate-900 rounded-3xl p-8 md:p-12 shadow-xl border border-slate-100 dark:border-slate-800 hidden">
+            <div class="flex items-center gap-4 mb-8 text-sm">
+                <span class="bg-teal-100 dark:bg-teal-900/30 text-teal-600 dark:text-teal-300 px-3 py-1 rounded-full font-bold">Compression</span>
+                <span class="text-slate-400"><i class="fa-regular fa-clock mr-1"></i> 4 min read</span>
+            </div>
+            <h2>Lossless vs. Lossy: The Two Ways to Shrink a File</h2>
+            <p>Compression is the art of making things smaller. But not all compression is created equal. You must choose between perfect accuracy (Lossless) and maximum size reduction (Lossy).</p>
+
+            <h2>Lossless: The Perfect Copy</h2>
+            <p>Lossless compression works like a really efficient packer. It finds patterns in the data (like "RRRRR") and rewrites them shorter ("5R"). When you unpack it, you get the <strong>exact</strong> original back.</p>
+            <ul>
+                <li><strong>Best for:</strong> Text documents, software code, financial data, PNG logos.</li>
+                <li><strong>Downside:</strong> File size reduction is usually only 30-50%.</li>
+            </ul>
+
+            <h2>Lossy: The Smart Compromise</h2>
+            <p>Lossy compression is smarter but destructive. It looks at an image or audio file and asks, "What can the human eye NOT see?" It deletes that data permanently.</p>
+            <ul>
+                <li><strong>Best for:</strong> Photos (JPEG), Music (MP3), Videos (MP4).</li>
+                <li><strong>Upside:</strong> Massive size reduction (often 90% smaller).</li>
+            </ul>
+
+            <!-- Call to Action Footer -->
+            <div class="mt-16 p-8 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 text-center">
+                <h3 class="!mt-0 !mb-2 !text-lg">Shrink your files</h3>
+                <p class="!text-sm !mb-4">Try both lossy and lossless compression safely.</p>
+                <a href="compress.html" class="inline-block bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-lg hover:shadow-teal-500/30">
+                    Open File Compressor <i class="fa-solid fa-file-zipper ml-2"></i>
+                </a>
+            </div>
+        </article>
+
+        <!-- Article 7: Raster vs. Vector (Existing content) -->
+        <article id="raster-vector" class="article-content bg-white dark:bg-slate-900 rounded-3xl p-8 md:p-12 shadow-xl border border-slate-100 dark:border-slate-800 hidden">
+             <div class="flex items-center gap-4 mb-8 text-sm">
+                <span class="bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-300 px-3 py-1 rounded-full font-bold">Graphics</span>
+                <span class="text-slate-400"><i class="fa-regular fa-clock mr-1"></i> 3 min read</span>
+            </div>
+            <h2>Raster vs. Vector: When to use Pixels or Paths</h2>
+            <p>If you've ever zoomed in on a logo and saw it get blurry, you were looking at a Raster image. If it stayed sharp forever, it was a Vector.</p>
+
+            <h2>Raster: The Map of Pixels</h2>
+            <p>Raster images (JPEG, PNG) are a grid of colored dots. They are great for photos because they can capture infinite detail. However, they are resolution-dependent. You cannot make them bigger without losing quality.</p>
+
+            <h2>Vector: The Math of Shapes</h2>
+            <p>Vector images (SVG, AI) are instructions. Instead of dots, the file says "Draw a circle here." Because it's math, you can scale it to the size of a building, and the edges will remain razor-sharp.</p>
+
+            <div class="takeaway-box">
+                <h4>Design Rule</h4>
+                <p>Use Vectors (SVG) for logos, icons, and text. Use Rasters (WebP/JPEG) for photographs.</p>
+            </div>
+        </article>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="text-center py-10 border-t border-slate-200 dark:border-slate-800 mt-12 bg-white dark:bg-slate-900">
+    <div class="container mx-auto px-6">
+      <p class="text-slate-600 dark:text-slate-400 mb-2 font-medium">UtilityKit is a collection of 100% free, client-side tools.</p>
+      <div class="flex justify-center space-x-4 mt-4">
+        <a href="articles.html" class="text-sm text-slate-500 hover:text-indigo-600 transition-colors">Articles</a>
+        <span class="text-slate-300">|</span>
+        <a href="privacy_policy.html" class="text-sm text-slate-500 hover:text-indigo-600 transition-colors">Privacy Policy</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // --- Logic for Theme, Nav, and Progress Bar ---
+
+    // 1. Theme Toggle
+    const themeToggle = document.getElementById('theme-toggle');
+    const themeIcon = document.getElementById('theme-icon');
+    const isDark = () => localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+    const applyTheme = () => {
+      if (isDark()) {
+        document.documentElement.classList.add('dark');
+        themeIcon.classList.remove('fa-moon');
+        themeIcon.classList.add('fa-sun');
+      } else {
+        document.documentElement.classList.remove('dark');
+        themeIcon.classList.remove('fa-sun');
+        themeIcon.classList.add('fa-moon');
+      }
+    };
+    applyTheme(); // Apply theme on load
+    
+    themeToggle.addEventListener('click', () => {
+      localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'light' : 'dark');
+      applyTheme();
+    });
+    
+
+    // 2. Scroll Progress Bar Logic
+    window.onscroll = function() {
+        let winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+        let height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        let scrolled = (winScroll / height) * 100;
+        document.getElementById("progress-bar").style.width = scrolled + "%";
+    };
+
+    // 3. Article Navigation Logic
+    document.addEventListener('DOMContentLoaded', () => {
+      const articleNav = document.getElementById('article-nav');
+      
+      // All articles must be listed here for dynamic hiding/showing
+      const articleIds = [
+        'calculator-utility',
+        'qr-code-basics',
+        'ocr-explained',
+        'base64-encoding',
+        'json-for-developers',
+        'client-side-utility',
+        'password-entropy',
+        'webp-jpeg-guide',
+        'timestamps-explained',
+        'currency-costs',
+        'lossless-lossy-compression',
+        'raster-vector',
+      ];
+      
+      const articles = {};
+      articleIds.forEach(id => {
+        articles[id] = document.getElementById(id);
+      });
+      
+      const updateContentVisibility = (hash) => {
+        const articleId = hash.substring(1) || 'client-side-utility';
+        
+        // Hide all articles
+        Object.values(articles).forEach(el => { 
+            if(el) el.classList.add('hidden'); 
+        });
+
+        // Show current article & Scroll to top
+        if (articles[articleId]) {
+          articles[articleId].classList.remove('hidden');
+          // Smooth scroll to the top of the main content area
+          document.querySelector('main').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Update Sidebar Active State
+        document.querySelectorAll('.article-link').forEach(link => {
+          link.classList.remove('active');
+          
+          // Reset default text colors
+          link.querySelector('.title-text').classList.remove('text-indigo-700', 'dark:text-indigo-400');
+          link.querySelector('.title-text').classList.add('text-slate-700', 'dark:text-slate-300');
+          link.querySelector('.meta-text').classList.remove('text-indigo-500', 'dark:text-indigo-500');
+          link.querySelector('.meta-text').classList.add('text-slate-400');
+
+
+          if (link.getAttribute('href') === '#' + articleId) {
+            link.classList.add('active');
+            // Apply active text colors
+            link.querySelector('.title-text').classList.remove('text-slate-700', 'dark:text-slate-300');
+            link.querySelector('.title-text').classList.add('text-indigo-700', 'dark:text-indigo-400');
+            link.querySelector('.meta-text').classList.remove('text-slate-400');
+            link.querySelector('.meta-text').classList.add('text-indigo-500', 'dark:text-indigo-500');
+          }
+        });
+      };
+
+      // Initial load: check hash or default to first article
+      updateContentVisibility(window.location.hash);
+      window.addEventListener('hashchange', () => updateContentVisibility(window.location.hash));
+
+      articleNav.addEventListener('click', (e) => {
+          const link = e.target.closest('.article-link');
+          if (link) {
+              e.preventDefault();
+              const targetId = link.getAttribute('href');
+              window.history.pushState(null, '', targetId);
+              updateContentVisibility(targetId);
+          }
+      });
+    });
+  </script>
+
+  <!-- Footer -->
+  <footer class="bg-slate-900 text-white mt-16 border-t border-slate-700">
+    <div class="container mx-auto px-6 py-12 max-w-7xl">
+      <div class="grid grid-cols-2 md:grid-cols-5 gap-8 border-b border-slate-800 pb-8 mb-8">
+        <div>
+          <h4 class="text-lg font-bold mb-4 text-indigo-400">UtilityKit</h4>
+          <ul class="space-y-2 text-sm text-slate-400">
+            <li><a href="about_us.html" class="hover:text-white transition">About Us</a></li>
+            <li><a href="articles.html" class="hover:text-white transition">Articles & Guides</a></li>
+            <li><a href="contact_us.html" class="hover:text-white transition">Contact Support</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h4 class="text-lg font-bold mb-4 text-indigo-400">Image Tools</h4>
+          <ul class="space-y-2 text-sm text-slate-400">
+            <li><a href="image.html" class="hover:text-white transition">Image Converter</a></li>
+            <li><a href="compress.html" class="hover:text-white transition">Image Compressor</a></li>
+            <li><a href="ocr.html" class="hover:text-white transition">Image OCR</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h4 class="text-lg font-bold mb-4 text-indigo-400">Data Tools</h4>
+          <ul class="space-y-2 text-sm text-slate-400">
+            <li><a href="json.html" class="hover:text-white transition">JSON Formatter</a></li>
+            <li><a href="base64.html" class="hover:text-white transition">Base64 Encoder</a></li>
+            <li><a href="timestamp.html" class="hover:text-white transition">Timestamp Converter</a></li>
+          </ul>
+        </div>
+        
+        <div class="col-span-2 md:col-span-1">
+          <h4 class="text-lg font-bold mb-4 text-red-400">Legal</h4>
+          <ul class="space-y-2 text-sm text-slate-400">
+            <li><a href="privacy_policy.html" class="hover:text-white transition">Privacy Policy (AdSense Required)</a></li>
+            <li><a href="terms_of_service.html" class="hover:text-white transition">Terms of Service</a></li>
+            <li><a href="disclaimer.html" class="hover:text-white transition text-white font-bold">Disclaimer</a></li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="text-center text-slate-500 text-sm">
+        <p>&copy; 2025 UtilityKit. All rights reserved. | <span class="font-semibold text-teal-400">Powered by client-side technology for your privacy.</span></p>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
+
+
+
+
